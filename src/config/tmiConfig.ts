@@ -1,7 +1,10 @@
+import * as dotenv from "dotenv";
 import { Options } from "tmi.js";
 
-export const Option: Options = {
+dotenv.config();
+
+export const tmiOptions: Options = {
   options: {
-    clientId: "",
+    clientId: process.env.TWITCH_CLIENT_ID,
   },
 };

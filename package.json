@@ -34,8 +34,10 @@
     "tmi.js": "^1.8.3"
   },
   "devDependencies": {
+    "@types/node": "^15.12.2",
     "@types/tmi.js": "^1.7.1",
     "concurrently": "^6.2.0",
+    "dotenv": "^10.0.0",
     "nodemon": "^2.0.7",
     "typescript": "^4.3.2"
   }
