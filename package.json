@@ -31,6 +31,7 @@
     "tmi.js": "^1.8.3"
   },
   "devDependencies": {
-    "@types/tmi.js": "^1.7.1"
+    "@types/tmi.js": "^1.7.1",
+    "typescript": "^4.3.2"
   }
 }
