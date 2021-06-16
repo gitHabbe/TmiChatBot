@@ -4,4 +4,4 @@ const speedrunConfig: AxiosRequestConfig = {
   baseURL: `https://www.speedrun.com/api/v1`,
 };
 
-export const speedrunInstance: AxiosInstance = axios.create(speedrunConfig);
+export const speedrunAPI: AxiosInstance = axios.create(speedrunConfig);

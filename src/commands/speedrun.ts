@@ -1,22 +1,15 @@
-import axios, { AxiosInstance, AxiosResponse, AxiosPromise } from "axios";
-import { speedrunInstance } from "../config/speedrunConfig";
-import { twitchInstance } from "../config/twitchConfig";
+import { AxiosResponse } from "axios";
+import { speedrunAPI } from "../config/speedrunConfig";
 import { GameType } from "../interfaces/speedrun";
 
 const responseBody = (response: AxiosResponse<GameType[]>) => response.data;
 
-export const getStreamerGame = async (channel: string) => {
-  const streamer = await twitchInstance.get(
-    `/search/channels?query=${channel}`
-  );
-};
-
-export const searchGameByName = async (
+export const searchSpeedgameByName = async (
   gameName: string
 ): Promise<GameType[]> => {
-  // const speedRun: AxiosResponse<GameType[]> = await speedrunInstance.get(
+  // const speedRun: AxiosResponse<GameType[]> = await speedrunAPI.get(
   //   `games?name=${gameName}`
   // );
   // return speedRun;
-  return speedrunInstance.get(`games?name=${gameName}`).then(responseBody);
+  return speedrunAPI.get(`/games?name=${gameName}`).then(responseBody);
 };
