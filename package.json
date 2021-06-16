@@ -1,0 +1,30 @@
+{
+  "name": "tmichatbot",
+  "version": "1.0.0",
+  "description": "Twitch chat bot developed in TypeScript",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gitHabbe/TmiChatBot.git"
+  },
+  "keywords": [
+    "typescript",
+    "ts",
+    "node",
+    "nodejs",
+    "twitch",
+    "chat",
+    "bot",
+    "tmi",
+    "tmijs"
+  ],
+  "author": "gitHabbe",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gitHabbe/TmiChatBot/issues"
+  },
+  "homepage": "https://github.com/gitHabbe/TmiChatBot#readme"
+}
