@@ -1,2 +1,3 @@
-console.log("ASDF");
-console.log("ASDF2");
+import { Client } from "tmi.js";
+
+const TmiClient = new Client({});
