@@ -1,9 +1,15 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosPromise } from "axios";
-import { speedrunConfig } from "../config/speedrunConfig";
+import { speedrunInstance } from "../config/speedrunConfig";
+import { twitchInstance } from "../config/twitchConfig";
 import { GameType } from "../interfaces/speedrun";
 
 const responseBody = (response: AxiosResponse<GameType[]>) => response.data;
-const speedrunInstance: AxiosInstance = axios.create(speedrunConfig);
+
+export const getStreamerGame = async (channel: string) => {
+  const streamer = await twitchInstance.get(
+    `/search/channels?query=${channel}`
+  );
+};
 
 export const searchGameByName = async (
   gameName: string

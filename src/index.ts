@@ -22,7 +22,7 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
   switch (userCommandName) {
     case CommandName.WR:
       const game = await searchGameByName("sm64");
-      console.log(game.data);
+      console.log(game);
       break;
     case CommandName.PB:
       console.log("PB");

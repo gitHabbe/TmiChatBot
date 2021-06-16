@@ -1,6 +1,7 @@
-import { AxiosRequestConfig } from "axios";
+import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 
-export const speedrunConfig: AxiosRequestConfig = {
-  method: "GET",
+const speedrunConfig: AxiosRequestConfig = {
   baseURL: `https://www.speedrun.com/api/v1`,
 };
+
+export const speedrunInstance: AxiosInstance = axios.create(speedrunConfig);
