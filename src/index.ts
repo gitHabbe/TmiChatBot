@@ -26,7 +26,7 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
   switch (userCommandName) {
     case "TEST":
       const streamer = await getStreamerGame(channel.slice(1));
-      console.log(streamer);
+      // console.log(streamer);
       break;
     case CommandName.WR:
       console.log(arg1);
