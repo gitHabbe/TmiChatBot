@@ -1,6 +1,7 @@
 import { Client, ChatUserstate } from "tmi.js";
 import { tmiOptions } from "./config/tmiConfig";
 import { CommandName } from "./interfaces/tmi";
+import { searchGameByName } from "./commands/speedrun";
 
 const tmiClient = new Client(tmiOptions);
 
@@ -11,15 +12,17 @@ try {
   console.log(`TMI Connect error: ${error}`);
 }
 
-tmiClient.on("message", (channel, userstate, message, self) => {
+tmiClient.on("message", async (channel, userstate, message, self) => {
   if (self) return;
   const isCommand: boolean = message.startsWith("!");
-  if (isCommand) return;
+  if (!isCommand) return;
 
   const userCommandName: string = message.split(" ")[0].slice(1).toUpperCase();
+  console.log(userCommandName);
   switch (userCommandName) {
     case CommandName.WR:
-      console.log("WR");
+      const game = await searchGameByName("sm64");
+      console.log(game.data);
       break;
     case CommandName.PB:
       console.log("PB");
