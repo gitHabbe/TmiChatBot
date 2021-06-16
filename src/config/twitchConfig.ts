@@ -11,4 +11,4 @@ const twitchConfig: AxiosRequestConfig = {
   },
 };
 
-export const twitchInstance: AxiosInstance = axios.create(twitchConfig);
+export const twitchAPI: AxiosInstance = axios.create(twitchConfig);
