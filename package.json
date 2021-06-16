@@ -26,5 +26,8 @@
   "bugs": {
     "url": "https://github.com/gitHabbe/TmiChatBot/issues"
   },
-  "homepage": "https://github.com/gitHabbe/TmiChatBot#readme"
+  "homepage": "https://github.com/gitHabbe/TmiChatBot#readme",
+  "dependencies": {
+    "tmi.js": "^1.8.3"
+  }
 }
