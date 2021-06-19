@@ -8,3 +8,7 @@ export interface ChannelType {
   title: string;
   started_at: string;
 }
+
+export interface StreamerResponse {
+  data: ChannelType[];
+}
