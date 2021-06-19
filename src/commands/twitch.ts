@@ -1,24 +1,24 @@
-import { AxiosResponse, AxiosPromise } from "axios";
+import { AxiosResponse } from "axios";
 import { twitchAPI } from "../config/twitchConfig";
 import { ChannelType } from "../interfaces/twitch";
 
-// interface Response {
-//   data: ChannelType;
-// }
-
-// const responseBody = (response: AxiosResponse<ChannelType[]>) => response.data;
-
-export const getStreamerGame = async (channelName: string) => {
+export const fetchStreamerByUsername = async (channelName: string) => {
   const streamers = await twitchAPI.get<AxiosResponse<ChannelType[]>>(
     `/search/channels?query=${channelName}`
   );
-  console.log(streamers.data.data);
-  return streamers;
-  // const asdf = streamers.data.data.find(
-  //   (channel: ChannelType) => channel.display_name === channelName
-  // );
-  // console.log(asdf);
+  const streamer = streamers.data.data.find(
+    (name: ChannelType) =>
+      name.display_name.toLowerCase() === channelName.toLowerCase()
+  );
+  if (streamer === undefined) throw new Error("User not found");
 
-  // return streamer;
-  // return twitchAPI.get(`/search/channels?query=${channel}`).then(responseBody);
+  console.log(streamer);
+
+  return streamer;
+};
+
+export const getStreamerTitle = async (channelName: string) => {
+  const streamer = await fetchStreamerByUsername(channelName);
+
+  return streamer.title;
 };

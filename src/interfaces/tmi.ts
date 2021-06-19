@@ -10,4 +10,6 @@ export interface TmiMessageProps {
 export enum CommandName {
   WR = "WR",
   PB = "PB",
+  TITLE = "TITLE",
+  UPTIME = "UPTIME",
 }

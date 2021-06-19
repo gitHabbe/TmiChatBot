@@ -2,7 +2,7 @@ import { Client, ChatUserstate } from "tmi.js";
 import { tmiOptions } from "./config/tmiConfig";
 import { CommandName } from "./interfaces/tmi";
 import { searchSpeedgameByName } from "./commands/speedrun";
-import { getStreamerGame } from "./commands/twitch";
+import { getStreamerTitle } from "./commands/twitch";
 
 const tmiClient = new Client(tmiOptions);
 
@@ -24,9 +24,9 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
 
   console.log(userCommandName);
   switch (userCommandName) {
-    case "TEST":
-      const streamer = await getStreamerGame(channel.slice(1));
-      // console.log(streamer);
+    case CommandName.TITLE:
+      const title = await getStreamerTitle(channel.slice(1));
+      tmiClient.say(channel, title);
       break;
     case CommandName.WR:
       console.log(arg1);
