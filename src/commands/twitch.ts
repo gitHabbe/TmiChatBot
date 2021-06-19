@@ -1,4 +1,4 @@
-import { AxiosResponse } from "axios";
+import { AxiosResponse, AxiosPromise } from "axios";
 import { twitchAPI } from "../config/twitchConfig";
 import { ChannelType } from "../interfaces/twitch";
 
@@ -13,11 +13,11 @@ export const getStreamerGame = async (channelName: string) => {
     `/search/channels?query=${channelName}`
   );
   console.log(streamers.data.data);
-  // return streamers;
-  const asdf = streamers.data.data.find(
-    (channel: ChannelType) => channel.display_name === channelName
-  );
-  console.log(asdf);
+  return streamers;
+  // const asdf = streamers.data.data.find(
+  //   (channel: ChannelType) => channel.display_name === channelName
+  // );
+  // console.log(asdf);
 
   // return streamer;
   // return twitchAPI.get(`/search/channels?query=${channel}`).then(responseBody);
