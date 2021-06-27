@@ -18,22 +18,22 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
   const isCommand: boolean = message.startsWith("!");
   if (!isCommand) return;
 
+  const streamer: string = channel.slice(1);
   const userCommandName: string = message.split(" ")[0].slice(1).toUpperCase();
-  const [arg1, arg2, arg3] = message.split(" ").slice(1);
-  console.log(arg1, arg2, arg3);
+  const messageArray: string[] = message.split(" ").slice(1);
 
   // console.log(userCommandName);
   switch (userCommandName) {
     case CommandName.UPTIME:
-      const uptime = await getStreamerUptime(channel.slice(1));
+      const uptime = await getStreamerUptime(streamer);
       tmiClient.say(channel, uptime);
       break;
     case CommandName.TITLE:
-      const title = await getStreamerTitle(channel.slice(1));
+      const title = await getStreamerTitle(streamer);
       tmiClient.say(channel, title);
       break;
     case CommandName.WR:
-      const game = await getSpeedgameWR(channel.slice(1), arg1, arg2);
+      const game = await getSpeedgameWR(streamer, messageArray);
       // console.log(game);
       break;
     case CommandName.PB:

@@ -30,3 +30,7 @@ export interface CategoryType {
 export interface CategoryResponse {
   data: CategoryType[];
 }
+
+// export interface GameAndCategoryQuery {
+
+// }

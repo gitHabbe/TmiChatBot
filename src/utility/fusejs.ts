@@ -4,11 +4,16 @@ import { CategoryType } from "../interfaces/speedrun";
 
 export const fuseSearchCategory = (
   categories: CategoryType[],
-  gameQuery: string
+  categoryQuery: string
 ) => {
+  let term = categories.find((category) => category.name === categoryQuery);
+  if (term === undefined) term === categoryQuery;
   const categoriesList = categories;
-  const fuseTest = new Fuse(categoriesList, fuseOptions);
-  console.log("~ fuseTest", fuseTest);
-  const asdf = fuseTest.search(gameQuery);
-  console.log("~ asdf", asdf);
+  const asdf: Fuse.IFuseOptions<CategoryType> = fuseOptions;
+  const fuseTest = new Fuse(categoriesList, asdf);
+  // console.log("~ fuseTest", fuseTest);
+  const fuseSearch = fuseTest.search(categoryQuery);
+  console.log("~ fuseSearch", fuseSearch);
+
+  return fuseSearch;
 };

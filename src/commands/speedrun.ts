@@ -39,30 +39,33 @@ export const getSpeedgameCategory = async (
     `/games/${game.id}/categories`
   );
   const categories: CategoryType[] = categoriesResponse.data.data;
-  const asdf = fuseSearchCategory(categories, "100");
+  const asdf = fuseSearchCategory(categories, category);
+  console.log("~ asdf", asdf);
 
-  console.log("~ categories", categories);
-  const correctCategory = categories.find(
-    (categoryName) => categoryName.name.toLowerCase() === category.toLowerCase()
+  // console.log("~ categories", categories);
+  const correctCategory = asdf.find(
+    (categoryName) => categoryName.item.name === category.toLowerCase()
   );
   if (correctCategory === undefined)
     throw new Error(`${correctCategory} category not found`);
+  console.log("~ correctCategory", correctCategory);
 
-  return correctCategory;
+  return correctCategory.item;
 };
 
 export const getSpeedgameWR = async (
   channel: string,
-  gameNameQuery: string | undefined,
-  categoryQuery: string | undefined
+  messageArray: string[]
 ) => {
   let game: GameType;
-  if (gameNameQuery === undefined) {
+  const gameQuery: string = messageArray[0];
+  const categoryQuery: string = [...messageArray].slice(1).join(" ");
+  console.log("~ categoryQuery", categoryQuery);
+  if (gameQuery === undefined) {
     const twitchGame: string = await getStreamerGame(channel);
     game = await searchSpeedgameByName(twitchGame);
   } else {
-    const gameResponse = await searchSpeedgameByName(gameNameQuery);
-    game = gameResponse;
+    game = await searchSpeedgameByName(gameQuery);
   }
   let category: CategoryType;
   if (categoryQuery === undefined) {
