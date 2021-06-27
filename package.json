@@ -32,6 +32,7 @@
   "homepage": "https://github.com/gitHabbe/TmiChatBot#readme",
   "dependencies": {
     "axios": "^0.21.1",
+    "fuse.js": "^6.4.6",
     "tmi.js": "^1.8.3"
   },
   "devDependencies": {
