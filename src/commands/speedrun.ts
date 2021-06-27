@@ -6,6 +6,7 @@ import {
   CategoryType,
   CategoryResponse,
 } from "../interfaces/speedrun";
+import { fuseSearchCategory } from "../utility/fusejs";
 import { fetchStreamerByUsername, getStreamerTitle } from "./twitch";
 
 export const searchSpeedgameByName = async (
@@ -38,6 +39,8 @@ export const getSpeedgameCategory = async (
     `/games/${game.id}/categories`
   );
   const categories: CategoryType[] = categoriesResponse.data.data;
+  const asdf = fuseSearchCategory(categories, "100");
+
   console.log("~ categories", categories);
   const correctCategory = categories.find(
     (categoryName) => categoryName.name.toLowerCase() === category.toLowerCase()

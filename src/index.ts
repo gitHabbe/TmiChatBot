@@ -22,7 +22,7 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
   const [arg1, arg2, arg3] = message.split(" ").slice(1);
   console.log(arg1, arg2, arg3);
 
-  console.log(userCommandName);
+  // console.log(userCommandName);
   switch (userCommandName) {
     case CommandName.UPTIME:
       const uptime = await getStreamerUptime(channel.slice(1));
