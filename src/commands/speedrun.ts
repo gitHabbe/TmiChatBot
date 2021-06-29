@@ -39,11 +39,8 @@ export const getSpeedgameCategory = async (
     `/games/${game.id}/categories`
   );
   const categories: CategoryType[] = categoriesResponse.data.data;
-  const asdf = fuseSearchCategory(categories, category);
-  console.log("~ asdf", asdf);
-
-  // console.log("~ categories", categories);
-  const correctCategory = asdf.find(
+  const fuzzyGameSearch = fuseSearchCategory(categories, category);
+  const correctCategory = fuzzyGameSearch.find(
     (categoryName) => categoryName.item.name === category.toLowerCase()
   );
   if (correctCategory === undefined)
