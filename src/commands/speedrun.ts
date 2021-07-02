@@ -8,6 +8,7 @@ import {
 } from "../interfaces/speedrun";
 import { fuseSearchCategory } from "../utility/fusejs";
 import { fetchStreamerByUsername, getStreamerTitle } from "./twitch";
+import { LowDB } from "../models/LowDB";
 
 export const searchSpeedgameByName = async (
   gameName: string
@@ -44,7 +45,7 @@ export const getSpeedgameCategory = async (
     (categoryName) => categoryName.item.name === category.toLowerCase()
   );
   if (correctCategory === undefined)
-    throw new Error(`${correctCategory} category not found`);
+    throw new Error(`${category} category not found`);
   console.log("~ correctCategory", correctCategory);
 
   return correctCategory.item;
@@ -54,6 +55,11 @@ export const getSpeedgameWR = async (
   channel: string,
   messageArray: string[]
 ) => {
+  const asdf = new LowDB("game_database.json");
+
+  console.log("DATA");
+  // console.log(asdf.getData());
+  // process.exit();
   let game: GameType;
   const gameQuery: string = messageArray[0];
   const categoryQuery: string = [...messageArray].slice(1).join(" ");

@@ -41,7 +41,7 @@ class LowDBWithChain<T> extends Low<T> {
 //     this.bb
 //   }
 // }
-class LowDB<T> {
+export class LowDB<T> {
   // private data: T[] = [];
   private json: string;
   private adapter: JSONFile<T>;
@@ -75,6 +75,6 @@ class LowDB<T> {
   };
 }
 
-const asdf = new LowDB<asdf>("game_database.json");
+// const asdf = new LowDB<asdf>("game_database.json");
 // asdf.init();
-asdf.getData();
+// asdf.getData();
