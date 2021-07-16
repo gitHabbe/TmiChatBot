@@ -1,5 +1,7 @@
 import * as dotenv from "dotenv";
 import { Options } from "tmi.js";
+import { readFileSync, writeFileSync } from "fs";
+import channels from "../private/tmi_channels.json";
 
 dotenv.config();
 
@@ -16,5 +18,5 @@ export const tmiOptions: Options = {
     username: process.env.TWITCH_USERNAME,
     password: "oauth:" + process.env.TWITCH_OAUTH_PASSWORD,
   },
-  channels: ["habbe"],
+  channels,
 };
