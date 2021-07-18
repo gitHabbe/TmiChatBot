@@ -12,50 +12,50 @@ generator client {
 
 
 model User {
-  id            Int      @default(autoincrement()) @id
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  name          String   
-  commands      Command[]
-  highlights    Highlight[]
-  components    Component[]
-  permissions   Permission[]
+  id              Int           @default(autoincrement()) @id
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  name            String        @unique
+  commands        Command[]
+  highlights      Highlight[]
+  components      Component[]
+  permissions     Permission[]
 }
 
 model Command {
-  id        Int      @default(autoincrement()) @id
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  name      String
-  content   String
-  madeBy    String
+  id              Int           @default(autoincrement()) @id
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt        
+  name            String
+  content         String
+  madeBy          String
 
-  user    User     @relation(fields: [userId], references: [id])
-  userId  Int
+  user            User          @relation(fields: [userId], references: [id])
+  userId          Int
 }
 model Highlight {
-  id              Int      @default(autoincrement()) @id
-  createdAt       DateTime @default(now())
+  id              Int           @default(autoincrement()) @id
+  createdAt       DateTime      @default(now())
   name            String
   url             String
   madeBy          String
   timestamp       Int
   vodId           Int
 
-  user    User     @relation(fields: [userId], references: [id])
-  userId  Int
+  user            User          @relation(fields: [userId], references: [id])
+  userId          Int
 }
 model Component {
-  id            Int      @default(autoincrement()) @id
-  createdAt     DateTime @default(now())
+  id              Int           @default(autoincrement()) @id
+  createdAt       DateTime      @default(now())
 
-  user    User     @relation(fields: [userId], references: [id])
-  userId  Int
+  user            User          @relation(fields: [userId], references: [id])
+  userId          Int
 }
 model Permission {
-  id            Int      @default(autoincrement()) @id
-  createdAt     DateTime @default(now())
+  id              Int           @default(autoincrement()) @id
+  createdAt       DateTime      @default(now())
 
-  user    User     @relation(fields: [userId], references: [id])
-  userId  Int
+  user            User          @relation(fields: [userId], references: [id])
+  userId          Int
 }
