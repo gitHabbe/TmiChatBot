@@ -1,6 +1,5 @@
 import * as dotenv from "dotenv";
 import { Options } from "tmi.js";
-import { readFileSync, writeFileSync } from "fs";
 import channels from "../private/tmi_channels.json";
 
 dotenv.config();

@@ -1,8 +1,9 @@
-import { Client, ChatUserstate } from "tmi.js";
+import { Client, Userstate } from "tmi.js";
 import { tmiOptions } from "./config/tmiConfig";
 import { CommandName } from "./interfaces/tmi";
 import { getSpeedgameWR } from "./commands/speedrun";
 import { getStreamerTitle, getStreamerUptime } from "./commands/twitch";
+import { createUser } from "./commands/tmi";
 
 const tmiClient = new Client(tmiOptions);
 
@@ -22,7 +23,6 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
   const userCommandName: string = message.split(" ")[0].slice(1).toUpperCase();
   const messageArray: string[] = message.split(" ").slice(1);
 
-  // console.log(userCommandName);
   switch (userCommandName) {
     case CommandName.UPTIME:
       const uptime = await getStreamerUptime(streamer);
@@ -38,6 +38,10 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
       break;
     case CommandName.PB:
       console.log("PB");
+      break;
+    case CommandName.JOIN:
+      const message = await createUser(channel, userstate.username);
+      tmiClient.say(channel, message);
       break;
 
     default:

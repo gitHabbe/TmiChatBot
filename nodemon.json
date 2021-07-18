@@ -1,0 +1,7 @@
+{
+  "verbose": true,
+  "ignore": ["./build/private/*.json"],
+  "nodemonConfig": {
+    "ignore": ["./build/private/*.json"]
+  }
+}
