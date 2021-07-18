@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { JsonFile } from "../models/database";
+import { JsonUserFile } from "../models/database";
 import { User } from "../interfaces/prisma";
 
 export const createUser = async (
@@ -12,16 +12,14 @@ export const createUser = async (
   if (!username) {
     throw new Error("User not found");
   }
-  console.log("creating user");
-
   const prisma = new PrismaClient();
   const user: User = await prisma.user.create({
     data: { name: username },
   });
 
   if (user) {
-    const newUser = new JsonFile<string>();
-    newUser.add(user.name);
+    const newUser = new JsonUserFile<string>(user.name);
+    newUser.add();
 
     return `I have joined channel: ${user.name}`;
   }
