@@ -12,7 +12,9 @@ export const fuseSearchCategory = (
   const categoriesList = categories;
   const fusejsOptions: Fuse.IFuseOptions<CategoryType> = fuseOptions;
   const fuseObject = new Fuse(categoriesList, fusejsOptions);
+  // console.log("~ fuseObject", fuseObject);
   const fuseSearch = fuseObject.search(categoryQuery);
+  // console.log("~ fuseSearch", fuseSearch);
 
   return fuseSearch;
 };

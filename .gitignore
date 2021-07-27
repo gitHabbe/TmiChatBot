@@ -4,6 +4,8 @@ build/
 private/
 .vscode/
 
+src/prisma/migrations
+
 .env
 .env.test
 .env.production

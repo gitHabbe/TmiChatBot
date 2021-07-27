@@ -1,4 +1,3 @@
-import { AxiosResponse } from "axios";
 import { speedrunAPI } from "../config/speedrunConfig";
 import {
   GameType,
@@ -8,21 +7,42 @@ import {
 } from "../interfaces/speedrun";
 import { fuseSearchCategory } from "../utility/fusejs";
 import { fetchStreamerByUsername, getStreamerTitle } from "./twitch";
+import { GetGameDatabase, CreateGameDatabase } from "../models/database";
+import { Game } from "@prisma/client";
 
 export const searchSpeedgameByName = async (
   gameName: string
 ): Promise<GameType> => {
-  const gamesResponse = await speedrunAPI.get<SpeedrunResponse>(
-    `games?name=${gameName}`
-  );
-  const games: GameType[] = gamesResponse.data.data;
-  const game = games.find(
-    (game: GameType) =>
-      game.abbreviation.toLowerCase() === gameName.toLowerCase()
-  );
-  if (game === undefined) throw new Error(`${gameName} game not found`);
+  const gameDB = new GetGameDatabase(gameName);
+  const isGameInDatabase = await gameDB.getGame();
+  console.log("~ isGameInDatabase", isGameInDatabase);
+  if (isGameInDatabase != null) {
+    console.log("IN DATABASE");
+    return isGameInDatabase;
+  } else {
+    console.log("NOT IN DATABASE");
+    const gamesResponse = await speedrunAPI.get<SpeedrunResponse>(
+      `games?name=${gameName}`
+    );
+    const foundGame = gamesResponse.data.data.find((game: GameType) => {
+      return game.abbreviation === gameName;
+    });
+    if (foundGame) {
+      console.log("CREATING GAME");
+      const newGame = new CreateGameDatabase(foundGame);
+      newGame.saveGame();
+      console.log("~ newGame", newGame);
+    }
+    const games: GameType[] = gamesResponse.data.data;
+    const game = games.find(
+      (game: GameType) =>
+        game.abbreviation.toLowerCase() === gameName.toLowerCase()
+    );
+    console.log("~ game", game?.abbreviation);
 
-  return game;
+    if (game === undefined) throw new Error(`${gameName} game not found`);
+    return game;
+  }
 };
 
 export const getStreamerGame = async (channel: string): Promise<string> => {
@@ -40,14 +60,15 @@ export const getSpeedgameCategory = async (
   );
   const categories: CategoryType[] = categoriesResponse.data.data;
   const fuzzyGameSearch = fuseSearchCategory(categories, category);
-  const correctCategory = fuzzyGameSearch.find(
-    (categoryName) => categoryName.item.name === category.toLowerCase()
-  );
-  if (correctCategory === undefined)
+  console.log("~ fuzzyGameSearch[0].item", fuzzyGameSearch[0].item.name);
+  // const correctCategory = fuzzyGameSearch.find(
+  //   (categoryName) => categoryName.item.name === category.toLowerCase()
+  // );
+  if (fuzzyGameSearch[0].item.name === undefined) {
     throw new Error(`${category} category not found`);
-  console.log("~ correctCategory", correctCategory);
+  }
 
-  return correctCategory.item;
+  return fuzzyGameSearch[0].item;
 };
 
 export const getSpeedgameWR = async (
@@ -57,7 +78,6 @@ export const getSpeedgameWR = async (
   let game: GameType;
   const gameQuery: string = messageArray[0];
   const categoryQuery: string = [...messageArray].slice(1).join(" ");
-  console.log("~ categoryQuery", categoryQuery);
   if (gameQuery === undefined) {
     const twitchGame: string = await getStreamerGame(channel);
     game = await searchSpeedgameByName(twitchGame);
@@ -71,5 +91,4 @@ export const getSpeedgameWR = async (
   } else {
     category = await getSpeedgameCategory(game, categoryQuery);
   }
-  console.log(category);
 };

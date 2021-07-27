@@ -34,6 +34,7 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
       break;
     case CommandName.WR:
       const game = await getSpeedgameWR(streamer, messageArray);
+      console.log("~ game", game);
       // console.log(game);
       break;
     case CommandName.PB:

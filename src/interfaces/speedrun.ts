@@ -1,9 +1,9 @@
 export interface GameType {
   id: string;
   abbreviation: string;
-  platforms: string[];
+  platforms: Platform[];
   names: Names;
-  links: Links;
+  links: Links[];
 }
 
 interface Names {
@@ -15,6 +15,10 @@ interface Names {
 interface Links {
   rel: string;
   uri: string;
+}
+
+interface Platform {
+  platformId: string;
 }
 
 export interface SpeedrunResponse {
@@ -30,7 +34,3 @@ export interface CategoryType {
 export interface CategoryResponse {
   data: CategoryType[];
 }
-
-// export interface GameAndCategoryQuery {
-
-// }
