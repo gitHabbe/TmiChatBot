@@ -1,0 +1,19 @@
+version: "3.7"
+
+services:
+  mysql:
+    image: mysql:5.7
+    ports:
+      # <Port exposed> : < MySQL Port running inside container>
+      - "3306:3306"
+    expose:
+      # Opens port 3306 on the container
+      - "3306"
+    volumes:
+      - todo-mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: s
+      MYSQL_DATABASE: TmiChatBot
+
+volumes:
+  todo-mysql-data:
