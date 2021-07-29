@@ -19,30 +19,23 @@ export const searchSpeedgameByName = async (
   if (isGameInDatabase != null) {
     console.log("IN DATABASE");
     return isGameInDatabase;
-  } else {
-    console.log("NOT IN DATABASE");
-    const gamesResponse = await speedrunAPI.get<SpeedrunResponse>(
-      `games?name=${gameName}`
-    );
-    const foundGame = gamesResponse.data.data.find((game: GameType) => {
-      return game.abbreviation === gameName;
-    });
-    if (foundGame) {
-      console.log("CREATING GAME");
-      const newGame = new CreateGameDatabase(foundGame);
-      newGame.saveGame();
-      console.log("~ newGame", newGame);
-    }
-    const games: GameType[] = gamesResponse.data.data;
-    const game = games.find(
-      (game: GameType) =>
-        game.abbreviation.toLowerCase() === gameName.toLowerCase()
-    );
-    console.log("~ game", game?.abbreviation);
-
-    if (game === undefined) throw new Error(`${gameName} game not found`);
-    return game;
   }
+  console.log("NOT IN DATABASE");
+  const gamesResponse = await speedrunAPI.get<SpeedrunResponse>(
+    `games?name=${gameName}`
+  );
+  const foundGame = gamesResponse.data.data.find((game: GameType) => {
+    return game.abbreviation.toLowerCase() === gameName.toLowerCase();
+  });
+  if (foundGame) {
+    console.log("CREATING GAME");
+    const newGame = new CreateGameDatabase(foundGame);
+    newGame.saveGame();
+    // console.log("~ newGame", newGame);
+  } else {
+    throw new Error(`${gameName} game not found`);
+  }
+  return foundGame;
 };
 
 export const getStreamerGame = async (channel: string): Promise<string> => {

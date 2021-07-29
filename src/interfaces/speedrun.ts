@@ -1,9 +1,11 @@
+import internal from "stream";
+
 export interface GameType {
   id: string;
   abbreviation: string;
-  platforms: Platform[];
+  platforms: string[];
   names: Names;
-  links: Links[];
+  links: Link[];
 }
 
 interface Names {
@@ -12,13 +14,46 @@ interface Names {
   twitch: string;
 }
 
-interface Links {
+interface Link {
   rel: string;
   uri: string;
 }
 
 interface Platform {
   platformId: string;
+}
+
+interface Category {
+  id: string;
+  name: string;
+  links: Link[];
+}
+
+interface Leaderboard {
+  game: string;
+  category: string;
+  runs: {
+    place: number;
+    run: Run;
+  };
+}
+
+interface Run {
+  id: string;
+  players: Player[];
+  times: {
+    primary: string;
+    primary_t: number;
+    realtime: string;
+    realtime_t: number;
+    ingame: string;
+    ingame_t: number;
+  };
+}
+
+interface Player {
+  id: string;
+  uri: string;
 }
 
 export interface SpeedrunResponse {
@@ -28,7 +63,7 @@ export interface SpeedrunResponse {
 export interface CategoryType {
   id: string;
   name: string;
-  links: Links;
+  links: Link;
 }
 
 export interface CategoryResponse {

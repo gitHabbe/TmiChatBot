@@ -28,7 +28,9 @@ export class JsonArrayFile<T> {
 class Database {
   public prisma: PrismaClient;
   constructor() {
-    this.prisma = new PrismaClient();
+    this.prisma = new PrismaClient({
+      log: ["query", "info", `warn`, `error`],
+    });
   }
 }
 
@@ -61,71 +63,56 @@ export class CreateGameDatabase extends Database {
 
   saveGame = async () => {
     try {
-      this.addGame();
-      this.addGamePlatforms();
-      this.addGameLinks();
-      this.addGameNames();
+      const asdf = await this.prisma.game.create({
+        data: {
+          id: this.game.id,
+          abbreviation: this.game.abbreviation,
+          names: {
+            create: this.names(),
+          },
+          links: {
+            create: this.links(),
+          },
+          platforms: {
+            create: this.platforms(),
+          },
+        },
+      });
     } catch (error) {
-      console.log("error:", error);
+      console.log("ERROR:", error);
     }
-
-    return this.game;
   };
 
-  addGame = () => {
-    return this.prisma.game.create({
-      data: {
-        id: this.game.id,
-        abbreviation: this.game.abbreviation,
-      },
+  private names = () => {
+    return {
+      // gameId: this.game.id,
+      twitch: this.game.names.twitch,
+      international: this.game.names.international,
+      japanese: this.game.names.japanese,
+    };
+  };
+
+  private links = () => {
+    return this.game.links.map((link) => {
+      return {
+        // gameId: this.game.id,
+        rel: link.rel,
+        uri: link.uri,
+      };
     });
   };
 
-  addGameNames = () => {
-    return this.prisma.gameNames.create({
-      data: {
-        gameId: this.game.id,
-        twitch: this.game.names.twitch,
-        international: this.game.names.international,
-        japanese: this.game.names.japanese,
-      },
+  private platforms = () => {
+    return this.game.platforms.map((platform) => {
+      return {
+        platformId: platform,
+      };
     });
   };
 
-  addGameLinks = async () => {
-    const links = await Promise.all(
-      this.game.links.map(async (link) => {
-        const newLink = await this.prisma.gameLink.create({
-          data: {
-            gameId: this.game.id,
-            rel: link.rel,
-            uri: link.uri,
-          },
-        });
-        return newLink;
-      })
-    );
-
-    return links;
-  };
-
-  addGamePlatforms = async () => {
-    const platforms = await Promise.all(
-      this.game.platforms.map(async (platform) => {
-        const newPlatform = await this.prisma.gamePlatform.create({
-          data: {
-            platformId: platform.platformId,
-            gameId: this.game.id,
-            // gameId: this.game.id,
-            // platformId: platform.platformId,
-          },
-        });
-        return newPlatform;
-      })
-    );
-
-    return platforms;
-  };
+  // private catefories = () => {
+  //   return this.game.
+  // };
 }
 
 export class GetGameDatabase extends Database {
