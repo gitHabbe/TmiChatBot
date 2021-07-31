@@ -1,7 +1,7 @@
 import { Client, Userstate } from "tmi.js";
 import { tmiOptions } from "./config/tmiConfig";
 import { CommandName } from "./interfaces/tmi";
-import { getSpeedgameWR } from "./commands/speedrun";
+import { searchSpeedgameByName } from "./commands/speedrun";
 import { getStreamerTitle, getStreamerUptime } from "./commands/twitch";
 import { createUser } from "./commands/tmi";
 
@@ -33,9 +33,8 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
       tmiClient.say(channel, title);
       break;
     case CommandName.WR:
-      const game = await getSpeedgameWR(streamer, messageArray);
-      // console.log("~ game", game);
-      // console.log(game);
+      const time = await searchSpeedgameByName(streamer, messageArray);
+      tmiClient.say(channel, time);
       break;
     case CommandName.PB:
       console.log("PB");

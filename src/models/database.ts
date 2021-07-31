@@ -57,35 +57,58 @@ export class UserDatabase extends Database {
 }
 
 export class CreateGameDatabase extends Database {
-  constructor(private game: GameType) {
+  constructor(private game: GameType, private categories: CategoryType[]) {
     super();
   }
 
   saveGame = async () => {
-    try {
-      const asdf = await this.prisma.game.create({
-        data: {
-          id: this.game.id,
-          abbreviation: this.game.abbreviation,
-          names: {
-            create: this.names(),
-          },
-          links: {
-            create: this.links(),
-          },
-          platforms: {
-            create: this.platforms(),
-          },
+    const asdf = await this.prisma.game.create({
+      data: {
+        id: this.game.id,
+        abbreviation: this.game.abbreviation,
+        names: {
+          create: this.names(),
         },
-      });
-    } catch (error) {
-      console.log("ERROR:", error);
-    }
+        links: {
+          create: this.links(),
+        },
+        platforms: {
+          create: this.platforms(),
+        },
+        categories: {
+          create: this.categories.map((category) => {
+            return {
+              id: category.id,
+              name: category.name,
+              links: {
+                create: category.links.map((link) => {
+                  return {
+                    rel: link.rel,
+                    uri: link.uri,
+                  };
+                }),
+              },
+            };
+          }),
+        },
+      },
+    });
+    return asdf;
   };
+
+  // saveCategories = async () => {
+  //   await this.prisma.category.create({
+  //     data: this.categories.map(category => {
+  //       return {
+  //         name: category.name,
+
+  //       }
+  //     })
+  //   })
+  // };
 
   private names = () => {
     return {
-      // gameId: this.game.id,
       twitch: this.game.names.twitch,
       international: this.game.names.international,
       japanese: this.game.names.japanese,
@@ -95,7 +118,6 @@ export class CreateGameDatabase extends Database {
   private links = () => {
     return this.game.links.map((link) => {
       return {
-        // gameId: this.game.id,
         rel: link.rel,
         uri: link.uri,
       };
@@ -110,20 +132,37 @@ export class CreateGameDatabase extends Database {
     });
   };
 
-  // private catefories = () => {
-  //   return this.game.
-  // };
+  private gameCategories = () => {
+    return this.categories.map((category) => {
+      return {
+        id: category.id,
+        name: category.name,
+        links: category.links.map((link) => {
+          return {
+            rel: link.rel,
+            uri: link.uri,
+          };
+        }),
+      };
+    });
+  };
+}
+
+class GetCategory extends Database {
+  constructor(private searchTerm: string) {
+    super();
+  }
 }
 
 export class GetGameDatabase extends Database {
-  constructor(private abbreviation: string) {
+  constructor(private searchTerm: string) {
     super();
   }
 
-  getGame = async (): Promise<GameType> => {
+  getGameByAbbreviation = async () => {
     const foundGame = await this.prisma.game.findFirst({
       where: {
-        abbreviation: this.abbreviation,
+        abbreviation: this.searchTerm,
       },
       select: {
         id: true,
@@ -131,6 +170,41 @@ export class GetGameDatabase extends Database {
         platforms: true,
         names: true,
         links: true,
+        categories: {
+          select: {
+            id: true,
+            gameId: true,
+            name: true,
+            links: true,
+          },
+        },
+      },
+    });
+
+    // @ts-ignore - Falsely optional SQL field "names"
+    return foundGame;
+  };
+  getGameByName = async () => {
+    const foundGame = await this.prisma.game.findFirst({
+      where: {
+        names: {
+          international: this.searchTerm,
+        },
+      },
+      select: {
+        id: true,
+        abbreviation: true,
+        platforms: true,
+        names: true,
+        links: true,
+        categories: {
+          select: {
+            id: true,
+            gameId: true,
+            name: true,
+            links: true,
+          },
+        },
       },
     });
 

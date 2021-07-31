@@ -1,20 +1,21 @@
 import Fuse from "fuse.js";
 import { fuseOptions } from "../config/fusejsConfig";
 import { CategoryType } from "../interfaces/speedrun";
+import { Category, CategoryLink } from ".prisma/client";
 
 export const fuseSearchCategory = (
-  categories: CategoryType[],
+  categories: Category[],
   categoryQuery: string
 ) => {
   let term = categories.find((category) => category.name === categoryQuery);
   // term = term === undefined ? categoryQuery : term.name;
   // if (term === undefined) term = categoryQuery;
   const categoriesList = categories;
-  const fusejsOptions: Fuse.IFuseOptions<CategoryType> = fuseOptions;
+  const fusejsOptions: Fuse.IFuseOptions<Category> = fuseOptions;
   const fuseObject = new Fuse(categoriesList, fusejsOptions);
   // console.log("~ fuseObject", fuseObject);
   const fuseSearch = fuseObject.search(categoryQuery);
-  // console.log("~ fuseSearch", fuseSearch);
+  console.log("~ fuseSearch", fuseSearch);
 
   return fuseSearch;
 };

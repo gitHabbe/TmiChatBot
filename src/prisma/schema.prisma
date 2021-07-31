@@ -17,6 +17,7 @@ model Game {
   names         GameNames?
   platforms     GamePlatform[]
   links         GameLink[]
+  categories    Category[]
 }
 
 model GameNames {
@@ -44,6 +45,29 @@ model GameLink {
 
   gameId  String
   game    Game @relation(fields: [gameId], references: [id])
+}
+
+model Category {
+  id    String @id
+  name  String
+  links CategoryLink[]
+
+  gameId  String
+  game    Game @relation(fields: [gameId], references: [id])
+}
+
+model CategoryLink {
+  id      Int    @id @default(autoincrement())
+  rel     String
+  uri     String
+
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+}
+
+model Player {
+  id  String @id
+  name String @unique
 }
 
 model User {

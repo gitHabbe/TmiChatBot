@@ -1,5 +1,3 @@
-import internal from "stream";
-
 export interface GameType {
   id: string;
   abbreviation: string;
@@ -19,14 +17,19 @@ interface Link {
   uri: string;
 }
 
-interface Platform {
-  platformId: string;
-}
+// interface Platform {
+//   platformId: string;
+// }
 
-interface Category {
-  id: string;
-  name: string;
-  links: Link[];
+// interface Category {
+//   id: string;
+//   name: string;
+//   links: Link[];
+//   leaderboard: Leaderboard;
+// }
+
+export interface LeaderboardReponse {
+  data: Leaderboard;
 }
 
 interface Leaderboard {
@@ -35,7 +38,7 @@ interface Leaderboard {
   runs: {
     place: number;
     run: Run;
-  };
+  }[];
 }
 
 interface Run {
@@ -63,7 +66,8 @@ export interface SpeedrunResponse {
 export interface CategoryType {
   id: string;
   name: string;
-  links: Link;
+  links: Link[];
+  // leaderboard: Leaderboard;
 }
 
 export interface CategoryResponse {

@@ -29,6 +29,12 @@ export const getStreamerTitle = async (channelName: string) => {
   return title;
 };
 
+export const getStreamerGame = async (channel: string): Promise<string> => {
+  const { game_name } = await fetchStreamerByUsername(channel);
+
+  return game_name;
+};
+
 export const getStreamerUptime = async (channelName: string) => {
   const { started_at } = await fetchStreamerByUsername(channelName);
   const started_at_date: Date = new Date(started_at);
