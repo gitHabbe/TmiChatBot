@@ -1,7 +1,7 @@
 import { Client, Userstate } from "tmi.js";
 import { tmiOptions } from "./config/tmiConfig";
 import { CommandName } from "./interfaces/tmi";
-import { searchSpeedgameByName } from "./commands/speedrun";
+import { getPersonalBest, getWorldRecord } from "./commands/speedrun";
 import { getStreamerTitle, getStreamerUptime } from "./commands/twitch";
 import { createUser } from "./commands/tmi";
 
@@ -25,23 +25,19 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
 
   switch (userCommandName) {
     case CommandName.UPTIME:
-      const uptime = await getStreamerUptime(streamer);
-      tmiClient.say(channel, uptime);
+      tmiClient.say(channel, await getStreamerUptime(streamer));
       break;
     case CommandName.TITLE:
-      const title = await getStreamerTitle(streamer);
-      tmiClient.say(channel, title);
+      tmiClient.say(channel, await getStreamerTitle(streamer));
       break;
     case CommandName.WR:
-      const time = await searchSpeedgameByName(streamer, messageArray);
-      tmiClient.say(channel, time);
+      tmiClient.say(channel, await getWorldRecord(channel, messageArray));
       break;
     case CommandName.PB:
-      console.log("PB");
+      tmiClient.say(channel, await getPersonalBest(channel, messageArray));
       break;
     case CommandName.JOIN:
-      const message = await createUser(channel, userstate.username);
-      tmiClient.say(channel, message);
+      tmiClient.say(channel, await createUser(channel, userstate.username));
       break;
 
     default:

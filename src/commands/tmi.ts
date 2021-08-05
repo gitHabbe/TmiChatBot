@@ -1,7 +1,6 @@
-import { PrismaClient } from "@prisma/client";
-import { JsonArrayFile } from "../models/database";
-import { User } from "../interfaces/prisma";
-import { UserDatabase } from "../models/database";
+import { JsonArrayFile } from "../models/JsonArrayFile";
+import { User } from "../models/database";
+// import { User } from "../interfaces/prisma";
 
 export const createUser = async (
   channel: string,
@@ -13,8 +12,8 @@ export const createUser = async (
   if (!username) {
     throw new Error("User not found");
   }
-  const user = new UserDatabase(username);
-  const newPrismaUser: User | undefined = await user.addUser();
+  const user = new User(username);
+  const newPrismaUser = await user.addUser();
 
   if (newPrismaUser) {
     const newUser = new JsonArrayFile<string>(newPrismaUser.name);

@@ -23,7 +23,6 @@ model Game {
 model GameNames {
   id            Int    @id @default(autoincrement())
   international String
-  japanese      String
   twitch        String
 
   gameId        String
@@ -65,7 +64,7 @@ model CategoryLink {
   category    Category @relation(fields: [categoryId], references: [id])
 }
 
-model Player {
+model Runner {
   id  String @id
   name String @unique
 }

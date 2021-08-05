@@ -8,7 +8,6 @@ export interface GameType {
 
 interface Names {
   international: string;
-  japanese: string;
   twitch: string;
 }
 
@@ -43,7 +42,8 @@ interface Leaderboard {
 
 interface Run {
   id: string;
-  players: Player[];
+  players: RunPlayer[];
+  date: string;
   times: {
     primary: string;
     primary_t: number;
@@ -54,13 +54,24 @@ interface Run {
   };
 }
 
-interface Player {
+interface RunPlayer {
   id: string;
   uri: string;
 }
 
+export interface IRunner {
+  id: string;
+  names: {
+    international: string;
+  };
+}
+
+export interface RunnerResponse {
+  data: IRunner;
+}
+
 export interface SpeedrunResponse {
-  data: GameType[];
+  data: GameType;
 }
 
 export interface CategoryType {

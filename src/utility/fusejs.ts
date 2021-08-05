@@ -15,7 +15,8 @@ export const fuseSearchCategory = (
   const fuseObject = new Fuse(categoriesList, fusejsOptions);
   // console.log("~ fuseObject", fuseObject);
   const fuseSearch = fuseObject.search(categoryQuery);
-  console.log("~ fuseSearch", fuseSearch);
+  if (fuseSearch.length === 0) throw new Error("Category not found");
+  // console.log("~ fuseSearch", fuseSearch[0]);
 
   return fuseSearch;
 };
