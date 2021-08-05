@@ -1,40 +1,16 @@
 import { PrismaClient } from "@prisma/client";
-import { readFileSync, writeFileSync } from "fs";
-import { GameType, CategoryType } from "../interfaces/speedrun";
+import { GameQuery, JoinedGame, UserQuery } from "../interfaces/prisma";
+import { GameType, CategoryType, IRunner } from "../interfaces/speedrun";
 
-export class JsonArrayFile<T> {
-  private jsonFile: string = "./src/private/tmi_channels.json";
-  private data: T[] = JSON.parse(readFileSync(this.jsonFile, "utf8"));
-
-  constructor(private username: T) {}
-
-  add = (): void => {
-    if (this.isInJson()) {
-      throw new Error("User already in JSON");
-    }
-    writeFileSync(this.jsonFile, JSON.stringify([...this.data, this.username]));
-  };
-
-  remove = (): void => {
-    const newData = this.data.filter((name: T) => name !== this.username);
-    writeFileSync(this.jsonFile, JSON.stringify(newData));
-  };
-
-  isInJson = (): T | undefined => {
-    return this.data.find((user: T) => user === this.username);
-  };
-}
-
-class Database {
+class Prisma {
   public prisma: PrismaClient;
   constructor() {
     this.prisma = new PrismaClient({
-      log: ["query", "info", `warn`, `error`],
+      // log: ["query", "info", `warn`, `error`],
     });
   }
 }
-
-export class UserDatabase extends Database {
+export class User extends Prisma {
   constructor(private username: string) {
     super();
   }
@@ -56,13 +32,89 @@ export class UserDatabase extends Database {
   };
 }
 
-export class CreateGameDatabase extends Database {
-  constructor(private game: GameType, private categories: CategoryType[]) {
+export class Runner extends Prisma {
+  constructor() {
     super();
   }
 
+  getRunnerWhere = async (query: UserQuery) => {
+    const runner = await this.prisma.runner.findFirst({
+      where: query,
+    });
+
+    if (runner === null) throw new Error("Runner not in database");
+
+    return runner;
+  };
+
+  saveRunner = async (runner: IRunner) => {
+    const newRunner = await this.prisma.runner.create({
+      data: {
+        id: runner.id,
+        name: runner.names.international,
+      },
+    });
+    if (newRunner === null) throw new Error("Runner could not be created");
+
+    return newRunner;
+  };
+}
+
+export class GameDatabase extends Prisma {
+  private _game: GameType | undefined = undefined;
+  private _categories: CategoryType[] | undefined;
+  constructor() {
+    super();
+  }
+
+  getGameWhere = async (gameQuery: GameQuery): Promise<JoinedGame> => {
+    const game = await this.prisma.game.findFirst({
+      where: gameQuery,
+      select: {
+        id: true,
+        abbreviation: true,
+        platforms: true,
+        names: true,
+        links: true,
+        categories: {
+          select: {
+            id: true,
+            gameId: true,
+            name: true,
+            links: true,
+          },
+        },
+      },
+    });
+    if (game === null) throw new Error("Game not in database");
+
+    return game;
+  };
+
+  set setGame(game: GameType | undefined) {
+    this._game = game;
+  }
+
+  get game() {
+    if (this._game === undefined) throw new Error("GAME NOT SET");
+    return this._game;
+  }
+
+  set setCategories(categories: CategoryType[] | undefined) {
+    this._categories = categories;
+  }
+
+  get categories() {
+    if (this._categories === undefined) throw new Error("CATEGORIES NOT SET");
+    return this._categories;
+  }
+
   saveGame = async () => {
-    const asdf = await this.prisma.game.create({
+    // console.log(this.game.abbreviation); // this is ok
+    // this.sgame = game;
+    // console.log(this.game.abbreviation); // this is ok
+
+    const newGame = await this.prisma.game.create({
       data: {
         id: this.game.id,
         abbreviation: this.game.abbreviation,
@@ -76,42 +128,19 @@ export class CreateGameDatabase extends Database {
           create: this.platforms(),
         },
         categories: {
-          create: this.categories.map((category) => {
-            return {
-              id: category.id,
-              name: category.name,
-              links: {
-                create: category.links.map((link) => {
-                  return {
-                    rel: link.rel,
-                    uri: link.uri,
-                  };
-                }),
-              },
-            };
-          }),
+          create: this.gameCategories(),
         },
       },
     });
-    return asdf;
+    if (newGame === null) throw new Error("Game could not be created");
+
+    return newGame;
   };
-
-  // saveCategories = async () => {
-  //   await this.prisma.category.create({
-  //     data: this.categories.map(category => {
-  //       return {
-  //         name: category.name,
-
-  //       }
-  //     })
-  //   })
-  // };
 
   private names = () => {
     return {
-      twitch: this.game.names.twitch,
+      twitch: this.game.names.twitch, // not ok
       international: this.game.names.international,
-      japanese: this.game.names.japanese,
     };
   };
 
@@ -137,78 +166,85 @@ export class CreateGameDatabase extends Database {
       return {
         id: category.id,
         name: category.name,
-        links: category.links.map((link) => {
-          return {
-            rel: link.rel,
-            uri: link.uri,
-          };
-        }),
+        links: {
+          create: category.links.map((link) => {
+            return {
+              rel: link.rel,
+              uri: link.uri,
+            };
+          }),
+        },
       };
     });
   };
 }
 
-class GetCategory extends Database {
-  constructor(private searchTerm: string) {
-    super();
-  }
-}
+// export class CreateGameDatabase extends Prisma {
+//   constructor(private game: GameType, private categories: CategoryType[]) {
+//     super();
+//   }
 
-export class GetGameDatabase extends Database {
-  constructor(private searchTerm: string) {
-    super();
-  }
+//   saveGame = async () => {
+//     const asdf = await this.prisma.game.create({
+//       data: {
+//         id: this.game.id,
+//         abbreviation: this.game.abbreviation,
+//         names: {
+//           create: this.names(),
+//         },
+//         links: {
+//           create: this.links(),
+//         },
+//         platforms: {
+//           create: this.platforms(),
+//         },
+//         categories: {
+//           create: this.gameCategories(),
+//         },
+//       },
+//     });
+//     return asdf;
+//   };
 
-  getGameByAbbreviation = async () => {
-    const foundGame = await this.prisma.game.findFirst({
-      where: {
-        abbreviation: this.searchTerm,
-      },
-      select: {
-        id: true,
-        abbreviation: true,
-        platforms: true,
-        names: true,
-        links: true,
-        categories: {
-          select: {
-            id: true,
-            gameId: true,
-            name: true,
-            links: true,
-          },
-        },
-      },
-    });
+//   private names = () => {
+//     return {
+//       twitch: this.game.names.twitch,
+//       international: this.game.names.international,
+//       japanese: this.game.names.japanese,
+//     };
+//   };
 
-    // @ts-ignore - Falsely optional SQL field "names"
-    return foundGame;
-  };
-  getGameByName = async () => {
-    const foundGame = await this.prisma.game.findFirst({
-      where: {
-        names: {
-          international: this.searchTerm,
-        },
-      },
-      select: {
-        id: true,
-        abbreviation: true,
-        platforms: true,
-        names: true,
-        links: true,
-        categories: {
-          select: {
-            id: true,
-            gameId: true,
-            name: true,
-            links: true,
-          },
-        },
-      },
-    });
+//   private links = () => {
+//     return this.game.links.map((link) => {
+//       return {
+//         rel: link.rel,
+//         uri: link.uri,
+//       };
+//     });
+//   };
 
-    // @ts-ignore - Falsely optional SQL field "names"
-    return foundGame;
-  };
-}
+//   private platforms = () => {
+//     return this.game.platforms.map((platform) => {
+//       return {
+//         platformId: platform,
+//       };
+//     });
+//   };
+
+//   private gameCategories = () => {
+//     return this.categories.map((category) => {
+//       return {
+//         id: category.id,
+//         name: category.name,
+//         links: {
+//           create: category.links.map((link) => {
+//             return {
+//               rel: link.rel,
+//               uri: link.uri,
+//             };
+//           }),
+//         },
+//       };
+//     });
+//   };
+// }
