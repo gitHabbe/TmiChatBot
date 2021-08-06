@@ -1,10 +1,10 @@
 import { speedrunAPI } from "../config/speedrunConfig";
 import {
-  GameType,
+  IGameType,
   SpeedrunResponse,
-  CategoryType,
-  CategoryResponse,
-  LeaderboardReponse,
+  ICategoryType,
+  ICategoryResponse,
+  ILeaderboardReponse,
   RunnerResponse,
   IRunner,
 } from "../interfaces/speedrun";
@@ -103,11 +103,13 @@ const axiosGame = async (gameName: string) => {
   }
 };
 
-const axiosCategories = async (game: GameType) => {
+const axiosCategories = async (game: IGameType) => {
   try {
     const {
       data: { data: categoriesArray },
-    } = await speedrunAPI.get<CategoryResponse>(`/games/${game.id}/categories`);
+    } = await speedrunAPI.get<ICategoryResponse>(
+      `/games/${game.id}/categories`
+    );
     return categoriesArray;
   } catch (error) {
     switch (error.response.data.status) {
@@ -176,7 +178,7 @@ const axiosWorldRecord = async (game: JoinedGame, category: Category) => {
   try {
     const {
       data: { data: worldRecord },
-    } = await speedrunAPI.get<LeaderboardReponse>(
+    } = await speedrunAPI.get<ILeaderboardReponse>(
       `leaderboards/${game.id}/category/${category.id}?top=1`
     );
     return worldRecord;
@@ -230,7 +232,7 @@ const axiosLeaderboard = async (game: JoinedGame, category: Category) => {
   try {
     const {
       data: { data: leaderboard },
-    } = await speedrunAPI.get<LeaderboardReponse>(
+    } = await speedrunAPI.get<ILeaderboardReponse>(
       `leaderboards/${game.id}/category/${category.id}`
     );
     return leaderboard;

@@ -1,4 +1,4 @@
-export interface ChannelType {
+export interface IChannelType {
   id: string;
   display_name: string;
   broadcaster_login: string;
@@ -9,6 +9,6 @@ export interface ChannelType {
   started_at: string;
 }
 
-export interface StreamerResponse {
-  data: ChannelType[];
+export interface IStreamerResponse {
+  data: IChannelType[];
 }

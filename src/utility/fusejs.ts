@@ -1,6 +1,6 @@
 import Fuse from "fuse.js";
 import { fuseOptions } from "../config/fusejsConfig";
-import { CategoryType } from "../interfaces/speedrun";
+import { ICategoryType } from "../interfaces/speedrun";
 import { Category, CategoryLink } from ".prisma/client";
 
 export const fuseSearchCategory = (

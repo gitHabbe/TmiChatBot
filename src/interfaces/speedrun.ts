@@ -1,4 +1,4 @@
-export interface GameType {
+export interface IGameType {
   id: string;
   abbreviation: string;
   platforms: string[];
@@ -15,32 +15,20 @@ interface Link {
   rel: string;
   uri: string;
 }
-
-// interface Platform {
-//   platformId: string;
-// }
-
-// interface Category {
-//   id: string;
-//   name: string;
-//   links: Link[];
-//   leaderboard: Leaderboard;
-// }
-
-export interface LeaderboardReponse {
-  data: Leaderboard;
+export interface ILeaderboardReponse {
+  data: ILeaderboard;
 }
 
-interface Leaderboard {
+interface ILeaderboard {
   game: string;
   category: string;
   runs: {
     place: number;
-    run: Run;
+    run: IRun;
   }[];
 }
 
-interface Run {
+interface IRun {
   id: string;
   players: RunPlayer[];
   date: string;
@@ -71,16 +59,16 @@ export interface RunnerResponse {
 }
 
 export interface SpeedrunResponse {
-  data: GameType;
+  data: IGameType;
 }
 
-export interface CategoryType {
+export interface ICategoryType {
   id: string;
   name: string;
   links: Link[];
   // leaderboard: Leaderboard;
 }
 
-export interface CategoryResponse {
-  data: CategoryType[];
+export interface ICategoryResponse {
+  data: ICategoryType[];
 }

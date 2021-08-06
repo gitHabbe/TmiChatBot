@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { GameQuery, JoinedGame, UserQuery } from "../interfaces/prisma";
-import { GameType, CategoryType, IRunner } from "../interfaces/speedrun";
+import { IGameType, ICategoryType, IRunner } from "../interfaces/speedrun";
 
 class Prisma {
   public prisma: PrismaClient;
@@ -61,8 +61,8 @@ export class Runner extends Prisma {
 }
 
 export class GameDatabase extends Prisma {
-  private _game: GameType | undefined = undefined;
-  private _categories: CategoryType[] | undefined;
+  private _game: IGameType | undefined = undefined;
+  private _categories: ICategoryType[] | undefined;
   constructor() {
     super();
   }
@@ -91,7 +91,7 @@ export class GameDatabase extends Prisma {
     return game;
   };
 
-  set setGame(game: GameType | undefined) {
+  set setGame(game: IGameType | undefined) {
     this._game = game;
   }
 
@@ -100,7 +100,7 @@ export class GameDatabase extends Prisma {
     return this._game;
   }
 
-  set setCategories(categories: CategoryType[] | undefined) {
+  set setCategories(categories: ICategoryType[] | undefined) {
     this._categories = categories;
   }
 

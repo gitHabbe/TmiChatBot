@@ -1,5 +1,5 @@
 import { twitchAPI } from "../config/twitchConfig";
-import { ChannelType, StreamerResponse } from "../interfaces/twitch";
+import { IChannelType, IStreamerResponse } from "../interfaces/twitch";
 import {
   letterFormatedDate,
   extractMillisecondsToObject,
@@ -7,15 +7,15 @@ import {
 
 export const fetchStreamerByUsername = async (
   channelName: string
-): Promise<ChannelType> => {
+): Promise<IChannelType> => {
   const {
     data: { data: streamers },
-  } = await twitchAPI.get<StreamerResponse>(
+  } = await twitchAPI.get<IStreamerResponse>(
     `/search/channels?query=${channelName}`
   );
 
   const streamer = streamers.find(
-    (name: ChannelType) =>
+    (name: IChannelType) =>
       name.display_name.toLowerCase() === channelName.toLowerCase()
   );
   if (streamer === undefined) throw new Error("User not found");
