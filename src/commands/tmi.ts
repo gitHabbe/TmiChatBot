@@ -1,5 +1,5 @@
 import { JsonArrayFile } from "../models/JsonArrayFile";
-import { User } from "../models/database";
+import { User } from "../models/database/user";
 // import { User } from "../interfaces/prisma";
 
 export const createUser = async (

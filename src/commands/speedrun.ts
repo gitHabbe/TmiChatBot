@@ -11,7 +11,8 @@ import {
 import { fuseSearchCategory } from "../utility/fusejs";
 import { secondsToHHMMSS } from "../utility/dateFormat";
 import { getStreamerTitle, getStreamerGame } from "./twitch";
-import { GameDatabase, Runner } from "../models/database";
+import { GameDatabase } from "../models/database/game";
+import { Runner } from "../models/database/runner";
 import { Game, Category, CategoryLink } from ".prisma/client";
 import { JoinedGame } from "../interfaces/prisma";
 
@@ -151,7 +152,7 @@ const getCategory = async (
 
 const runnerToDatabase = async (query: string) => {
   const runner: IRunner = await axiosRunner(query);
-  const runnerDatabase = new Runner();
+  const runnerDatabase: Runner = new Runner();
 
   return await runnerDatabase.saveRunner(runner);
 };
