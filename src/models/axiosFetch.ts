@@ -1,10 +1,9 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
-import { Interface } from "readline";
 import { speedrunAPI } from "../config/speedrunConfig";
 import { IGameType } from "../interfaces/speedrun";
 import { SpeedrunResponse, RunnerResponse } from "../interfaces/speedrun";
 
-interface IAxiosOptions {
+export interface IAxiosOptions {
   name: string;
   type: string;
   url: string;
@@ -43,10 +42,9 @@ export class Speedrun<T> {
 
   fetchAPI = async () => {
     try {
-      const { data } = await speedrunAPI.get<T>(this.options.url);
-      return data;
+      return await speedrunAPI.get<T>(this.options.url);
     } catch (error) {
-      this.throwError(error);
+      return this.throwError(error);
     }
   };
 }
@@ -55,7 +53,7 @@ const asdf = async () => {
   const aa = new Speedrun<RunnerResponse>({
     name: "dkr",
     type: "User",
-    url: "users/habbeee",
+    url: "users/habbe",
   });
   console.log("ASDF");
   try {
@@ -65,3 +63,5 @@ const asdf = async () => {
     console.log(error.message);
   }
 };
+
+// asdf();

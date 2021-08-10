@@ -1,4 +1,3 @@
-import { speedrunAPI } from "../config/speedrunConfig";
 import {
   IGameType,
   SpeedrunResponse,
@@ -15,6 +14,7 @@ import { GameDatabase } from "../models/database/game";
 import { Runner } from "../models/database/runner";
 import { Game, Category, CategoryLink } from ".prisma/client";
 import { JoinedGame } from "../interfaces/prisma";
+import { IAxiosOptions, Speedrun } from "../models/axiosFetch";
 
 class CustomError extends Error {
   userMessage: string | undefined;
@@ -87,42 +87,26 @@ const fetchRunner = async (query: string) => {
 };
 
 const axiosGame = async (gameName: string) => {
-  try {
-    const {
-      data: { data: game },
-    } = await speedrunAPI.get<SpeedrunResponse>(`games/${gameName}`);
-    return game;
-  } catch (error) {
-    switch (error.response.data.status) {
-      case 420:
-        throw new Error("SpeedrunCom is having network problem");
-      case 404:
-        throw new Error("Game not found on SpeedrunCom");
-      default:
-        throw new Error("Unknown error");
-    }
-  }
+  const options: IAxiosOptions = {
+    type: "Game",
+    name: gameName,
+    url: `games/${gameName}`,
+  };
+  const game = new Speedrun<SpeedrunResponse>(options);
+  // const { data: { data: gameRes } } = await game.fetchAPI();
+  const res = await game.fetchAPI();
+  return res.data.data;
 };
 
 const axiosCategories = async (game: IGameType) => {
-  try {
-    const {
-      data: { data: categoriesArray },
-    } = await speedrunAPI.get<ICategoryResponse>(
-      `/games/${game.id}/categories`
-    );
-    return categoriesArray;
-  } catch (error) {
-    if (error)
-      switch (error.response.data.status) {
-        case 420:
-          throw new Error("SpeedrunCom is having network problem");
-        case 404:
-          throw new Error("Category not found on SpeedrunCom");
-        default:
-          throw new Error("Unknown error");
-      }
-  }
+  const options: IAxiosOptions = {
+    type: "Category",
+    name: game.names.international,
+    url: `/games/${game.id}/categories`,
+  };
+  const categories = new Speedrun<ICategoryResponse>(options);
+  const res = await categories.fetchAPI();
+  return res.data.data;
 };
 
 const gameToDatabase = async (gameName: string) => {
@@ -159,41 +143,25 @@ const runnerToDatabase = async (query: string) => {
 };
 
 const axiosRunner = async (query: string) => {
-  try {
-    const {
-      data: { data: runner },
-    } = await speedrunAPI.get<RunnerResponse>(`users/${query}`);
-    return runner;
-  } catch (error) {
-    switch (error.response.data.status) {
-      case 420:
-        throw new Error("SpeedrunCom is having network problem");
-      case 404:
-        throw new Error(`Runner: ${query} not found on SpeedrunCom`);
-      default:
-        throw new Error("Unknown error");
-    }
-  }
+  const options: IAxiosOptions = {
+    type: "Runner",
+    name: query,
+    url: `/users/${query}`,
+  };
+  const runner = new Speedrun<RunnerResponse>(options);
+  const res = await runner.fetchAPI();
+  return res.data.data;
 };
 
 const axiosWorldRecord = async (game: JoinedGame, category: Category) => {
-  try {
-    const {
-      data: { data: worldRecord },
-    } = await speedrunAPI.get<ILeaderboardReponse>(
-      `leaderboards/${game.id}/category/${category.id}?top=1`
-    );
-    return worldRecord;
-  } catch (error) {
-    switch (error.response.data.status) {
-      case 420:
-        throw new Error("SpeedrunCom is having network problem");
-      case 404:
-        throw new Error("Category not found on SpeedrunCom");
-      default:
-        throw new Error("Unknown error");
-    }
-  }
+  const options: IAxiosOptions = {
+    type: "World record",
+    name: "Run",
+    url: `leaderboards/${game.id}/category/${category.id}?top=1`,
+  };
+  const worldRecord = new Speedrun<ILeaderboardReponse>(options);
+  const res = await worldRecord.fetchAPI();
+  return res.data.data;
 };
 
 const fetchWorldRecord = async (game: JoinedGame, category: Category) => {
@@ -231,23 +199,14 @@ export const getWorldRecord = async (
 };
 
 const axiosLeaderboard = async (game: JoinedGame, category: Category) => {
-  try {
-    const {
-      data: { data: leaderboard },
-    } = await speedrunAPI.get<ILeaderboardReponse>(
-      `leaderboards/${game.id}/category/${category.id}`
-    );
-    return leaderboard;
-  } catch (error) {
-    switch (error.response.data.status) {
-      case 420:
-        throw new Error("SpeedrunCom is having network problem");
-      case 404:
-        throw new Error("Category not found on SpeedrunCom");
-      default:
-        throw new Error("Unknown error");
-    }
-  }
+  const options: IAxiosOptions = {
+    type: "Leaderboard",
+    name: category.name,
+    url: `leaderboards/${game.id}/category/${category.id}`,
+  };
+  const leaderboard = new Speedrun<ILeaderboardReponse>(options);
+  const res = await leaderboard.fetchAPI();
+  return res.data.data;
 };
 
 const fetchPersonalBest = async (
