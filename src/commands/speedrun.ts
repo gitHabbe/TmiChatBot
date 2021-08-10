@@ -113,14 +113,15 @@ const axiosCategories = async (game: IGameType) => {
     );
     return categoriesArray;
   } catch (error) {
-    switch (error.response.data.status) {
-      case 420:
-        throw new Error("SpeedrunCom is having network problem");
-      case 404:
-        throw new Error("Category not found on SpeedrunCom");
-      default:
-        throw new Error("Unknown error");
-    }
+    if (error)
+      switch (error.response.data.status) {
+        case 420:
+          throw new Error("SpeedrunCom is having network problem");
+        case 404:
+          throw new Error("Category not found on SpeedrunCom");
+        default:
+          throw new Error("Unknown error");
+      }
   }
 };
 
