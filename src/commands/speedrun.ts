@@ -43,7 +43,7 @@ const calculateGameName = async (
 const calculateCategoryName = async (
   messageArray: string[],
   streamer: string
-) => {
+): Promise<string> => {
   const categoryUserInput: string[] = messageArray.slice(1);
   if (categoryUserInput.length === 0) {
     const titleCategory = await getStreamerTitle(streamer);
@@ -86,35 +86,33 @@ const fetchRunner = async (query: string) => {
   }
 };
 
-const axiosGame = async (gameName: string) => {
-  const options: IAxiosOptions = {
+const axiosSpeedrun = async <T>(options: IAxiosOptions) => {
+  const speedrun = new Speedrun<T>(options);
+  const res = await speedrun.fetchAPI();
+  return res.data;
+};
+
+const gameToDatabase = async (gameName: string) => {
+  const gameOptions: IAxiosOptions = {
     type: "Game",
     name: gameName,
     url: `games/${gameName}`,
   };
-  const game = new Speedrun<SpeedrunResponse>(options);
-  // const { data: { data: gameRes } } = await game.fetchAPI();
-  const res = await game.fetchAPI();
-  return res.data.data;
-};
-
-const axiosCategories = async (game: IGameType) => {
-  const options: IAxiosOptions = {
+  const axiosGame: SpeedrunResponse = await axiosSpeedrun<SpeedrunResponse>(
+    gameOptions
+  );
+  const game = axiosGame.data;
+  const categoriesOptions: IAxiosOptions = {
     type: "Category",
     name: game.names.international,
     url: `/games/${game.id}/categories`,
   };
-  const categories = new Speedrun<ICategoryResponse>(options);
-  const res = await categories.fetchAPI();
-  return res.data.data;
-};
-
-const gameToDatabase = async (gameName: string) => {
-  const game = await axiosGame(gameName);
-  const categories = await axiosCategories(game);
+  const categories: ICategoryResponse = await axiosSpeedrun<ICategoryResponse>(
+    categoriesOptions
+  );
   const newGame = new GameDatabase();
   newGame.setGame = game;
-  newGame.setCategories = categories;
+  newGame.setCategories = categories.data;
   return newGame.saveGame();
 };
 
@@ -136,36 +134,29 @@ const getCategory = async (
 };
 
 const runnerToDatabase = async (query: string) => {
-  const runner: IRunner = await axiosRunner(query);
-  const runnerDatabase: Runner = new Runner();
-
-  return await runnerDatabase.saveRunner(runner);
-};
-
-const axiosRunner = async (query: string) => {
   const options: IAxiosOptions = {
     type: "Runner",
     name: query,
     url: `/users/${query}`,
   };
-  const runner = new Speedrun<RunnerResponse>(options);
-  const res = await runner.fetchAPI();
-  return res.data.data;
+  const axiosRunner: RunnerResponse = await axiosSpeedrun<RunnerResponse>(
+    options
+  );
+  const runner: IRunner = axiosRunner.data;
+  const runnerDatabase: Runner = new Runner();
+
+  return await runnerDatabase.saveRunner(runner);
 };
 
-const axiosWorldRecord = async (game: JoinedGame, category: Category) => {
+const fetchWorldRecord = async (game: JoinedGame, category: Category) => {
   const options: IAxiosOptions = {
     type: "World record",
     name: "Run",
     url: `leaderboards/${game.id}/category/${category.id}?top=1`,
   };
-  const worldRecord = new Speedrun<ILeaderboardReponse>(options);
-  const res = await worldRecord.fetchAPI();
-  return res.data.data;
-};
-
-const fetchWorldRecord = async (game: JoinedGame, category: Category) => {
-  const worldRecord = await axiosWorldRecord(game, category);
+  const axiosWorldRecord: ILeaderboardReponse =
+    await axiosSpeedrun<ILeaderboardReponse>(options);
+  const worldRecord = axiosWorldRecord.data;
   const worldRecordTime: string = secondsToHHMMSS(
     worldRecord.runs[0].run.times.primary_t
   );
@@ -187,11 +178,8 @@ export const getWorldRecord = async (
 ) => {
   try {
     const gameName = await calculateGameName(messageArray, streamer);
-    console.log("~ gameName", gameName);
     const game = await fetchGame(gameName);
-    console.log("~ game", game);
     const category = await getCategory(game, messageArray, streamer);
-    console.log("~ category", category);
     return await fetchWorldRecord(game, category);
   } catch (error) {
     return error.message;
@@ -219,7 +207,6 @@ const fetchPersonalBest = async (
     return run.run.players[0].id === runnerId;
   });
   if (personalRun === undefined) throw new Error("Personal run not found");
-  console.log("~ personalRun", personalRun);
   const personalRunTime: string = secondsToHHMMSS(
     personalRun.run.times.primary_t
   );
@@ -237,17 +224,13 @@ export const getPersonalBest = async (
 ): Promise<string> => {
   try {
     const runner = await fetchRunner(messageArray[0]);
-    console.log("~ runner", runner);
     const gameName = await calculateGameName(messageArray.slice(1), streamer);
-    console.log("~ gameName", gameName);
     const game = await fetchGame(gameName);
-    console.log("~ game", game);
     const category = await getCategory(
       game,
       messageArray.slice(1),
       runner.name
     );
-    console.log("~ category", category);
     return await fetchPersonalBest(game, category, runner.id);
   } catch (error) {
     console.log("~ error", error.message);
