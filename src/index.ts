@@ -3,7 +3,7 @@ import { tmiOptions } from "./config/tmiConfig";
 import { CommandName } from "./interfaces/tmi";
 import { getPersonalBest, getWorldRecord } from "./commands/speedrun";
 import { getStreamerTitle, getStreamerUptime } from "./commands/twitch";
-import { createUser } from "./commands/tmi";
+import { createUser, removeUser } from "./commands/tmi";
 
 const tmiClient = new Client(tmiOptions);
 
@@ -38,6 +38,9 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
       break;
     case CommandName.JOIN:
       tmiClient.say(channel, await createUser(channel, userstate.username));
+      break;
+    case CommandName.PART:
+      tmiClient.say(channel, await removeUser(channel, userstate.username));
       break;
 
     default:

@@ -1,7 +1,7 @@
 import { twitchAPI } from "../config/twitchConfig";
 import { IChannelType, IStreamerResponse } from "../interfaces/twitch";
 import {
-  letterFormatedDate,
+  dateToLetters,
   extractMillisecondsToObject,
 } from "../utility/dateFormat";
 
@@ -23,7 +23,9 @@ export const fetchStreamerByUsername = async (
   return streamer;
 };
 
-export const getStreamerTitle = async (channelName: string) => {
+export const getStreamerTitle = async (
+  channelName: string
+): Promise<string> => {
   const { title } = await fetchStreamerByUsername(channelName);
 
   return title;
@@ -37,12 +39,12 @@ export const getStreamerGame = async (channel: string): Promise<string> => {
 
 export const getStreamerUptime = async (channelName: string) => {
   const { started_at } = await fetchStreamerByUsername(channelName);
-  const started_at_date: Date = new Date(started_at);
+  const date_started_at: Date = new Date(started_at);
   const date_now: Date = new Date();
   const time_diff_milliseconds: number =
-    date_now.getTime() - started_at_date.getTime();
+    date_now.getTime() - date_started_at.getTime();
   const dateDataObject = extractMillisecondsToObject(time_diff_milliseconds);
-  const uptime: string = letterFormatedDate(dateDataObject);
+  const uptime: string = dateToLetters(dateDataObject);
 
   return uptime;
 };

@@ -72,3 +72,15 @@ export interface ICategoryType {
 export interface ICategoryResponse {
   data: ICategoryType[];
 }
+
+export enum StatusCode {
+  NotFound = 404,
+  ServerError = 420,
+}
+
+export enum ErrorMessage {
+  NotFound = "not found on SpeedrunCom",
+  ServerError = "SpeedrunCom is having network problems",
+  GenericAxios = "Problem getting data from SpeedrunCom",
+  Generic = "Problem getting data from",
+}

@@ -28,7 +28,7 @@ export const extractMillisecondsToObject = (
   };
 };
 
-export const letterFormatedDate = (dateObject: IletterFormatedDate): string => {
+export const dateToLetters = (dateObject: IletterFormatedDate): string => {
   const days: string =
     dateObject.dayDistance > 0 ? `${dateObject.dayDistance}d` : "";
   const hours: string =
@@ -44,32 +44,42 @@ export const letterFormatedDate = (dateObject: IletterFormatedDate): string => {
 export const secondsToHHMMSS = (seconds: number) => {
   let str: string = "";
   let days = Math.floor((seconds % 31536000) / 86400);
-  if (days > 0) str += days + "d ";
+  // let daysStr = days > 0 ? days + "d " : "";
+  str += days > 0 ? days + "d " : "";
+  // if (days > 0) str += days + "d ";
   let hours = Math.floor(((seconds % 31536000) % 86400) / 3600);
-  if (hours > 0) {
-    if (hours < 10) {
-      str += "0" + hours + ":";
-    } else {
-      str += hours + ":";
-    }
-  }
+  // let hoursStr =
+  //   hours > 0 ? (hours < 10 ? "0" + hours + ":" : hours + ":") : "";
+  str += hours > 0 ? (hours < 10 ? "0" + hours + ":" : hours + ":") : "";
+  // if (hours > 0) {
+  //   if (hours < 10) {
+  //     str += "0" + hours + ":";
+  //   } else {
+  //     str += hours + ":";
+  //   }
+  // }
   let mins = Math.floor((((seconds % 31536000) % 86400) % 3600) / 60);
-  if (mins > 0) {
-    if (mins < 10) {
-      str += "0" + mins + ":";
-    } else {
-      str += mins + ":";
-    }
-  }
+  // let minsStr = mins > 0 ? (mins < 10 ? "0" + mins + ":" : mins + ":") : "";
+  str += mins > 0 ? (mins < 10 ? "0" + mins + ":" : mins + ":") : "";
+  // if (mins > 0) {
+  //   if (mins < 10) {
+  //     str += "0" + mins + ":";
+  //   } else {
+  //     str += mins + ":";
+  //   }
+  // }
   let secs = Math.floor((((seconds % 31536000) % 86400) % 3600) % 60);
-  if (secs > 0) {
-    if (hours < 0 && mins < 0) {
-      str += secs + "s";
-    } else if (secs < 10) {
-      str += "0" + secs;
-    } else {
-      str += secs + "";
-    }
-  }
+  console.log(days, hours, mins);
+
+  str += hours === 0 && mins === 0 ? secs + "s" : secs < 0 ? "0" + secs : secs;
+  // if (secs > 0) {
+  //   if (hours < 0 && mins < 0) {
+  //     str += secs + "s";
+  //   } else if (secs < 10) {
+  //     str += "0" + secs;
+  //   } else {
+  //     str += secs + "";
+  //   }
+  // }
   return str.trim();
 };

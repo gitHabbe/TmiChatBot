@@ -1,6 +1,5 @@
 import { JsonArrayFile } from "../models/JsonArrayFile";
 import { User } from "../models/database/user";
-// import { User } from "../interfaces/prisma";
 
 export const createUser = async (
   channel: string,
@@ -23,4 +22,11 @@ export const createUser = async (
   }
 
   return "Something went wrong. I couldn't join your channel";
+};
+
+export const removeUser = async (
+  channel: string,
+  username: string | undefined
+) => {
+  return "Unknown";
 };

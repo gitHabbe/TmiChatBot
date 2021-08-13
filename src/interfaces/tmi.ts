@@ -13,4 +13,5 @@ export enum CommandName {
   TITLE = "TITLE",
   UPTIME = "UPTIME",
   JOIN = "JOIN",
+  PART = "PART",
 }
