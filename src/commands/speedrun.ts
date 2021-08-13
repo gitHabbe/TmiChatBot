@@ -1,10 +1,10 @@
 import {
   IGameType,
-  SpeedrunResponse,
+  IGameResponse,
   ICategoryType,
   ICategoryResponse,
   ILeaderboardReponse,
-  RunnerResponse,
+  IRunnerResponse,
   IRunner,
 } from "../interfaces/speedrun";
 import { fuseSearchCategory } from "../utility/fusejs";
@@ -16,19 +16,6 @@ import { Game, Category, CategoryLink } from ".prisma/client";
 import { JoinedGame } from "../interfaces/prisma";
 import { IAxiosOptions, Speedrun } from "../models/axiosFetch";
 import { AxiosResponse } from "axios";
-
-class CustomError extends Error {
-  userMessage: string | undefined;
-  constructor(message: string, userMessage: string | undefined = undefined) {
-    super(message);
-    this.userMessage = userMessage;
-  }
-}
-
-export const gameNotInDatabase = new CustomError(
-  "GAME NOT FOUND",
-  "GAME NOT FOUND"
-);
 
 const calculateGameName = async (
   messageArray: string[],
@@ -99,7 +86,7 @@ const gameToDatabase = async (gameName: string) => {
     name: gameName,
     url: `games/${gameName}`,
   };
-  const axiosGame: SpeedrunResponse = await axiosSpeedrunCom<SpeedrunResponse>(
+  const axiosGame: IGameResponse = await axiosSpeedrunCom<IGameResponse>(
     gameOptions
   );
   const game: IGameType = axiosGame.data;
@@ -140,7 +127,7 @@ const runnerToDatabase = async (query: string) => {
     name: query,
     url: `/users/${query}`,
   };
-  const axiosRunner: RunnerResponse = await axiosSpeedrunCom<RunnerResponse>(
+  const axiosRunner: IRunnerResponse = await axiosSpeedrunCom<IRunnerResponse>(
     options
   );
   const runner: IRunner = axiosRunner.data;
