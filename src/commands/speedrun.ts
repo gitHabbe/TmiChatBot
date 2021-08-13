@@ -15,6 +15,7 @@ import { Runner } from "../models/database/runner";
 import { Game, Category, CategoryLink } from ".prisma/client";
 import { JoinedGame } from "../interfaces/prisma";
 import { IAxiosOptions, Speedrun } from "../models/axiosFetch";
+import { AxiosResponse } from "axios";
 
 class CustomError extends Error {
   userMessage: string | undefined;
@@ -86,9 +87,9 @@ const fetchRunner = async (query: string) => {
   }
 };
 
-const axiosSpeedrun = async <T>(options: IAxiosOptions) => {
+const axiosSpeedrunCom = async <T>(options: IAxiosOptions) => {
   const speedrun = new Speedrun<T>(options);
-  const res = await speedrun.fetchAPI();
+  const res: AxiosResponse<T> = await speedrun.fetchAPI();
   return res.data;
 };
 
@@ -98,21 +99,21 @@ const gameToDatabase = async (gameName: string) => {
     name: gameName,
     url: `games/${gameName}`,
   };
-  const axiosGame: SpeedrunResponse = await axiosSpeedrun<SpeedrunResponse>(
+  const axiosGame: SpeedrunResponse = await axiosSpeedrunCom<SpeedrunResponse>(
     gameOptions
   );
-  const game = axiosGame.data;
+  const game: IGameType = axiosGame.data;
   const categoriesOptions: IAxiosOptions = {
     type: "Category",
     name: game.names.international,
     url: `/games/${game.id}/categories`,
   };
-  const categories: ICategoryResponse = await axiosSpeedrun<ICategoryResponse>(
-    categoriesOptions
-  );
+  const axiosCategories: ICategoryResponse =
+    await axiosSpeedrunCom<ICategoryResponse>(categoriesOptions);
+  const categories: ICategoryType[] = axiosCategories.data;
   const newGame = new GameDatabase();
   newGame.setGame = game;
-  newGame.setCategories = categories.data;
+  newGame.setCategories = categories;
   return newGame.saveGame();
 };
 
@@ -139,7 +140,7 @@ const runnerToDatabase = async (query: string) => {
     name: query,
     url: `/users/${query}`,
   };
-  const axiosRunner: RunnerResponse = await axiosSpeedrun<RunnerResponse>(
+  const axiosRunner: RunnerResponse = await axiosSpeedrunCom<RunnerResponse>(
     options
   );
   const runner: IRunner = axiosRunner.data;
@@ -155,7 +156,7 @@ const fetchWorldRecord = async (game: JoinedGame, category: Category) => {
     url: `leaderboards/${game.id}/category/${category.id}?top=1`,
   };
   const axiosWorldRecord: ILeaderboardReponse =
-    await axiosSpeedrun<ILeaderboardReponse>(options);
+    await axiosSpeedrunCom<ILeaderboardReponse>(options);
   const worldRecord = axiosWorldRecord.data;
   const worldRecordTime: string = secondsToHHMMSS(
     worldRecord.runs[0].run.times.primary_t

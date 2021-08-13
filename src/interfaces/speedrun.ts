@@ -54,11 +54,11 @@ export interface IRunner {
   };
 }
 
-export interface RunnerResponse {
+export interface IRunnerResponse {
   data: IRunner;
 }
 
-export interface SpeedrunResponse {
+export interface IGameResponse {
   data: IGameType;
 }
 
