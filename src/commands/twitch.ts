@@ -8,27 +8,34 @@ import {
 export const fetchStreamerByUsername = async (
   channelName: string
 ): Promise<IChannelType> => {
-  const {
-    data: { data: streamers },
-  } = await twitchAPI.get<IStreamerResponse>(
-    `/search/channels?query=${channelName}`
-  );
+  try {
+    const {
+      data: { data: streamers },
+    } = await twitchAPI.get<IStreamerResponse>(
+      `/search/channels?query=${channelName}`
+    );
+    const streamer = streamers.find(
+      (name: IChannelType) =>
+        name.display_name.toLowerCase() === channelName.toLowerCase()
+    );
+    if (streamer === undefined) throw new Error("User not found");
 
-  const streamer = streamers.find(
-    (name: IChannelType) =>
-      name.display_name.toLowerCase() === channelName.toLowerCase()
-  );
-  if (streamer === undefined) throw new Error("User not found");
-
-  return streamer;
+    return streamer;
+  } catch (error) {
+    throw new Error(`${channelName} is not online`);
+  }
 };
 
 export const getStreamerTitle = async (
   channelName: string
 ): Promise<string> => {
-  const { title } = await fetchStreamerByUsername(channelName);
+  try {
+    const { title } = await fetchStreamerByUsername(channelName);
 
-  return title;
+    return title;
+  } catch (error) {
+    return error.message;
+  }
 };
 
 export const getStreamerGame = async (channel: string): Promise<string> => {
@@ -38,13 +45,17 @@ export const getStreamerGame = async (channel: string): Promise<string> => {
 };
 
 export const getStreamerUptime = async (channelName: string) => {
-  const { started_at } = await fetchStreamerByUsername(channelName);
-  const date_started_at: Date = new Date(started_at);
-  const date_now: Date = new Date();
-  const time_diff_milliseconds: number =
-    date_now.getTime() - date_started_at.getTime();
-  const dateDataObject = extractMillisecondsToObject(time_diff_milliseconds);
-  const uptime: string = dateToLetters(dateDataObject);
+  try {
+    const { started_at } = await fetchStreamerByUsername(channelName);
+    const date_started_at: Date = new Date(started_at);
+    const date_now: Date = new Date();
+    const time_diff_milliseconds: number =
+      date_now.getTime() - date_started_at.getTime();
+    const dateDataObject = extractMillisecondsToObject(time_diff_milliseconds);
+    const uptime: string = dateToLetters(dateDataObject);
 
-  return uptime;
+    return uptime;
+  } catch (error) {
+    return error.message;
+  }
 };

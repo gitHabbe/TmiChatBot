@@ -2,7 +2,7 @@ import { Prisma } from "./database";
 import { UserQuery } from "../../interfaces/prisma";
 import { IRunner } from "../../interfaces/speedrun";
 
-export class Runner extends Prisma {
+export class RunnerPrisma extends Prisma {
   constructor() {
     super();
   }

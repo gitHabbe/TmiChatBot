@@ -20,10 +20,10 @@ export interface UserQuery {
   name?: string;
 }
 export interface JoinedGame {
-  names: GameNames | null;
-  links: GameLink[];
   id: string;
   abbreviation: string;
+  names: GameNames | null;
+  links: GameLink[];
   platforms: GamePlatform[];
   categories: {
     links: CategoryLink[];

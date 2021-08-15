@@ -66,7 +66,6 @@ export interface ICategoryType {
   id: string;
   name: string;
   links: Link[];
-  // leaderboard: Leaderboard;
 }
 
 export interface ICategoryResponse {
@@ -74,11 +73,12 @@ export interface ICategoryResponse {
 }
 
 export enum StatusCode {
+  Unauthorized = 401,
   NotFound = 404,
   ServerError = 420,
 }
 
-export enum ErrorMessage {
+export enum SpeedrunComErrorMessage {
   NotFound = "not found on SpeedrunCom",
   ServerError = "SpeedrunCom is having network problems",
   GenericAxios = "Problem getting data from SpeedrunCom",

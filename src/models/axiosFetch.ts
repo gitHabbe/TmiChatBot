@@ -1,6 +1,6 @@
 import axios, { AxiosError } from "axios";
 import { speedrunAPI } from "../config/speedrunConfig";
-import { ErrorMessage, StatusCode } from "../interfaces/speedrun";
+import { SpeedrunComErrorMessage, StatusCode } from "../interfaces/speedrun";
 
 export interface IAxiosOptions {
   name: string;
@@ -12,17 +12,18 @@ export class Speedrun<T> {
   constructor(private options: IAxiosOptions) {}
 
   throwError = (error: Error | AxiosError) => {
-    if (!axios.isAxiosError(error)) throw new Error(ErrorMessage.Generic);
-    if (!error.response) throw new Error(ErrorMessage.GenericAxios);
+    if (!axios.isAxiosError(error))
+      throw new Error(SpeedrunComErrorMessage.Generic);
+    if (!error.response) throw new Error(SpeedrunComErrorMessage.GenericAxios);
     const { type, name } = this.options;
     const { NotFound, ServerError } = StatusCode;
     switch (error.response.status) {
       case NotFound:
-        throw new Error(`${type} ${name} ${ErrorMessage.NotFound}`);
+        throw new Error(`${type} ${name} ${SpeedrunComErrorMessage.NotFound}`);
       case ServerError:
-        throw new Error(`${ErrorMessage.ServerError}`);
+        throw new Error(`${SpeedrunComErrorMessage.ServerError}`);
       default:
-        throw new Error(`${ErrorMessage.Generic} ${type} ${name}`);
+        throw new Error(`${SpeedrunComErrorMessage.Generic} ${type} ${name}`);
     }
   };
 

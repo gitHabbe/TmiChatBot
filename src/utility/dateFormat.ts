@@ -83,3 +83,10 @@ export const secondsToHHMMSS = (seconds: number) => {
   // }
   return str.trim();
 };
+
+export const datesDaysDifference = (date: string): number => {
+  const daysAgo = Math.floor(
+    (new Date().getTime() - new Date(date).getTime()) / 86400000
+  );
+  return daysAgo;
+};
