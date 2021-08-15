@@ -7,7 +7,7 @@ const twitchConfig: AxiosRequestConfig = {
   baseURL: `https://api.twitch.tv/helix`,
   headers: {
     "Client-Id": process.env.TWITCH_CLIENT_ID,
-    Authorization: `Bearer ${process.env.TWITCH_OAUTH_PASSWORD2}`,
+    Authorization: `Bearer ${process.env.TWITCH_OAUTH_PASSWORD}`,
   },
 };
 

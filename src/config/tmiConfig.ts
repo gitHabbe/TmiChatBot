@@ -15,7 +15,7 @@ export const tmiOptions: Options = {
   },
   identity: {
     username: process.env.TWITCH_USERNAME,
-    password: "oauth:" + process.env.TWITCH_OAUTH_PASSWORD,
+    password: "oauth:" + process.env.TWITCH_OAUTH_PASSWORD2,
   },
   channels,
 };
