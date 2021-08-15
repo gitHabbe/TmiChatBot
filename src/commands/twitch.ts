@@ -47,6 +47,7 @@ export const getStreamerGame = async (channel: string): Promise<string> => {
 export const getStreamerUptime = async (channelName: string) => {
   try {
     const { started_at } = await fetchStreamerByUsername(channelName);
+    if (started_at === "") throw new Error("Streamer not online");
     const date_started_at: Date = new Date(started_at);
     const date_now: Date = new Date();
     const time_diff_milliseconds: number =
