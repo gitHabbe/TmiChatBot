@@ -30,7 +30,7 @@ export const getStreamerTitle = async (
   channelName: string
 ): Promise<string> => {
   try {
-    const { title } = await fetchStreamerByUsername(channelName);
+    const { title }: IChannelType = await fetchStreamerByUsername(channelName);
 
     return title;
   } catch (error) {
@@ -39,14 +39,16 @@ export const getStreamerTitle = async (
 };
 
 export const getStreamerGame = async (channel: string): Promise<string> => {
-  const { game_name } = await fetchStreamerByUsername(channel);
+  const { game_name }: IChannelType = await fetchStreamerByUsername(channel);
 
   return game_name;
 };
 
 export const getStreamerUptime = async (channelName: string) => {
   try {
-    const { started_at } = await fetchStreamerByUsername(channelName);
+    const { started_at }: IChannelType = await fetchStreamerByUsername(
+      channelName
+    );
     if (started_at === "") throw new Error("Streamer not online");
     const date_started_at: Date = new Date(started_at);
     const date_now: Date = new Date();

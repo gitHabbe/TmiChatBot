@@ -35,7 +35,7 @@ const categoryFromMessage = async (
 ): Promise<string> => {
   const categoryUserInput: string[] = messageArray.slice(1);
   if (categoryUserInput.length === 0) {
-    const titleCategory = await getStreamerTitle(streamer);
+    const titleCategory: string = await getStreamerTitle(streamer);
     return titleCategory;
   }
   return categoryUserInput.join(" ");
@@ -52,7 +52,7 @@ const gameFromDatabase = async (gameQuery: string): Promise<JoinedGame> => {
 
 const getGame = (gameName: string): Promise<JoinedGame> => {
   return gameFromDatabase(gameName).catch(async () => {
-    const newGame = await gameToDatabase(gameName);
+    const newGame: Game = await gameToDatabase(gameName);
     return gameFromDatabase(newGame.abbreviation);
   });
 };
@@ -66,7 +66,7 @@ const runnerFromDatabase = async (query: string): Promise<Runner> => {
 
 const getRunner = async (query: string): Promise<Runner> => {
   return runnerFromDatabase(query).catch(async () => {
-    const newRunner = await runnerToDatabase(query);
+    const newRunner: Runner = await runnerToDatabase(query);
     return await runnerFromDatabase(newRunner.id);
   });
 };
@@ -110,7 +110,7 @@ const getCategory = async (game: JoinedGame, targetCategory: string) => {
   return fuzzyGameSearch[0].item;
 };
 
-const runnerToDatabase = async (query: string) => {
+const runnerToDatabase = async (query: string): Promise<Runner> => {
   const options: IAxiosOptions = {
     type: "Runner",
     name: query,
@@ -125,7 +125,10 @@ const runnerToDatabase = async (query: string) => {
   return await runnerDatabase.saveRunner(runner);
 };
 
-const fetchWorldRecord = async (game: JoinedGame, category: Category) => {
+const fetchWorldRecord = async (
+  game: JoinedGame,
+  category: Category
+): Promise<string> => {
   const options: IAxiosOptions = {
     type: "World record",
     name: "Run",
@@ -136,7 +139,9 @@ const fetchWorldRecord = async (game: JoinedGame, category: Category) => {
   const worldRecordTime: string = secondsToHHMMSS(
     worldRecord.runs[0].run.times.primary_t
   );
-  const runnerDatabase = await getRunner(worldRecord.runs[0].run.players[0].id);
+  const runnerDatabase: Runner = await getRunner(
+    worldRecord.runs[0].run.players[0].id
+  );
 
   const daysAgo = datesDaysDifference(worldRecord.runs[0].run.date);
 
@@ -171,9 +176,8 @@ const fetchPersonalBest = async (
     name: category.name,
     url: `leaderboards/${game.id}/category/${category.id}`,
   };
-  const { data: leaderboard } = await axiosSpeedrunCom<ILeaderboardReponse>(
-    options
-  );
+  const { data: leaderboard }: ILeaderboardReponse =
+    await axiosSpeedrunCom<ILeaderboardReponse>(options);
   const personalRun = leaderboard.runs.find((run) => {
     return run.run.players[0].id === runnerId;
   });
@@ -208,7 +212,7 @@ export const getPersonalBest = async (
       messageArray,
       streamer
     );
-    const fuzzyCategory = await getCategory(game, categoryName);
+    const fuzzyCategory: Category = await getCategory(game, categoryName);
     return await fetchPersonalBest(game, fuzzyCategory, runner.id);
   } catch (error) {
     console.log("~ error", error.message);
