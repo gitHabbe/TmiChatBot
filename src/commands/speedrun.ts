@@ -10,7 +10,7 @@ import {
 import { fuseSearchCategory } from "../utility/fusejs";
 import { datesDaysDifference, secondsToHHMMSS } from "../utility/dateFormat";
 import { getStreamerTitle, getStreamerGame } from "./twitch";
-import { GameDatabase } from "../models/database/game";
+import { GamePrisma } from "../models/database/game";
 import { RunnerPrisma } from "../models/database/runner";
 import { Game, Category, CategoryLink } from ".prisma/client";
 import { JoinedGame } from "../interfaces/prisma";
@@ -42,7 +42,7 @@ const categoryFromMessage = async (
 };
 
 const gameFromDatabase = async (gameQuery: string): Promise<JoinedGame> => {
-  const gameDatabase = new GameDatabase();
+  const gameDatabase = new GamePrisma();
   return gameDatabase
     .getGameWhere({ abbreviation: gameQuery })
     .catch(() =>
@@ -93,10 +93,10 @@ const gameToDatabase = async (gameName: string): Promise<Game> => {
   };
   const { data: categories }: ICategoryResponse =
     await axiosSpeedrunCom<ICategoryResponse>(categoriesOptions);
-  const newGame = new GameDatabase();
+  const newGame = new GamePrisma();
   newGame.setGame = game;
   newGame.setCategories = categories;
-  return newGame.saveGame();
+  return newGame.save();
 };
 
 const getCategory = async (game: JoinedGame, targetCategory: string) => {

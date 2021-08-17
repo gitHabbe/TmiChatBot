@@ -2,12 +2,9 @@ import { Prisma } from "./database";
 import { GameQuery, JoinedGame } from "../../interfaces/prisma";
 import { IGameType, ICategoryType } from "../../interfaces/speedrun";
 
-export class GameDatabase extends Prisma {
+export class GamePrisma extends Prisma {
   private _game: IGameType | undefined = undefined;
   private _categories: ICategoryType[] | undefined;
-  constructor() {
-    super();
-  }
 
   getGameWhere = async (gameQuery: GameQuery): Promise<JoinedGame> => {
     const game = await this.prisma.game.findFirst({
@@ -51,7 +48,7 @@ export class GameDatabase extends Prisma {
     return this._categories;
   }
 
-  saveGame = async () => {
+  save = async () => {
     const newGame = await this.prisma.game.create({
       data: {
         id: this.game.id,

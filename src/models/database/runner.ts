@@ -3,10 +3,6 @@ import { UserQuery } from "../../interfaces/prisma";
 import { IRunner } from "../../interfaces/speedrun";
 
 export class RunnerPrisma extends Prisma {
-  constructor() {
-    super();
-  }
-
   getRunnerWhere = async (query: UserQuery) => {
     const runner = await this.prisma.runner.findFirst({
       where: query,

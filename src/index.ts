@@ -26,11 +26,7 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
   const isCommand = await isUserCustomCommand(streamer, chatterCommand);
   if (isCommand) return tmiClient.say(channel, isCommand.content);
   const chatterCommandUpper: string = chatterCommand.slice(1).toUpperCase();
-  console.log("~ chatterCommandUpper", chatterCommandUpper);
   const messageArray: string[] = message.split(" ").slice(1);
-  console.log("~ messageArray", messageArray);
-  // const isCommand: boolean = message.startsWith("!");
-  // if (!isCommand) return;
 
   switch (chatterCommandUpper) {
     case CommandName.UPTIME:
