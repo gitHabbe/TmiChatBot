@@ -101,9 +101,11 @@ const gameToDatabase = async (gameName: string): Promise<Game> => {
 
 const getCategory = async (game: JoinedGame, targetCategory: string) => {
   const validCategories = game.categories.filter((category) => {
-    category.links.findIndex(
-      (category: CategoryLink) => category.rel === "leaderboard"
-    ) > 0;
+    return (
+      category.links.findIndex(
+        (category: CategoryLink) => category.rel === "leaderboard"
+      ) > 0
+    );
   });
   const fuzzyGameSearch = fuseSearchCategory(validCategories, targetCategory);
 
@@ -190,7 +192,7 @@ const fetchPersonalBest = async (
     (new Date().getTime() - new Date(personalRun.run.date).getTime()) / 86400000
   );
   const runner: string =
-    runnerDatabase.name[-1].toLowerCase() === "s"
+    runnerDatabase.name.slice(-1).toLowerCase() === "s"
       ? runnerDatabase.name + "'"
       : runnerDatabase.name + "'s";
 

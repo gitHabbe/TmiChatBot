@@ -14,4 +14,5 @@ export enum CommandName {
   UPTIME = "UPTIME",
   JOIN = "JOIN",
   PART = "PART",
+  NEWCMD = "NEWCMD",
 }

@@ -1,20 +1,32 @@
 import { Prisma } from "./database";
 
-export class User extends Prisma {
+export class UserPrisma extends Prisma {
+  private db = this.prisma.user;
   constructor(private username: string) {
     super();
   }
 
   addUser = () => {
-    return this.prisma.user.create({
+    return this.db.create({
       data: {
         name: this.username,
       },
     });
   };
 
-  getUser = () => {
-    return this.prisma.user.findFirst({
+  getUser = async () => {
+    const user = await this.db.findFirst({
+      where: {
+        name: this.username,
+      },
+    });
+    if (user === null) throw new Error("User not found");
+
+    return user;
+  };
+
+  removeUser = () => {
+    return this.db.delete({
       where: {
         name: this.username,
       },
