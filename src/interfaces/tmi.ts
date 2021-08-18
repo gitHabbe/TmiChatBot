@@ -15,4 +15,5 @@ export enum CommandName {
   JOIN = "JOIN",
   PART = "PART",
   NEWCMD = "NEWCMD",
+  DELCMD = "DELCMD",
 }

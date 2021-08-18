@@ -56,17 +56,13 @@ export const newCommand = async (
     // await asdf.addUser();
     if (!creator) throw new Error("Creator not specified");
     const commandName = messageArray[0];
-    console.log("~ commandName", commandName);
     const commandContent = messageArray.slice(1).join("");
-    console.log("~ commandContent", commandContent);
     const userPrisma = new UserPrisma(streamer);
     const user: User = await userPrisma.getUser();
-    console.log("~ user", user);
     const newCommand = new CommandPrisma(user);
     const command = await newCommand.add(commandName, commandContent, creator);
     return `Command ${command.name} created`;
   } catch (error) {
-    console.log("error.message:", error.message);
     return "Couldn't create command";
   }
 };
@@ -84,4 +80,23 @@ export const isUserCustomCommand = async (
   );
 
   return isCommand;
+};
+
+export const removeCommand = async (
+  streamer: string,
+  messageArray: string[],
+  creator: string | undefined
+): Promise<string> => {
+  try {
+    if (!creator) throw new Error("Creator not specified");
+    const commandName = messageArray[0];
+    const userPrisma = new UserPrisma(streamer);
+    const user: User = await userPrisma.getUser();
+    const command = new CommandPrisma(user);
+    const delCommand = await command.remove(commandName);
+
+    return `Command ${delCommand.name} deleted`;
+  } catch (error) {
+    return "Couldn't remove command";
+  }
 };

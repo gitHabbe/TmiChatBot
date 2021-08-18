@@ -14,10 +14,10 @@ model Game {
   id            String @id
   abbreviation  String @unique
 
-  names         GameNames?
-  platforms     GamePlatform[]
-  links         GameLink[]
-  categories    Category[]
+  names       GameNames?
+  platforms   GamePlatform[]
+  links       GameLink[]
+  categories  Category[]
 }
 
 model GameNames {
@@ -25,22 +25,22 @@ model GameNames {
   international String
   twitch        String
 
-  gameId        String
-  game          Game  @relation(fields: [gameId], references: [id])
+  gameId  String
+  game    Game  @relation(fields: [gameId], references: [id])
 }
 
 model GamePlatform {
   id          Int    @id @default(autoincrement())
   platformId  String
 
-  gameId      String
-  game        Game @relation(fields: [gameId], references: [id])
+  gameId  String
+  game    Game @relation(fields: [gameId], references: [id])
 }
 
 model GameLink {
-  id      Int    @id @default(autoincrement())
-  rel     String
-  uri     String
+  id  Int    @id @default(autoincrement())
+  rel String
+  uri String
 
   gameId  String
   game    Game @relation(fields: [gameId], references: [id])
@@ -56,28 +56,29 @@ model Category {
 }
 
 model CategoryLink {
-  id      Int    @id @default(autoincrement())
-  rel     String
-  uri     String
+  id  Int    @id @default(autoincrement())
+  rel String
+  uri String
 
   categoryId  String
   category    Category @relation(fields: [categoryId], references: [id])
 }
 
 model Runner {
-  id  String @id
-  name String @unique
+  id    String @id
+  name  String @unique
 }
 
 model User {
-  id          Int          @id @default(autoincrement())
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  name        String       @unique
+  id        Int          @id @default(autoincrement())
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  name      String       @unique
+
   commands    Command[]
   highlights  Highlight[]
   components  Component[]
-  permissions Permission[]
+  trusts      Trust[]
 }
 
 model Command {
@@ -88,8 +89,8 @@ model Command {
   content   String
   madeBy    String
 
-  user      User @relation(fields: [userId], references: [id])
-  userId    Int
+  user    User @relation(fields: [userId], references: [id])
+  userId  Int
 }
 
 model Highlight {   
@@ -109,14 +110,15 @@ model Component {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
 
-  user      User @relation(fields: [userId], references: [id])
-  userId    Int
+  user    User @relation(fields: [userId], references: [id])
+  userId  Int
 }
 
-model Permission {
+model Trust {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
+  madeBy    String
 
-  user      User @relation(fields: [userId], references: [id])
-  userId    Int
+  user    User @relation(fields: [userId], references: [id])
+  userId  Int
 }
