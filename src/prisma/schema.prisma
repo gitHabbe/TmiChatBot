@@ -117,6 +117,7 @@ model Component {
 model Trust {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
+  name      String
   madeBy    String
 
   user    User @relation(fields: [userId], references: [id])

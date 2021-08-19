@@ -1,4 +1,4 @@
-import { Client, Userstate } from "tmi.js";
+import { Client } from "tmi.js";
 import { tmiOptions } from "./config/tmiConfig";
 import { CommandName } from "./interfaces/tmi";
 import { getPersonalBest, getWorldRecord } from "./commands/speedrun";
@@ -9,7 +9,10 @@ import {
   newCommand,
   removeCommand,
   removeUser,
+  addUserTrust,
+  removeUserTrust,
 } from "./commands/tmi";
+import { UserPrisma } from "./models/database/user";
 
 const tmiClient = new Client(tmiOptions);
 
@@ -20,13 +23,14 @@ try {
   console.log(`TMI Connect error: ${error}`);
 }
 
+// const asdf = new UserPrisma("habbe");
+// asdf.addUser();
+
 tmiClient.on("message", async (channel, userstate, message, self) => {
   if (self) return;
   const streamer: string = channel.slice(1);
   const chatterCommand: string = message.split(" ")[0];
-  console.log("~ chatterCommand", chatterCommand);
   const isCommand = await isUserCustomCommand(streamer, chatterCommand);
-  console.log("~ isCommand", isCommand);
   if (isCommand) return tmiClient.say(channel, isCommand.content);
   const chatterCommandUpper: string = chatterCommand.slice(1).toUpperCase();
   const messageArray: string[] = message.split(" ").slice(1);
@@ -61,6 +65,18 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
         channel,
         await removeCommand(streamer, messageArray, userstate.username)
       );
+    case CommandName.TRUST:
+      tmiClient.say(
+        channel,
+        await addUserTrust(streamer, messageArray, userstate.username)
+      );
+      break;
+    case CommandName.UNTRUST:
+      tmiClient.say(
+        channel,
+        await removeUserTrust(streamer, messageArray, userstate.username)
+      );
+      break;
     default:
       break;
   }

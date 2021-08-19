@@ -16,4 +16,6 @@ export enum CommandName {
   PART = "PART",
   NEWCMD = "NEWCMD",
   DELCMD = "DELCMD",
+  TRUST = "TRUST",
+  UNTRUST = "UNTRUST",
 }

@@ -2,6 +2,7 @@ import { JsonArrayFile } from "../models/JsonArrayFile";
 import { UserPrisma } from "../models/database/user";
 import { CommandPrisma } from "../models/database/command";
 import { Command, User } from "@prisma/client";
+import { TrustPrisma } from "../models/database/trust";
 
 export const createUser = async (
   channel: string,
@@ -49,18 +50,18 @@ export const removeUser = async (
 export const newCommand = async (
   streamer: string,
   messageArray: string[],
-  creator: string | undefined
+  madeBy: string | undefined
 ): Promise<string> => {
   try {
-    // const asdf = new UserPrisma("habbe");
-    // await asdf.addUser();
-    if (!creator) throw new Error("Creator not specified");
+    if (!madeBy) throw new Error("Creator not specified");
+    const isTrusted = await isTrustedUser(streamer, madeBy);
+    if (!isTrusted) throw new Error(`${madeBy} not allowed to do that`);
     const commandName = messageArray[0];
     const commandContent = messageArray.slice(1).join("");
     const userPrisma = new UserPrisma(streamer);
     const user: User = await userPrisma.getUser();
     const newCommand = new CommandPrisma(user);
-    const command = await newCommand.add(commandName, commandContent, creator);
+    const command = await newCommand.add(commandName, commandContent, madeBy);
     return `Command ${command.name} created`;
   } catch (error) {
     return "Couldn't create command";
@@ -85,10 +86,12 @@ export const isUserCustomCommand = async (
 export const removeCommand = async (
   streamer: string,
   messageArray: string[],
-  creator: string | undefined
+  madeBy: string | undefined
 ): Promise<string> => {
   try {
-    if (!creator) throw new Error("Creator not specified");
+    if (!madeBy) throw new Error("Creator not specified");
+    const isTrusted = await isTrustedUser(streamer, madeBy);
+    if (!isTrusted) throw new Error(`${madeBy} not allowed to do that`);
     const commandName = messageArray[0];
     const userPrisma = new UserPrisma(streamer);
     const user: User = await userPrisma.getUser();
@@ -98,5 +101,52 @@ export const removeCommand = async (
     return `Command ${delCommand.name} deleted`;
   } catch (error) {
     return "Couldn't remove command";
+  }
+};
+
+export const isTrustedUser = async (streamer: string, madeBy: string) => {
+  const userPrisma = new UserPrisma(streamer);
+  const user: User = await userPrisma.getUser();
+  const trust = new TrustPrisma(user);
+  return trust.isTrusted(madeBy);
+};
+
+export const addUserTrust = async (
+  streamer: string,
+  messageArray: string[],
+  madeBy: string | undefined
+) => {
+  try {
+    if (!madeBy) throw new Error("Creator not specified");
+    const newTrust = messageArray[0];
+    if (!newTrust) throw new Error("No user specified");
+    const userPrisma = new UserPrisma(streamer);
+    const user: User = await userPrisma.getUser();
+    const trust = new TrustPrisma(user);
+    const addTrust = await trust.add(newTrust, madeBy);
+    return `${addTrust.name} added to trust-list`;
+  } catch (error) {
+    if (error.message) return error.message;
+    return "Problem creating trust";
+  }
+};
+
+export const removeUserTrust = async (
+  streamer: string,
+  messageArray: string[],
+  madeBy: string | undefined
+) => {
+  try {
+    if (!madeBy) throw new Error("Creator not specified");
+    const deleteTrust = messageArray[0];
+    if (!deleteTrust) throw new Error("No user specified");
+    const userPrisma = new UserPrisma(streamer);
+    const user: User = await userPrisma.getUser();
+    const trust = new TrustPrisma(user);
+    const removeTrust = await trust.remove(deleteTrust);
+    return `${removeTrust.name} removed from trust-list`;
+  } catch (error) {
+    if (error.message) return error.message;
+    return "Problem creating trust";
   }
 };
