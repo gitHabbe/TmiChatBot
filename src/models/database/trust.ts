@@ -17,7 +17,7 @@ export class TrustPrisma extends Prisma {
   add = async (newName: string, madeBy: string) => {
     const trustee = await this.find(newName);
     if (trustee) throw new Error(`${newName} is already trusted`);
-    if (!this.isTrusted(madeBy)) throw new Error(`${newName} cannot add trust`);
+    if (!this.isTrusted(madeBy)) throw new Error(`${madeBy} cannot add trust`);
     return this.db.create({
       data: {
         name: newName,
@@ -27,9 +27,10 @@ export class TrustPrisma extends Prisma {
     });
   };
 
-  remove = async (name: string) => {
-    const trustee = await this.find(name);
-    if (!trustee) throw new Error(`${name} is not trusted`);
+  remove = async (deleteName: string, madeBy: string) => {
+    const trustee = await this.find(deleteName);
+    if (!trustee) throw new Error(`${deleteName} is not trusted`);
+    if (!this.isTrusted(madeBy)) throw new Error(`${madeBy} cannot add trust`);
     return await this.db.delete({
       where: {
         id: trustee.id,

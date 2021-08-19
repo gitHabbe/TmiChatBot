@@ -6,7 +6,7 @@ export class UserPrisma extends Prisma {
     super();
   }
 
-  addUser = () => {
+  add = () => {
     return this.db.create({
       data: {
         name: this.username,
@@ -14,7 +14,7 @@ export class UserPrisma extends Prisma {
     });
   };
 
-  getUser = async () => {
+  find = async () => {
     const user = await this.db.findFirst({
       where: {
         name: this.username,
@@ -25,7 +25,7 @@ export class UserPrisma extends Prisma {
     return user;
   };
 
-  removeUser = () => {
+  remove = () => {
     return this.db.delete({
       where: {
         name: this.username,

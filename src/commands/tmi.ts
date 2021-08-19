@@ -16,7 +16,7 @@ export const createUser = async (
       throw new Error("User not found");
     }
     const user = new UserPrisma(username);
-    const newPrismaUser = await user.addUser();
+    const newPrismaUser = await user.add();
 
     if (newPrismaUser) {
       const jsonUser = new JsonArrayFile<string>(newPrismaUser.name);
@@ -36,7 +36,7 @@ export const removeUser = async (
       throw new Error("User not found");
     }
     const user = new UserPrisma(username);
-    const removedUser = await user.removeUser();
+    const removedUser = await user.remove();
     if (removedUser) {
       const jsonUser = new JsonArrayFile<string>(removedUser.name);
       jsonUser.remove();
@@ -59,7 +59,7 @@ export const newCommand = async (
     const commandName = messageArray[0];
     const commandContent = messageArray.slice(1).join("");
     const userPrisma = new UserPrisma(streamer);
-    const user: User = await userPrisma.getUser();
+    const user: User = await userPrisma.find();
     const newCommand = new CommandPrisma(user);
     const command = await newCommand.add(commandName, commandContent, madeBy);
     return `Command ${command.name} created`;
@@ -73,7 +73,7 @@ export const isUserCustomCommand = async (
   targetCommand: string
 ): Promise<Command | undefined> => {
   const userPrisma = new UserPrisma(streamer);
-  const user: User = await userPrisma.getUser();
+  const user: User = await userPrisma.find();
   const command = new CommandPrisma(user);
   const commands = await command.findAll();
   const isCommand = commands.find(
@@ -94,7 +94,7 @@ export const removeCommand = async (
     if (!isTrusted) throw new Error(`${madeBy} not allowed to do that`);
     const commandName = messageArray[0];
     const userPrisma = new UserPrisma(streamer);
-    const user: User = await userPrisma.getUser();
+    const user: User = await userPrisma.find();
     const command = new CommandPrisma(user);
     const delCommand = await command.remove(commandName);
 
@@ -106,7 +106,7 @@ export const removeCommand = async (
 
 export const isTrustedUser = async (streamer: string, madeBy: string) => {
   const userPrisma = new UserPrisma(streamer);
-  const user: User = await userPrisma.getUser();
+  const user: User = await userPrisma.find();
   const trust = new TrustPrisma(user);
   return trust.isTrusted(madeBy);
 };
@@ -121,7 +121,7 @@ export const addUserTrust = async (
     const newTrust = messageArray[0];
     if (!newTrust) throw new Error("No user specified");
     const userPrisma = new UserPrisma(streamer);
-    const user: User = await userPrisma.getUser();
+    const user: User = await userPrisma.find();
     const trust = new TrustPrisma(user);
     const addTrust = await trust.add(newTrust, madeBy);
     return `${addTrust.name} added to trust-list`;
@@ -141,9 +141,9 @@ export const removeUserTrust = async (
     const deleteTrust = messageArray[0];
     if (!deleteTrust) throw new Error("No user specified");
     const userPrisma = new UserPrisma(streamer);
-    const user: User = await userPrisma.getUser();
+    const user: User = await userPrisma.find();
     const trust = new TrustPrisma(user);
-    const removeTrust = await trust.remove(deleteTrust);
+    const removeTrust = await trust.remove(deleteTrust, madeBy);
     return `${removeTrust.name} removed from trust-list`;
   } catch (error) {
     if (error.message) return error.message;
