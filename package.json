@@ -6,7 +6,7 @@
   "scripts": {
     "dev:build": "tsc -w",
     "dev:run": "nodemon build/index.js",
-    "dev:reset": "rm -rf src/prisma/migrations && npx prisma migrate reset -f",
+    "dbreset": "npx prisma migrate reset -f && npx prisma migrate dev --name init",
     "dev": "concurrently npm:dev:*",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
