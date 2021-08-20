@@ -77,6 +77,9 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
         await removeUserTrust(streamer, messageArray, userstate.username)
       );
       break;
+    case CommandName.TS:
+      tmiClient.say(channel, "creating timestamp");
+      break;
     default:
       break;
   }

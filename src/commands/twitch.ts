@@ -1,13 +1,17 @@
 import { twitchAPI } from "../config/twitchConfig";
-import { IChannelType, IStreamerResponse } from "../interfaces/twitch";
+import {
+  IStreamer,
+  IStreamerResponse,
+  IVideosResponse,
+} from "../interfaces/twitch";
 import {
   dateToLetters,
   extractMillisecondsToObject,
 } from "../utility/dateFormat";
 
-export const fetchStreamerByUsername = async (
+export const fetchStreamer = async (
   channelName: string
-): Promise<IChannelType> => {
+): Promise<IStreamer> => {
   try {
     const {
       data: { data: streamers },
@@ -15,7 +19,7 @@ export const fetchStreamerByUsername = async (
       `/search/channels?query=${channelName}`
     );
     const streamer = streamers.find(
-      (name: IChannelType) =>
+      (name: IStreamer) =>
         name.display_name.toLowerCase() === channelName.toLowerCase()
     );
     if (streamer === undefined) throw new Error("User not found");
@@ -26,11 +30,24 @@ export const fetchStreamerByUsername = async (
   }
 };
 
+export const fetchStreamerVideos = async (user_id: number) => {
+  try {
+    const {
+      data: { data: videos },
+    } = await twitchAPI.get<IVideosResponse>(`/videos?user_id=${user_id}`);
+    if (videos.length === 0) throw new Error(`Streamer doesn't save vods`);
+
+    return videos;
+  } catch (error) {
+    throw new Error(`Videos not found`);
+  }
+};
+
 export const getStreamerTitle = async (
   channelName: string
 ): Promise<string> => {
   try {
-    const { title }: IChannelType = await fetchStreamerByUsername(channelName);
+    const { title }: IStreamer = await fetchStreamer(channelName);
 
     return title;
   } catch (error) {
@@ -39,16 +56,14 @@ export const getStreamerTitle = async (
 };
 
 export const getStreamerGame = async (channel: string): Promise<string> => {
-  const { game_name }: IChannelType = await fetchStreamerByUsername(channel);
+  const { game_name }: IStreamer = await fetchStreamer(channel);
 
   return game_name;
 };
 
 export const getStreamerUptime = async (channelName: string) => {
   try {
-    const { started_at }: IChannelType = await fetchStreamerByUsername(
-      channelName
-    );
+    const { started_at }: IStreamer = await fetchStreamer(channelName);
     if (started_at === "") throw new Error("Streamer not online");
     const date_started_at: Date = new Date(started_at);
     const date_now: Date = new Date();

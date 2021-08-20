@@ -76,7 +76,7 @@ model User {
   name      String       @unique
 
   commands    Command[]
-  highlights  Highlight[]
+  timestamps  Timestamp[]
   components  Component[]
   trusts      Trust[]
 }
@@ -93,7 +93,7 @@ model Command {
   userId  Int
 }
 
-model Highlight {   
+model Timestamp {   
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   name      String

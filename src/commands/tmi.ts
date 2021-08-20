@@ -3,6 +3,10 @@ import { UserPrisma } from "../models/database/user";
 import { CommandPrisma } from "../models/database/command";
 import { Command, User } from "@prisma/client";
 import { TrustPrisma } from "../models/database/trust";
+import { fetchStreamer, fetchStreamerVideos } from "./twitch";
+import { TimestampPrisma } from "../models/database/timestamp";
+import { time } from "console";
+import { IStreamer, IVideo } from "../interfaces/twitch";
 
 export const createUser = async (
   channel: string,
@@ -91,7 +95,7 @@ export const removeCommand = async (
   try {
     if (!madeBy) throw new Error("Creator not specified");
     const isTrusted = await isTrustedUser(streamer, madeBy);
-    if (!isTrusted) throw new Error(`${madeBy} not allowed to do that`);
+    if (!isTrusted) throw new Error(`${madeBy} not allowed to remove command`);
     const commandName = messageArray[0];
     const userPrisma = new UserPrisma(streamer);
     const user: User = await userPrisma.find();
@@ -147,6 +151,29 @@ export const removeUserTrust = async (
     return `${removeTrust.name} removed from trust-list`;
   } catch (error) {
     if (error.message) return error.message;
-    return "Problem creating trust";
+    return "Problem removing trust";
+  }
+};
+
+export const addTimestamp = async (
+  streamer: string,
+  messageArray: string[],
+  madeBy: string | undefined
+) => {
+  try {
+    if (!madeBy) throw new Error("Creator not specified");
+    const isTrusted = await isTrustedUser(streamer, madeBy);
+    if (!isTrusted)
+      throw new Error(`${madeBy} not allowed to create timestamp`);
+    const timestampName: string = messageArray[0];
+    const userPrisma = new UserPrisma(streamer);
+    const user: User = await userPrisma.find();
+    const timestamp = new TimestampPrisma(user);
+    const { id, started_at }: IStreamer = await fetchStreamer(streamer);
+    const videos: IVideo[] = await fetchStreamerVideos(parseInt(id));
+    const newTimestamp = await timestamp.add(videos[0], timestampName, madeBy);
+  } catch (error) {
+    if (error.message) return error.message;
+    return "Problem creating timestamp";
   }
 };
