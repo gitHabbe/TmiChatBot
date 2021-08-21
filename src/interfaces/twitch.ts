@@ -30,3 +30,17 @@ export interface IVideo {
 export interface IVideosResponse {
   data: IVideo[];
 }
+
+export interface IFollowage {
+  from_id: string;
+  from_login: string;
+  from_name: string;
+  to_id: string;
+  to_login: string;
+  to_name: string;
+  followed_at: string;
+}
+
+export interface IFollowageResponse {
+  data: IFollowage[];
+}

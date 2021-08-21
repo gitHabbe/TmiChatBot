@@ -1,10 +1,14 @@
+import { Userstate } from "tmi.js";
 import { twitchAPI } from "../config/twitchConfig";
 import {
+  IFollowage,
+  IFollowageResponse,
   IStreamer,
   IStreamerResponse,
   IVideosResponse,
 } from "../interfaces/twitch";
 import {
+  datesDaysDifference,
   dateToLetters,
   extractMillisecondsToObject,
 } from "../utility/dateFormat";
@@ -76,4 +80,33 @@ export const getStreamerUptime = async (channelName: string) => {
   } catch (error) {
     return error.message;
   }
+};
+
+export const fetchFollowage = async (
+  streamer_id: string,
+  follower_id: string
+) => {
+  const {
+    data: { data: followage },
+  } = await twitchAPI.get<IFollowageResponse>(
+    `/users/follows?to_id=${streamer_id}&from_id=${follower_id}`
+  );
+
+  return followage;
+};
+
+export const getFollowage = async (channel: string, user: Userstate) => {
+  if (!user["user-id"]) throw new Error(`${user.username} not found`);
+  const streamer: IStreamer = await fetchStreamer(channel);
+  const followage: IFollowage[] = await fetchFollowage(
+    streamer.id,
+    user["user-id"]
+  );
+  if (followage.length === 0) {
+    return `${user.username} is not following ${channel}`;
+  }
+  const days_ago: number = datesDaysDifference(followage[0].followed_at);
+  console.log("day_difference:", days_ago);
+
+  return `${user.username} followage: ${days_ago} days`;
 };

@@ -2,7 +2,11 @@ import { Client } from "tmi.js";
 import { tmiOptions } from "./config/tmiConfig";
 import { CommandName } from "./interfaces/tmi";
 import { getPersonalBest, getWorldRecord } from "./commands/speedrun";
-import { getStreamerTitle, getStreamerUptime } from "./commands/twitch";
+import {
+  getFollowage,
+  getStreamerTitle,
+  getStreamerUptime,
+} from "./commands/twitch";
 import {
   createUser,
   isUserCustomCommand,
@@ -95,7 +99,7 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
       );
       break;
     case CommandName.FOLLOWAGE:
-      tmiClient.say(channel, "followage triggered");
+      tmiClient.say(channel, await getFollowage(streamer, userstate));
       break;
     default:
       break;
