@@ -91,6 +91,46 @@ export const datesDaysDifference = (date: string): number => {
   return daysAgo;
 };
 
-// export const youtubeDurationToHHMMSS = (youtubeDur) => {
+export const youtubeDurationToHHMMSS = (youtubeDuration: string) => {
+  // PT10S
+  // PT3M31S
+  // PT10H1M26S
+  const youtubeDurationRegex: RegExp = /PT(\d?\dH)?(\d?\dM)?(\d?\dS)/;
+  const asdf = youtubeDurationRegex.exec(youtubeDuration);
+  if (asdf) {
+    const duration = asdf.slice(1).map((digit) => {
+      if (typeof digit === "undefined") return;
+      if (digit.length === 2) {
+        return "0" + digit.slice(0, -1);
+      }
+      return digit.slice(0, -1);
+    });
+    let aa = duration.filter((dd) => dd !== undefined).join(":");
+    if (aa.length == 2) {
+      aa = "00:" + aa;
+    }
+    console.log("~ duration", aa);
+    return aa;
+  }
+  return "N/A";
+};
 
-// };
+export const numberToRoundedWithLetter = (views: string) => {
+  const viewsNum = parseInt(views);
+  let suffix;
+  let zeros;
+  if (viewsNum > Math.pow(10, 9)) {
+    suffix = "B";
+    zeros = 9;
+  } else if (viewsNum > Math.pow(10, 6)) {
+    suffix = "M";
+    zeros = 6;
+  } else if (viewsNum > Math.pow(10, 3)) {
+    suffix = "K";
+    zeros = 3;
+  } else {
+    suffix = "";
+    zeros = 0;
+  }
+  return (viewsNum / Math.pow(10, zeros)).toFixed(zeros ? 1 : 0) + suffix;
+};
