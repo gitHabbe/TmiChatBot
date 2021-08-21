@@ -1,4 +1,5 @@
 import { User } from "@prisma/client";
+import { ChatUserstate } from "tmi.js";
 import { Prisma } from "./database";
 
 export class TrustPrisma extends Prisma {
@@ -7,27 +8,32 @@ export class TrustPrisma extends Prisma {
     super();
   }
 
-  isTrusted = async (name: string) => {
-    return this.find(name) !== null || name === this.user.name;
-    // if (this.find(name) !== null) return true;
-    // else if (creator === this.user.name) return true;
-    // else return false;
+  isTrusted = async (name: ChatUserstate): Promise<boolean> => {
+    const { username, mod } = name;
+    if (!username) throw new Error(`User not found`);
+    const isMod: boolean = mod === true;
+    const isTrusted: boolean = this.find(username) !== null;
+    const isStreamer: boolean = this.user.name === username;
+
+    return isStreamer || isMod || isTrusted;
   };
 
-  add = async (newName: string, madeBy: string) => {
+  add = async (newName: string, madeBy: ChatUserstate) => {
+    const { username } = madeBy;
+    if (!username) throw new Error(`User not found`);
     const trustee = await this.find(newName);
     if (trustee) throw new Error(`${newName} is already trusted`);
     if (!this.isTrusted(madeBy)) throw new Error(`${madeBy} cannot add trust`);
     return this.db.create({
       data: {
         name: newName,
-        madeBy: madeBy,
+        madeBy: username,
         userId: this.user.id,
       },
     });
   };
 
-  remove = async (deleteName: string, madeBy: string) => {
+  remove = async (deleteName: string, madeBy: ChatUserstate) => {
     const trustee = await this.find(deleteName);
     if (!trustee) throw new Error(`${deleteName} is not trusted`);
     if (!this.isTrusted(madeBy)) throw new Error(`${madeBy} cannot add trust`);

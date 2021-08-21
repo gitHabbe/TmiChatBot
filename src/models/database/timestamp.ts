@@ -13,25 +13,28 @@ export class TimestampPrisma extends Prisma {
     const started_date = new Date(created_at).getTime();
     const now_date = new Date().getTime();
     const secondsAgo: number = Math.floor((now_date - started_date) / 1000);
+    const backtrackLength = 90;
     return this.db.create({
       data: {
         name: name,
         url: url,
         madeBy: madeBy,
-        timestamp: secondsAgo,
+        timestamp: secondsAgo - backtrackLength,
         vodId: parseInt(id),
         userId: this.user.id,
       },
     });
   };
 
-  // remove = async (deleteName: string, madeBy: string) => {
-  //   return await this.db.delete({
-  //     where: {
-  //       id: trustee.id,
-  //     },
-  //   });
-  // };
+  remove = async (deleteName: string) => {
+    const timestamp = await this.find(deleteName);
+    if (!timestamp) throw new Error(`Timestamp ${deleteName} doesn't exist`);
+    return await this.db.delete({
+      where: {
+        id: timestamp.id,
+      },
+    });
+  };
 
   find = (name: string) => {
     return this.db.findFirst({

@@ -19,4 +19,5 @@ export enum CommandName {
   TRUST = "TRUST",
   UNTRUST = "UNTRUST",
   TS = "TS",
+  DTS = "DTS",
 }

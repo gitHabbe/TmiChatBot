@@ -11,6 +11,8 @@ import {
   removeUser,
   addUserTrust,
   removeUserTrust,
+  addTimestamp,
+  removeTimestamp,
 } from "./commands/tmi";
 import { UserPrisma } from "./models/database/user";
 
@@ -49,36 +51,45 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
       tmiClient.say(channel, await getPersonalBest(channel, messageArray));
       break;
     case CommandName.JOIN:
-      tmiClient.say(channel, await createUser(channel, userstate.username));
+      tmiClient.say(channel, await createUser(channel, userstate));
       break;
     case CommandName.PART:
-      tmiClient.say(channel, await removeUser(userstate.username));
+      tmiClient.say(channel, await removeUser(userstate));
       break;
     case CommandName.NEWCMD:
       tmiClient.say(
         channel,
-        await newCommand(streamer, messageArray, userstate.username)
+        await newCommand(streamer, messageArray, userstate)
       );
       break;
     case CommandName.DELCMD:
       tmiClient.say(
         channel,
-        await removeCommand(streamer, messageArray, userstate.username)
+        await removeCommand(streamer, messageArray, userstate)
       );
     case CommandName.TRUST:
       tmiClient.say(
         channel,
-        await addUserTrust(streamer, messageArray, userstate.username)
+        await addUserTrust(streamer, messageArray, userstate)
       );
       break;
     case CommandName.UNTRUST:
       tmiClient.say(
         channel,
-        await removeUserTrust(streamer, messageArray, userstate.username)
+        await removeUserTrust(streamer, messageArray, userstate)
       );
       break;
     case CommandName.TS:
-      tmiClient.say(channel, "creating timestamp");
+      tmiClient.say(
+        channel,
+        await addTimestamp(streamer, messageArray, userstate)
+      );
+      break;
+    case CommandName.DTS:
+      tmiClient.say(
+        channel,
+        await removeTimestamp(streamer, messageArray, userstate)
+      );
       break;
     default:
       break;
