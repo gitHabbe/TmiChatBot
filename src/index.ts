@@ -13,6 +13,7 @@ import {
   removeUserTrust,
   addTimestamp,
   removeTimestamp,
+  findTimestamp,
 } from "./commands/tmi";
 import { UserPrisma } from "./models/database/user";
 
@@ -25,10 +26,9 @@ try {
   console.log(`TMI Connect error: ${error}`);
 }
 
-// const asdf = new UserPrisma("habbe");
-// asdf.addUser();
-
 tmiClient.on("message", async (channel, userstate, message, self) => {
+  // const asdf = new UserPrisma("habbe");
+  // await asdf.add();
   if (self) return;
   const streamer: string = channel.slice(1);
   const chatterCommand: string = message.split(" ")[0];
@@ -85,11 +85,17 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
         await addTimestamp(streamer, messageArray, userstate)
       );
       break;
+    case CommandName.FINDTS:
+      tmiClient.say(channel, await findTimestamp(streamer, messageArray));
+      break;
     case CommandName.DTS:
       tmiClient.say(
         channel,
         await removeTimestamp(streamer, messageArray, userstate)
       );
+      break;
+    case CommandName.FOLLOWAGE:
+      tmiClient.say(channel, "followage triggered");
       break;
     default:
       break;

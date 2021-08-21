@@ -13,13 +13,12 @@ export class TimestampPrisma extends Prisma {
     const started_date = new Date(created_at).getTime();
     const now_date = new Date().getTime();
     const secondsAgo: number = Math.floor((now_date - started_date) / 1000);
-    const backtrackLength = 90;
     return this.db.create({
       data: {
         name: name,
         url: url,
         madeBy: madeBy,
-        timestamp: secondsAgo - backtrackLength,
+        timestamp: secondsAgo,
         vodId: parseInt(id),
         userId: this.user.id,
       },
@@ -36,13 +35,16 @@ export class TimestampPrisma extends Prisma {
     });
   };
 
-  find = (name: string) => {
-    return this.db.findFirst({
+  find = async (name: string) => {
+    const timestamp = await this.db.findFirst({
       where: {
         userId: this.user.id,
         name: name,
       },
     });
+    if (timestamp === null) throw new Error(`Timestamp: ${name} not found`);
+
+    return timestamp;
   };
 
   // findAll = () => {

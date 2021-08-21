@@ -189,6 +189,25 @@ export const addTimestamp = async (
   }
 };
 
+export const findTimestamp = async (
+  streamer: string,
+  messageArray: string[]
+) => {
+  try {
+    const timestampName: string = messageArray[0];
+    const userPrisma = new UserPrisma(streamer);
+    const user: User = await userPrisma.find();
+    const timestampObj = new TimestampPrisma(user);
+    const foundTimestamp = await timestampObj.find(timestampName);
+    const backtrackLength = 90;
+    const { name, url, timestamp } = foundTimestamp;
+    return `${name}: ${url}?t=${timestamp - backtrackLength}s`;
+  } catch (error) {
+    if (error.message) return error.message;
+    return "Problem deleteing timestamp";
+  }
+};
+
 export const removeTimestamp = async (
   streamer: string,
   messageArray: string[],

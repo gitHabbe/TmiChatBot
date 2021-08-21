@@ -19,5 +19,7 @@ export enum CommandName {
   TRUST = "TRUST",
   UNTRUST = "UNTRUST",
   TS = "TS",
+  FINDTS = "FINDTS",
   DTS = "DTS",
+  FOLLOWAGE = "FOLLOWAGE",
 }
