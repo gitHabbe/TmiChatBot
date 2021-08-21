@@ -20,6 +20,8 @@ import {
   findTimestamp,
 } from "./commands/tmi";
 import { UserPrisma } from "./models/database/user";
+import { youtubeRegex } from "./config/youtubeConfig";
+import { youtubeInfo } from "./commands/socialMedia";
 
 const tmiClient = new Client(tmiOptions);
 
@@ -34,10 +36,19 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
   // const asdf = new UserPrisma("habbe");
   // await asdf.add();
   if (self) return;
+  const youtube_hit = youtubeRegex.exec(message);
+  if (youtube_hit) {
+    const videoInfo = await youtubeInfo(youtube_hit);
+    return tmiClient.say(channel, videoInfo);
+    return;
+  }
+
   const streamer: string = channel.slice(1);
   const chatterCommand: string = message.split(" ")[0];
   const isCommand = await isUserCustomCommand(streamer, chatterCommand);
   if (isCommand) return tmiClient.say(channel, isCommand.content);
+
+  if (message[0] !== "!") return;
   const chatterCommandUpper: string = chatterCommand.slice(1).toUpperCase();
   const messageArray: string[] = message.split(" ").slice(1);
 

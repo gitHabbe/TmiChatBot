@@ -11,9 +11,14 @@ export class TrustPrisma extends Prisma {
   isTrusted = async (name: ChatUserstate): Promise<boolean> => {
     const { username, mod } = name;
     if (!username) throw new Error(`User not found`);
-    const isMod: boolean = mod === true;
-    const isTrusted: boolean = this.find(username) !== null;
     const isStreamer: boolean = this.user.name === username;
+    const isMod: boolean = mod === true;
+    const trustee = await this.find(username);
+    let isTrusted = false;
+    console.log("~ username", username);
+    if (trustee) {
+      isTrusted = trustee.name.toLowerCase() === username.toLowerCase();
+    }
 
     return isStreamer || isMod || isTrusted;
   };
