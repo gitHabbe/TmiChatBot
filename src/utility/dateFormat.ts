@@ -44,10 +44,12 @@ export const dateToLetters = (dateObject: IletterFormatedDate): string => {
 export const secondsToHHMMSS = (seconds: number) => {
   let str: string = "";
   let days = Math.floor((seconds % 31536000) / 86400);
+  let hours = Math.floor(((seconds % 31536000) % 86400) / 3600);
+  let mins = Math.floor((((seconds % 31536000) % 86400) % 3600) / 60);
+  let secs = Math.floor((((seconds % 31536000) % 86400) % 3600) % 60);
   // let daysStr = days > 0 ? days + "d " : "";
   str += days > 0 ? days + "d " : "";
   // if (days > 0) str += days + "d ";
-  let hours = Math.floor(((seconds % 31536000) % 86400) / 3600);
   // let hoursStr =
   //   hours > 0 ? (hours < 10 ? "0" + hours + ":" : hours + ":") : "";
   str += hours > 0 ? (hours < 10 ? "0" + hours + ":" : hours + ":") : "";
@@ -58,7 +60,6 @@ export const secondsToHHMMSS = (seconds: number) => {
   //     str += hours + ":";
   //   }
   // }
-  let mins = Math.floor((((seconds % 31536000) % 86400) % 3600) / 60);
   // let minsStr = mins > 0 ? (mins < 10 ? "0" + mins + ":" : mins + ":") : "";
   str += mins > 0 ? (mins < 10 ? "0" + mins + ":" : mins + ":") : "";
   // if (mins > 0) {
@@ -68,7 +69,6 @@ export const secondsToHHMMSS = (seconds: number) => {
   //     str += mins + ":";
   //   }
   // }
-  let secs = Math.floor((((seconds % 31536000) % 86400) % 3600) % 60);
   console.log(days, hours, mins);
 
   str += hours === 0 && mins === 0 ? secs + "s" : secs < 0 ? "0" + secs : secs;
@@ -96,23 +96,26 @@ export const youtubeDurationToHHMMSS = (youtubeDuration: string) => {
   // PT3M31S
   // PT10H1M26S
   const youtubeDurationRegex: RegExp = /PT(\d?\dH)?(\d?\dM)?(\d?\dS)/;
-  const asdf = youtubeDurationRegex.exec(youtubeDuration);
-  if (asdf) {
-    const duration = asdf.slice(1).map((digit) => {
+  const youtubeRegex: RegExpExecArray | null =
+    youtubeDurationRegex.exec(youtubeDuration);
+  if (!youtubeRegex) return "N/A";
+  const paddedDuration: (string | undefined)[] = youtubeRegex
+    .slice(1)
+    .map((digit) => {
       if (typeof digit === "undefined") return;
       if (digit.length === 2) {
         return "0" + digit.slice(0, -1);
       }
       return digit.slice(0, -1);
     });
-    let aa = duration.filter((dd) => dd !== undefined).join(":");
-    if (aa.length == 2) {
-      aa = "00:" + aa;
-    }
-    console.log("~ duration", aa);
-    return aa;
+  let paddedTime: string = paddedDuration
+    .filter((dd) => dd !== undefined)
+    .join(":");
+  if (paddedTime.length == 2) {
+    paddedTime = "00:" + paddedTime;
   }
-  return "N/A";
+
+  return paddedTime;
 };
 
 export const numberToRoundedWithLetter = (views: string) => {

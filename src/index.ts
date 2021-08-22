@@ -21,7 +21,8 @@ import {
 } from "./commands/tmi";
 import { UserPrisma } from "./models/database/user";
 import { youtubeRegex } from "./config/youtubeConfig";
-import { youtubeInfo } from "./commands/socialMedia";
+import { tweetInfo, youtubeInfo } from "./commands/socialMedia";
+import { twitterRegex } from "./config/twitterConfig";
 
 const tmiClient = new Client(tmiOptions);
 
@@ -37,10 +38,12 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
   // await asdf.add();
   if (self) return;
   const youtube_hit = youtubeRegex.exec(message);
+  const tweet_hit = twitterRegex.exec(message);
+
   if (youtube_hit) {
-    const videoInfo = await youtubeInfo(youtube_hit);
-    return tmiClient.say(channel, videoInfo);
-    return;
+    return tmiClient.say(channel, await youtubeInfo(youtube_hit));
+  } else if (tweet_hit) {
+    return tmiClient.say(channel, await tweetInfo(tweet_hit));
   }
 
   const streamer: string = channel.slice(1);
