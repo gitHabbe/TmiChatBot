@@ -6,9 +6,17 @@ import {
   ILeaderboardReponse,
   IRunnerResponse,
   IRunner,
+  InduvidualLevelSupport,
+  IInduvidualLevel,
+  IInduvidualLevelResponse,
+  IInduvidualLevelWithVehicle,
 } from "../interfaces/speedrun";
-import { fuseSearchCategory } from "../utility/fusejs";
-import { datesDaysDifference, secondsToHHMMSS } from "../utility/dateFormat";
+import { fuseSearch, fuseSearchCategory } from "../utility/fusejs";
+import {
+  datesDaysDifference,
+  floatToHHMMSS,
+  secondsToHHMMSS,
+} from "../utility/dateFormat";
 import { getStreamerTitle, getStreamerGame } from "./twitch";
 import { GamePrisma } from "../models/database/game";
 import { RunnerPrisma } from "../models/database/runner";
@@ -17,6 +25,13 @@ import { JoinedGame } from "../interfaces/prisma";
 import { IAxiosOptions, Speedrun } from "../models/axiosFetch";
 import { AxiosResponse } from "axios";
 import { Runner } from "@prisma/client";
+import { speedrunAPI } from "../config/speedrunConfig";
+import {
+  JsonArrayFile,
+  JsonLevels,
+  JsonUserArrayFile,
+  level,
+} from "../models/JsonArrayFile";
 
 const gameFromMessage = async (
   messageArray: string[],
@@ -221,3 +236,60 @@ export const getPersonalBest = async (
     return error.message;
   }
 };
+
+export const getInduvidualWorldRecord = async (
+  streamer: string,
+  messageArray: string[]
+) => {
+  const gameName: string = await gameFromMessage(messageArray, streamer);
+  switch (gameName.toUpperCase()) {
+    case InduvidualLevelSupport.DKR:
+      return DiddyKongRacingInduvidualWorldRecord(messageArray);
+    default:
+      throw Error(`${gameName} doesn't support !ilwr`);
+  }
+};
+
+const DiddyKongRacingInduvidualWorldRecord = async (messageArray: string[]) => {
+  // const game: JoinedGame = await getGame(gameName);
+  const jsonLevels = new JsonLevels();
+  let levelData = jsonLevels.levels.getData;
+  // console.log("~ levelData", levelData);
+  const targetLevel = messageArray[1];
+  levelData = levelData.filter((level) => {
+    return level.abbreviation === targetLevel;
+  });
+  if (levelData.length === 0) levelData = jsonLevels.levels.getData;
+  const targetVehicle = messageArray[2];
+  if (targetVehicle) {
+    levelData = levelData.filter((level) => {
+      return level.vehicle === targetVehicle.toLowerCase();
+    });
+  } else {
+    levelData = levelData.filter((level) => {
+      return level.default;
+    });
+  }
+  const categoryId = "ndx0q5dq";
+  if (!targetLevel) throw new Error(`No level specified`);
+  const fuseHit = fuseSearch<level>(levelData, targetLevel);
+  console.log("~ fuseHit", fuseHit.slice(0, 3));
+  const optionsLeaderboard: IAxiosOptions = {
+    type: "Leaderboard",
+    name: "Induvidual level",
+    url: `leaderboards/9dow9e1p/level/${fuseHit[0].item.id}/${categoryId}?top=1`,
+  };
+  console.log("opt:", optionsLeaderboard.url);
+  const { data: leaderboardRes }: ILeaderboardReponse =
+    await axiosSpeedrunCom<ILeaderboardReponse>(optionsLeaderboard);
+  const worldRecord = leaderboardRes.runs[0].run.times.primary_t;
+  const worldRecordTime = floatToHHMMSS(worldRecord);
+  const userId = leaderboardRes.runs[0].run.players[0].id;
+  const user = await getRunner(userId);
+
+  return `${fuseHit[0].item.name} ${fuseHit[0].item.vehicle} WR: ${worldRecordTime} by ${user.name}`;
+};
+
+getInduvidualWorldRecord("habbe", ["dkrr", "htv"]).then((data) => {
+  console.log("data:", data);
+});

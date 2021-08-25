@@ -20,3 +20,20 @@ export const fuseSearchCategory = (
 
   return fuseSearch;
 };
+
+interface hasName {
+  name: string;
+}
+
+export const fuseSearch = <T extends hasName>(
+  candidates: T[],
+  target: string
+) => {
+  const fusejsOptions: Fuse.IFuseOptions<T> = fuseOptions;
+  const fuseObject: Fuse<T> = new Fuse(candidates, fusejsOptions);
+  const fuseSearch: Fuse.FuseResult<T>[] = fuseObject.search(target);
+
+  if (fuseSearch.length === 0) throw new Error(`${target} not found`);
+
+  return fuseSearch;
+};

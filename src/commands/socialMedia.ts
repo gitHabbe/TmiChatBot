@@ -1,7 +1,9 @@
 import { twitterAPI } from "../config/twitterConfig";
 import { youtubeAPI } from "../config/youtubeConfig";
 import {
+  ITwitterTweet,
   ITwitterTweetResponse,
+  ITwitterUser,
   IYoutubePagination,
 } from "../interfaces/socialMedia";
 import {
@@ -9,7 +11,9 @@ import {
   youtubeDurationToHHMMSS,
 } from "../utility/dateFormat";
 
-export const youtubeInfo = async (youtube_hit: RegExpExecArray) => {
+export const youtubeInfo = async (
+  youtube_hit: RegExpExecArray
+): Promise<string> => {
   try {
     const youtube_id = youtube_hit[3];
     const { data: youtube_pagination } =
@@ -32,16 +36,18 @@ export const youtubeInfo = async (youtube_hit: RegExpExecArray) => {
   }
 };
 
-export const tweetInfo = async (tweet_hit: RegExpExecArray) => {
+export const tweetInfo = async (
+  tweet_hit: RegExpExecArray
+): Promise<string> => {
   try {
     const tweet_id = tweet_hit[1];
     const { data: tweet } = await twitterAPI.get<ITwitterTweetResponse>(
       `/tweets/${tweet_id}?expansions=author_id&user.fields=name,username,verified&tweet.fields=public_metrics,created_at`
     );
     console.log("tweet:", tweet);
-    const { text } = tweet.data;
-    const { name, username, verified } = tweet.includes.users[0];
-    const verifiedCheck = verified ? "✔" : ""; // alt: ✅
+    const { text }: ITwitterTweet = tweet.data;
+    const { name, username, verified }: ITwitterUser = tweet.includes.users[0];
+    const verifiedCheck: string = verified ? "✔" : ""; // alt: ✅
 
     return `[${name}@${username}${verifiedCheck}] ${text}`;
   } catch (error) {

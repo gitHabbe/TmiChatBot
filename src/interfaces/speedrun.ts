@@ -84,3 +84,24 @@ export enum SpeedrunComErrorMessage {
   GenericAxios = "Problem getting data from SpeedrunCom",
   Generic = "Problem getting data from",
 }
+
+export enum InduvidualLevelSupport {
+  DKR = "DKR",
+}
+
+export interface IInduvidualLevel {
+  id: string;
+  name: string;
+  links: {
+    rel: string;
+    uri: string;
+  }[];
+}
+
+export interface IInduvidualLevelResponse {
+  data: IInduvidualLevel[];
+}
+
+export interface IInduvidualLevelWithVehicle extends IInduvidualLevel {
+  vehicle: string;
+}

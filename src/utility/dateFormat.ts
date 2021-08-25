@@ -47,40 +47,11 @@ export const secondsToHHMMSS = (seconds: number) => {
   let hours = Math.floor(((seconds % 31536000) % 86400) / 3600);
   let mins = Math.floor((((seconds % 31536000) % 86400) % 3600) / 60);
   let secs = Math.floor((((seconds % 31536000) % 86400) % 3600) % 60);
-  // let daysStr = days > 0 ? days + "d " : "";
   str += days > 0 ? days + "d " : "";
-  // if (days > 0) str += days + "d ";
-  // let hoursStr =
-  //   hours > 0 ? (hours < 10 ? "0" + hours + ":" : hours + ":") : "";
   str += hours > 0 ? (hours < 10 ? "0" + hours + ":" : hours + ":") : "";
-  // if (hours > 0) {
-  //   if (hours < 10) {
-  //     str += "0" + hours + ":";
-  //   } else {
-  //     str += hours + ":";
-  //   }
-  // }
-  // let minsStr = mins > 0 ? (mins < 10 ? "0" + mins + ":" : mins + ":") : "";
   str += mins > 0 ? (mins < 10 ? "0" + mins + ":" : mins + ":") : "";
-  // if (mins > 0) {
-  //   if (mins < 10) {
-  //     str += "0" + mins + ":";
-  //   } else {
-  //     str += mins + ":";
-  //   }
-  // }
-  console.log(days, hours, mins);
-
   str += hours === 0 && mins === 0 ? secs + "s" : secs < 0 ? "0" + secs : secs;
-  // if (secs > 0) {
-  //   if (hours < 0 && mins < 0) {
-  //     str += secs + "s";
-  //   } else if (secs < 10) {
-  //     str += "0" + secs;
-  //   } else {
-  //     str += secs + "";
-  //   }
-  // }
+
   return str.trim();
 };
 
@@ -136,4 +107,27 @@ export const numberToRoundedWithLetter = (views: string) => {
     zeros = 0;
   }
   return (viewsNum / Math.pow(10, zeros)).toFixed(zeros ? 1 : 0) + suffix;
+};
+
+export const floatToHHMMSS = (time: number) => {
+  let str = "";
+  let mins = Math.floor((((time % 31536000) % 86400) % 3600) / 60);
+  if (mins > 0) {
+    if (mins < 10) {
+      str += "0" + mins + ":";
+    } else {
+      str += mins + ":";
+    }
+  }
+  let secs = Math.floor((((time % 31536000) % 86400) % 3600) % 60);
+  if (secs > 0) {
+    if (secs < 10) {
+      str += "0" + secs;
+    } else {
+      str += secs;
+    }
+  }
+
+  let milli = String(time).split(".");
+  return str + "." + milli[1];
 };

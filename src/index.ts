@@ -1,7 +1,11 @@
 import { Client } from "tmi.js";
 import { tmiOptions } from "./config/tmiConfig";
 import { CommandName } from "./interfaces/tmi";
-import { getPersonalBest, getWorldRecord } from "./commands/speedrun";
+import {
+  getInduvidualWorldRecord,
+  getPersonalBest,
+  getWorldRecord,
+} from "./commands/speedrun";
 import {
   getFollowage,
   getStreamerTitle,
@@ -64,6 +68,12 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
       break;
     case CommandName.WR:
       tmiClient.say(channel, await getWorldRecord(channel, messageArray));
+      break;
+    case CommandName.ILWR:
+      tmiClient.say(
+        channel,
+        await getInduvidualWorldRecord(streamer, messageArray)
+      );
       break;
     case CommandName.PB:
       tmiClient.say(channel, await getPersonalBest(channel, messageArray));
