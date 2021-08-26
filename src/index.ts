@@ -75,6 +75,9 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
         await getInduvidualWorldRecord(streamer, messageArray)
       );
       break;
+    case CommandName.ILPB:
+      console.log("ILPB");
+      break;
     case CommandName.PB:
       tmiClient.say(channel, await getPersonalBest(channel, messageArray));
       break;

@@ -254,7 +254,6 @@ const DiddyKongRacingInduvidualWorldRecord = async (messageArray: string[]) => {
   // const game: JoinedGame = await getGame(gameName);
   const jsonLevels = new JsonLevels();
   let levelData = jsonLevels.levels.getData;
-  // console.log("~ levelData", levelData);
   const targetLevel = messageArray[1];
   levelData = levelData.filter((level) => {
     return level.abbreviation === targetLevel;
@@ -290,6 +289,74 @@ const DiddyKongRacingInduvidualWorldRecord = async (messageArray: string[]) => {
   return `${fuseHit[0].item.name} ${fuseHit[0].item.vehicle} WR: ${worldRecordTime} by ${user.name}`;
 };
 
-getInduvidualWorldRecord("habbe", ["dkrr", "htv"]).then((data) => {
-  console.log("data:", data);
-});
+export const getInduvidualPersonalBest = async (
+  streamer: string,
+  messageArray: string[]
+) => {
+  const gameName: string = await gameFromMessage(
+    messageArray.slice(1),
+    streamer
+  );
+  switch (gameName.toUpperCase()) {
+    case InduvidualLevelSupport.DKR:
+      return DiddyKongRacingInduvidualPersonalBest(messageArray);
+    default:
+      throw Error(`${gameName} doesn't support !ilwr`);
+  }
+};
+
+const DiddyKongRacingInduvidualPersonalBest = async (
+  messageArray: string[]
+) => {
+  const jsonLevels = new JsonLevels();
+  let levelData = jsonLevels.levels.getData;
+  const runnerArg = messageArray[0];
+  console.log("~ runnerArg", runnerArg);
+  const targetLevel = messageArray[2];
+  if (!targetLevel) throw new Error(`No level specified`);
+  console.log("~ targetLevel", targetLevel);
+  console.log("~ levelData", levelData);
+  levelData = levelData.filter((level) => {
+    return level.abbreviation === targetLevel;
+  });
+  if (levelData.length === 0) levelData = jsonLevels.levels.getData;
+  const targetVehicle = messageArray[3];
+  console.log("~ targetVehicle", targetVehicle);
+  if (targetVehicle) {
+    levelData = levelData.filter((level) => {
+      return level.vehicle === targetVehicle.toLowerCase();
+    });
+  } else {
+    levelData = levelData.filter((level) => {
+      return level.default;
+    });
+  }
+  const categoryId = "ndx0q5dq";
+  const fuseHit = fuseSearch<level>(levelData, targetLevel);
+  console.log("~ fuseHit", fuseHit.slice(0, 3));
+  const optionsLeaderboard: IAxiosOptions = {
+    type: "Leaderboard",
+    name: "Induvidual level",
+    url: `leaderboards/9dow9e1p/level/${fuseHit[0].item.id}/${categoryId}`,
+  };
+  console.log("opt:", optionsLeaderboard.url);
+  const runner = await getRunner(runnerArg);
+  console.log("~ runner", runner);
+  const { data: leaderboardRes }: ILeaderboardReponse =
+    await axiosSpeedrunCom<ILeaderboardReponse>(optionsLeaderboard);
+  const personalBest = leaderboardRes.runs.find((run) => {
+    return run.run.players[0].id === runner.id;
+  });
+  if (!personalBest) throw new Error(`Run not found`);
+  const personalBestTime = floatToHHMMSS(personalBest.run.times.primary_t);
+  console.log("~ personalBestTime", personalBestTime);
+
+  return `${runner.name} ${fuseHit[0].item.name} ${fuseHit[0].item.vehicle} PB: ${personalBestTime} by ${runner.name}`;
+};
+
+getInduvidualPersonalBest("habbe", ["nordicboa", "dkr", "tricky"]).then(
+  (data) => {
+    console.log("data:", data);
+    return;
+  }
+);
