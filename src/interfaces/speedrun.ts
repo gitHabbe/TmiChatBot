@@ -89,6 +89,10 @@ export enum InduvidualLevelSupport {
   DKR = "DKR",
 }
 
+export enum TimeTrialSupport {
+  DKR = "DKR",
+}
+
 export interface IInduvidualLevel {
   id: string;
   name: string;

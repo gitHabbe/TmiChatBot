@@ -47,7 +47,7 @@ export const tweetInfo = async (
     console.log("tweet:", tweet);
     const { text }: ITwitterTweet = tweet.data;
     const { name, username, verified }: ITwitterUser = tweet.includes.users[0];
-    const verifiedCheck: string = verified ? "✔" : ""; // alt: ✅
+    const verifiedCheck: string = verified ? "✔" : ""; // alts: ✅ 💬
 
     return `[${name}@${username}${verifiedCheck}] ${text}`;
   } catch (error) {

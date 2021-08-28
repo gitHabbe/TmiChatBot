@@ -2,8 +2,11 @@ import { Client } from "tmi.js";
 import { tmiOptions } from "./config/tmiConfig";
 import { CommandName } from "./interfaces/tmi";
 import {
+  getInduvidualPersonalBest,
   getInduvidualWorldRecord,
   getPersonalBest,
+  getTimeTrialPersonalBest,
+  getTimeTrialWorldRecord,
   getWorldRecord,
 } from "./commands/speedrun";
 import {
@@ -75,11 +78,26 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
         await getInduvidualWorldRecord(streamer, messageArray)
       );
       break;
-    case CommandName.ILPB:
-      console.log("ILPB");
-      break;
     case CommandName.PB:
       tmiClient.say(channel, await getPersonalBest(channel, messageArray));
+      break;
+    case CommandName.ILPB:
+      tmiClient.say(
+        channel,
+        await getInduvidualPersonalBest(streamer, messageArray)
+      );
+      break;
+    case CommandName.TTWR:
+      tmiClient.say(
+        channel,
+        await getTimeTrialWorldRecord(streamer, messageArray)
+      );
+      break;
+    case CommandName.TTPB:
+      tmiClient.say(
+        channel,
+        await getTimeTrialPersonalBest(streamer, messageArray)
+      );
       break;
     case CommandName.JOIN:
       tmiClient.say(channel, await createUser(channel, userstate));

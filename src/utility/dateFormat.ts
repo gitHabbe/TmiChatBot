@@ -127,6 +127,28 @@ export const floatToHHMMSS = (time: number) => {
       str += secs;
     }
   }
+  let milli = String(time).split(".");
+  return str + "." + milli[1];
+};
+
+export const stringFloatToHHMMSSmm = (time: string) => {
+  let str = "";
+  let mins = Math.floor((((parseInt(time) % 31536000) % 86400) % 3600) / 60);
+  if (mins > 0) {
+    if (mins < 10) {
+      str += "0" + mins + ":";
+    } else {
+      str += mins + ":";
+    }
+  }
+  let secs = Math.floor((((parseInt(time) % 31536000) % 86400) % 3600) % 60);
+  if (secs > 0) {
+    if (secs < 10) {
+      str += "0" + secs;
+    } else {
+      str += secs;
+    }
+  }
 
   let milli = String(time).split(".");
   return str + "." + milli[1];

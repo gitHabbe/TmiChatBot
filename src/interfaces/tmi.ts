@@ -24,4 +24,6 @@ export enum CommandName {
   FOLLOWAGE = "FOLLOWAGE",
   ILWR = "ILWR",
   ILPB = "ILPB",
+  TTWR = "TTWR",
+  TTPB = "TTPB",
 }

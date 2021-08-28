@@ -10,12 +10,14 @@ import {
   IInduvidualLevel,
   IInduvidualLevelResponse,
   IInduvidualLevelWithVehicle,
+  TimeTrialSupport,
 } from "../interfaces/speedrun";
 import { fuseSearch, fuseSearchCategory } from "../utility/fusejs";
 import {
   datesDaysDifference,
   floatToHHMMSS,
   secondsToHHMMSS,
+  stringFloatToHHMMSSmm,
 } from "../utility/dateFormat";
 import { getStreamerTitle, getStreamerGame } from "./twitch";
 import { GamePrisma } from "../models/database/game";
@@ -25,13 +27,9 @@ import { JoinedGame } from "../interfaces/prisma";
 import { IAxiosOptions, Speedrun } from "../models/axiosFetch";
 import { AxiosResponse } from "axios";
 import { Runner } from "@prisma/client";
-import { speedrunAPI } from "../config/speedrunConfig";
-import {
-  JsonArrayFile,
-  JsonLevels,
-  JsonUserArrayFile,
-  level,
-} from "../models/JsonArrayFile";
+import { JsonLevels, JsonTimeTrials } from "../models/JsonArrayFile";
+import { ILevel, ITimeTrialResponse } from "../interfaces/specificGames";
+import { dkr64API } from "../config/speedrunConfig";
 
 const gameFromMessage = async (
   messageArray: string[],
@@ -253,12 +251,12 @@ export const getInduvidualWorldRecord = async (
 const DiddyKongRacingInduvidualWorldRecord = async (messageArray: string[]) => {
   // const game: JoinedGame = await getGame(gameName);
   const jsonLevels = new JsonLevels();
-  let levelData = jsonLevels.levels.getData;
+  let levelData = jsonLevels.data();
   const targetLevel = messageArray[1];
   levelData = levelData.filter((level) => {
     return level.abbreviation === targetLevel;
   });
-  if (levelData.length === 0) levelData = jsonLevels.levels.getData;
+  if (levelData.length === 0) levelData = jsonLevels.data();
   const targetVehicle = messageArray[2];
   if (targetVehicle) {
     levelData = levelData.filter((level) => {
@@ -271,7 +269,7 @@ const DiddyKongRacingInduvidualWorldRecord = async (messageArray: string[]) => {
   }
   const categoryId = "ndx0q5dq";
   if (!targetLevel) throw new Error(`No level specified`);
-  const fuseHit = fuseSearch<level>(levelData, targetLevel);
+  const fuseHit = fuseSearch<ILevel>(levelData, targetLevel);
   console.log("~ fuseHit", fuseHit.slice(0, 3));
   const optionsLeaderboard: IAxiosOptions = {
     type: "Leaderboard",
@@ -309,7 +307,7 @@ const DiddyKongRacingInduvidualPersonalBest = async (
   messageArray: string[]
 ) => {
   const jsonLevels = new JsonLevels();
-  let levelData = jsonLevels.levels.getData;
+  let levelData = jsonLevels.data();
   const runnerArg = messageArray[0];
   console.log("~ runnerArg", runnerArg);
   const targetLevel = messageArray[2];
@@ -319,7 +317,7 @@ const DiddyKongRacingInduvidualPersonalBest = async (
   levelData = levelData.filter((level) => {
     return level.abbreviation === targetLevel;
   });
-  if (levelData.length === 0) levelData = jsonLevels.levels.getData;
+  if (levelData.length === 0) levelData = jsonLevels.data();
   const targetVehicle = messageArray[3];
   console.log("~ targetVehicle", targetVehicle);
   if (targetVehicle) {
@@ -332,7 +330,7 @@ const DiddyKongRacingInduvidualPersonalBest = async (
     });
   }
   const categoryId = "ndx0q5dq";
-  const fuseHit = fuseSearch<level>(levelData, targetLevel);
+  const fuseHit = fuseSearch<ILevel>(levelData, targetLevel);
   console.log("~ fuseHit", fuseHit.slice(0, 3));
   const optionsLeaderboard: IAxiosOptions = {
     type: "Leaderboard",
@@ -354,9 +352,155 @@ const DiddyKongRacingInduvidualPersonalBest = async (
   return `${runner.name} ${fuseHit[0].item.name} ${fuseHit[0].item.vehicle} PB: ${personalBestTime} by ${runner.name}`;
 };
 
-getInduvidualPersonalBest("habbe", ["nordicboa", "dkr", "tricky"]).then(
-  (data) => {
-    console.log("data:", data);
-    return;
+export const getTimeTrialWorldRecord = async (
+  streamer: string,
+  messageArray: string[]
+) => {
+  const gameName: string = await gameFromMessage(messageArray, streamer);
+  console.log("gameName:", gameName);
+  switch (gameName.toUpperCase()) {
+    case TimeTrialSupport.DKR:
+      return DiddyKongRacingTimeTrialWorldRecord(messageArray);
+
+    default:
+      return "No WR found";
+      break;
   }
-);
+};
+
+// ttwr dkr lake
+
+const filterDiddyKongRacingTimeTrial = async (messageArray: string[]) => {
+  const targetVehicle = messageArray[2];
+  const jsonTimeTrials = new JsonTimeTrials();
+  let vehicle = "",
+    laps = "3",
+    shortcut = false;
+  let tracks = jsonTimeTrials.data();
+  let filteredMessage = messageArray
+    .filter((word) => {
+      if (parseInt(word) === 1) laps = "1";
+      return parseInt(word) !== 1;
+    })
+    .filter((word) => {
+      const shortcutKeywords = ["shortcut", "short", "sc"];
+      if (shortcutKeywords.includes(word)) shortcut = true;
+      return !shortcutKeywords.includes(word);
+    })
+    .filter((word) => {
+      const vehicles = ["CAR", "HOVER", "PLANE"];
+      if (vehicles.includes(word.toUpperCase())) vehicle = word;
+      return !vehicles.includes(word.toUpperCase());
+    })
+    .filter((word) => {
+      return word !== "3";
+    });
+  const trackQuery = filteredMessage.slice(1).join(" ");
+  console.log("~ filteredMessage", filteredMessage);
+  // const targetLevel = filteredMessage[1];
+  tracks = tracks.filter((track) => {
+    return track.abbreviation === trackQuery;
+  });
+  if (tracks.length === 0) tracks = jsonTimeTrials.data();
+  if (vehicle) {
+    tracks = tracks.filter((track) => {
+      return track.vehicle === vehicle;
+    });
+  } else {
+    tracks = tracks.filter((track) => {
+      return track.default === true;
+    });
+  }
+  console.log("~ trackQuery", trackQuery);
+  console.log("~ laps", laps);
+  console.log("~ shortcut", shortcut);
+  console.log("~ vehicle", vehicle);
+  console.log("~ tracks", tracks.length, tracks.slice(0, 3));
+  const trackType = shortcut ? "shortcut" : "standard";
+  const fuseHit = fuseSearch<ILevel>(tracks, trackQuery);
+
+  return { fuseHit: fuseHit[0], laps, trackType };
+};
+
+const DiddyKongRacingTimeTrialWorldRecord = async (messageArray: string[]) => {
+  const { fuseHit, laps, trackType } = await filterDiddyKongRacingTimeTrial(
+    messageArray
+  );
+  console.log("~ fuseHit, laps, trackType", fuseHit, laps, trackType);
+  const { vehicle, name } = fuseHit.item;
+  console.log("~ vehicle, name", vehicle, name);
+  console.log(
+    `&track=${name}&vehicle=${vehicle}&laps=${laps}&type=${trackType}`
+  );
+
+  const worldRecoard = await dkr64API.get<ITimeTrialResponse>(
+    `/world_record?api_token=${process.env.DKR64_API_TOKEN}&track=${name}&vehicle=${vehicle}&laps=${laps}&type=${trackType}`
+  );
+  console.log("~ worldRecoard", worldRecoard.data);
+  const runner = worldRecoard.data.times[0].username;
+  let time = worldRecoard.data.times[0].time_value;
+  console.log("parseFloat(time):", parseFloat(time).toFixed(2));
+  time = stringFloatToHHMMSSmm(time);
+  const track = name
+    .split("-")
+    .map((word) => {
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join(" ");
+  const formalVehicle = vehicle.charAt(0).toUpperCase() + vehicle.slice(1);
+  const shortcut = trackType === "shortcut" ? "[Shortcut]" : "";
+
+  return `${track} [${formalVehicle}][${laps}-lap]${shortcut} WR: ${time} by ${runner}`;
+};
+
+export const getTimeTrialPersonalBest = async (
+  streamer: string,
+  messageArray: string[]
+): Promise<string> => {
+  const gameName: string = await gameFromMessage(
+    messageArray.slice(1),
+    streamer
+  );
+  console.log("gameName:", gameName);
+  switch (gameName.toUpperCase()) {
+    case TimeTrialSupport.DKR:
+      return DiddyKongRacingTimeTrialPersonalBest(messageArray);
+    default:
+      return "Didnt' work";
+  }
+};
+
+const DiddyKongRacingTimeTrialPersonalBest = async (messageArray: string[]) => {
+  const { fuseHit, laps, trackType } = await filterDiddyKongRacingTimeTrial(
+    messageArray.slice(1)
+  );
+  const { vehicle, name } = fuseHit.item;
+  const runner = messageArray[0];
+  console.log("~ runner", runner);
+  const personalBest = await dkr64API.get<ITimeTrialResponse>(
+    `/times?api_token=${process.env.DKR64_API_TOKEN}&track=${name}&vehicle=${vehicle}&laps=${laps}&type=${trackType}&user=${runner}`
+  );
+  const run = personalBest.data.times.find((run) => {
+    console.log("run.username.toUpperCase():", run.username.toUpperCase());
+    return run.username.toUpperCase() === runner.toUpperCase();
+  });
+  if (!run) throw new Error(`Cant find run`);
+  let time = run.time_value;
+  console.log("parseFloat(time):", parseFloat(time).toFixed(2));
+  time = stringFloatToHHMMSSmm(time);
+  const track = name
+    .split("-")
+    .map((word) => {
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join(" ");
+  const formalVehicle = vehicle.charAt(0).toUpperCase() + vehicle.slice(1);
+  const shortcut = trackType === "shortcut" ? "[Shortcut]" : "";
+
+  return `${runner} ${track} [${formalVehicle}][${laps}-lap]${shortcut} PB: ${time}`;
+};
+
+getTimeTrialWorldRecord("habbe", ["dkr", "1", "dc", "hover"]).then((data) => {
+  console.log("data:", data);
+  return;
+});

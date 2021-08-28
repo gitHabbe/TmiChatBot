@@ -1,6 +1,6 @@
 import { ChatUserstate } from "tmi.js";
 import { Command, User } from "@prisma/client";
-import { JsonUserArrayFile } from "../models/JsonArrayFile";
+import { JsonStringArray } from "../models/JsonArrayFile";
 import { UserPrisma } from "../models/database/user";
 import { CommandPrisma } from "../models/database/command";
 import { TrustPrisma } from "../models/database/trust";
@@ -24,8 +24,8 @@ export const createUser = async (
     const newPrismaUser = await user.add();
 
     if (newPrismaUser) {
-      const jsonUser = new JsonUserArrayFile<string>(newPrismaUser.name);
-      jsonUser.add();
+      const jsonUser = new JsonStringArray();
+      jsonUser.add(newPrismaUser.name);
     }
     return `I have joined channel: ${newPrismaUser.name}`;
   } catch (error) {
@@ -41,8 +41,8 @@ export const removeUser = async (userstate: ChatUserstate): Promise<string> => {
     const user = new UserPrisma(userstate.username);
     const removedUser = await user.remove();
     if (removedUser) {
-      const jsonUser = new JsonUserArrayFile<string>(removedUser.name);
-      jsonUser.remove();
+      const jsonUser = new JsonStringArray();
+      jsonUser.remove(removedUser.name);
     }
     return `I have left channel: ${removeUser.name}`;
   } catch (error) {

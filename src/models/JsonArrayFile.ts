@@ -1,60 +1,68 @@
 import { readFileSync, writeFileSync } from "fs";
-
-export class JsonUserArrayFile<T> {
-  private jsonFile: string = "./src/private/tmi_channels.json";
-  private data: T[] = JSON.parse(readFileSync(this.jsonFile, "utf8"));
-
-  constructor(private username: T) {}
-
-  add = (): void => {
-    if (this.isInJson()) {
-      throw new Error("User already in JSON");
-    }
-    writeFileSync(this.jsonFile, JSON.stringify([...this.data, this.username]));
-  };
-
-  remove = (): void => {
-    const newData = this.data.filter((name: T) => name !== this.username);
-    writeFileSync(this.jsonFile, JSON.stringify(newData));
-  };
-
-  isInJson = (): T | undefined => {
-    return this.data.find((user: T) => user === this.username);
-  };
-}
-
-// interface hasId {
-//   id: string;
-// }
-
-export class JsonArrayFile<T> {
-  private jsonFile: string = `./src/private/${this.filename}.json`;
-  private data: T[] = JSON.parse(readFileSync(this.jsonFile, "utf8"));
+import {
+  ILevel,
+  ILevels,
+  ITimeTrialJson,
+  ITimeTrialsJson,
+} from "../interfaces/specificGames";
+export class JsonFile<T> {
+  jsonFile: string = `./src/private/${this.filename}.json`;
+  private data = JSON.parse(readFileSync(this.jsonFile, "utf8"));
   constructor(private filename: string) {}
 
-  get getData() {
+  get getData(): T {
     return this.data;
   }
-
-  add = (newData: T) => {
-    writeFileSync(this.jsonFile, JSON.stringify([...this.data, newData]));
-  };
 }
 
-export interface level {
-  id: string;
-  name: string;
-  abbreviation: string;
-  vehicle: string;
-  default: boolean;
+export class JsonStringArray {
+  private strings = new JsonFile<string[]>("tmi_channels");
+
+  add = (newString: string) => {
+    if (this.isInJson(newString)) {
+      throw new Error("User already in JSON");
+    }
+    writeFileSync(
+      this.strings.jsonFile,
+      JSON.stringify([...this.strings.getData, newString])
+    );
+  };
+
+  remove = (newString: string): void => {
+    const newArray = this.strings.getData.filter(
+      (curString: string) => curString !== newString
+    );
+    writeFileSync(this.strings.jsonFile, JSON.stringify(newArray));
+  };
+
+  isInJson = (newUser: string) => {
+    return this.strings.getData.find((user: string) => user === newUser);
+  };
 }
 
 export class JsonLevels {
-  levels = new JsonArrayFile<level>("dkr_data");
-  constructor() {}
+  private levels = new JsonFile<ILevels>("dkr_data");
 
-  find = (lvl: level) => {
-    return this.levels.getData.find((level) => {
+  data = (): ILevel[] => {
+    return this.levels.getData.levels;
+  };
+
+  find = (lvl: ILevel) => {
+    return this.data().find((level) => {
+      return level.abbreviation === lvl.abbreviation;
+    });
+  };
+}
+
+export class JsonTimeTrials {
+  private levels = new JsonFile<ITimeTrialsJson>("dkr_data");
+
+  data = (): ITimeTrialJson[] => {
+    return this.levels.getData.timetrial;
+  };
+
+  find = (lvl: ITimeTrialJson) => {
+    return this.data().find((level) => {
       return level.abbreviation === lvl.abbreviation;
     });
   };
