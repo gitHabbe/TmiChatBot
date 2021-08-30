@@ -26,4 +26,9 @@ export enum CommandName {
   ILPB = "ILPB",
   TTWR = "TTWR",
   TTPB = "TTPB",
+  TOGGLE = "TOGGLE",
+}
+
+export enum ComponentsSupport {
+  SLOTS = "SLOTS",
 }

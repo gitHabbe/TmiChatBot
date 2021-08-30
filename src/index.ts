@@ -25,6 +25,7 @@ import {
   addTimestamp,
   removeTimestamp,
   findTimestamp,
+  toggleComponent,
 } from "./commands/tmi";
 import { UserPrisma } from "./models/database/user";
 import { youtubeRegex } from "./config/youtubeConfig";
@@ -41,8 +42,8 @@ try {
 }
 
 tmiClient.on("message", async (channel, userstate, message, self) => {
-  // const asdf = new UserPrisma("habbe");
-  // await asdf.add();
+  const asdf = new UserPrisma("habbe");
+  await asdf.add();
   if (self) return;
   const youtube_hit = youtubeRegex.exec(message);
   const tweet_hit = twitterRegex.exec(message);
@@ -145,6 +146,9 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
       break;
     case CommandName.FOLLOWAGE:
       tmiClient.say(channel, await getFollowage(streamer, userstate));
+      break;
+    case CommandName.TOGGLE:
+      tmiClient.say(channel, await toggleComponent(streamer, messageArray));
       break;
     default:
       break;

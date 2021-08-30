@@ -7,6 +7,8 @@ import { TrustPrisma } from "../models/database/trust";
 import { fetchStreamer, fetchStreamerVideos } from "./twitch";
 import { TimestampPrisma } from "../models/database/timestamp";
 import { IStreamer, IVideo } from "../interfaces/twitch";
+import { ComponentPrisma } from "../models/database/component";
+import { ComponentsSupport } from "../interfaces/tmi";
 
 export const createUser = async (
   channel: string,
@@ -227,5 +229,28 @@ export const removeTimestamp = async (
   } catch (error) {
     if (error.message) return error.message;
     return "Problem deleteing timestamp";
+  }
+};
+
+export const toggleComponent = async (
+  streamer: string,
+  messageArray: string[]
+) => {
+  try {
+    const targetComponent = messageArray[0];
+    const isSupported = targetComponent.toUpperCase() in ComponentsSupport;
+    if (!isSupported)
+      throw new Error(`Component ${targetComponent} doesn't exist`);
+    const userPrisma = new UserPrisma(streamer);
+    const user: User = await userPrisma.find();
+    const component = new ComponentPrisma(user, targetComponent);
+    await component.toggle();
+    const componentStatus =
+      (await component.isEnabled()) === true ? "Enabled" : "Disabled";
+
+    return `Component ${targetComponent} is now: ${componentStatus}`;
+  } catch (error) {
+    if (error.message) return error.message;
+    return "Problem toggling component";
   }
 };

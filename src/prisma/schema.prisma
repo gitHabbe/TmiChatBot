@@ -109,6 +109,8 @@ model Timestamp {
 model Component {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
+  name      String
+  enabled   Boolean
 
   user    User @relation(fields: [userId], references: [id])
   userId  Int
