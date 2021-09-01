@@ -76,6 +76,7 @@ model User {
   name      String       @unique
 
   commands    Command[]
+  settings    setting[]
   timestamps  Timestamp[]
   components  Component[]
   trusts      Trust[]
@@ -121,6 +122,16 @@ model Trust {
   createdAt DateTime @default(now())
   name      String
   madeBy    String
+
+  user    User @relation(fields: [userId], references: [id])
+  userId  Int
+}
+
+model setting {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  type      String
+  value     String
 
   user    User @relation(fields: [userId], references: [id])
   userId  Int

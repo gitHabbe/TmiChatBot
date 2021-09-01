@@ -27,8 +27,10 @@ export enum CommandName {
   TTWR = "TTWR",
   TTPB = "TTPB",
   TOGGLE = "TOGGLE",
+  SETSPEEDRUNNER = "SETSPEEDRUNNER",
 }
 
 export enum ComponentsSupport {
   SLOTS = "SLOTS",
+  POKEMON = "POKEMON",
 }

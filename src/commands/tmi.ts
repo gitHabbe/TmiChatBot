@@ -9,6 +9,9 @@ import { TimestampPrisma } from "../models/database/timestamp";
 import { IStreamer, IVideo } from "../interfaces/twitch";
 import { ComponentPrisma } from "../models/database/component";
 import { ComponentsSupport } from "../interfaces/tmi";
+import { randomInt } from "../utility/math";
+import { pokemonAPI } from "../config/pokemonConfig";
+import { IPokemon } from "../interfaces/pokemon";
 
 export const createUser = async (
   channel: string,
@@ -196,6 +199,7 @@ export const findTimestamp = async (
   messageArray: string[]
 ) => {
   try {
+    console.log("~ messageArray", messageArray);
     const timestampName: string = messageArray[0];
     const userPrisma = new UserPrisma(streamer);
     const user: User = await userPrisma.find();
@@ -237,10 +241,8 @@ export const toggleComponent = async (
   messageArray: string[]
 ) => {
   try {
-    const targetComponent = messageArray[0];
-    const isSupported = targetComponent.toUpperCase() in ComponentsSupport;
-    if (!isSupported)
-      throw new Error(`Component ${targetComponent} doesn't exist`);
+    // console.log("messageArray:", messageArray);
+    let targetComponent = messageArray[0].toUpperCase();
     const userPrisma = new UserPrisma(streamer);
     const user: User = await userPrisma.find();
     const component = new ComponentPrisma(user, targetComponent);
@@ -254,3 +256,83 @@ export const toggleComponent = async (
     return "Problem toggling component";
   }
 };
+
+export const componentSlots = async (
+  streamer: string,
+  messageArray: string[]
+) => {
+  console.log("~ messageArray", messageArray);
+  const targetComponent = "SLOTS";
+  const userPrisma = new UserPrisma(streamer);
+  const user: User = await userPrisma.find();
+  const component = new ComponentPrisma(user, targetComponent);
+  const isEnabled = await component.isEnabled();
+  if (!isEnabled) return `Component ${targetComponent} is not enabled`;
+
+  const emoteSelection = [
+    "PogChamp",
+    "EleGiggle",
+    "Jebaited",
+    "VoHiYo",
+    "SeemsGood",
+  ];
+  const maxLength = emoteSelection.length;
+  const rolls = [
+    randomInt(maxLength),
+    randomInt(maxLength),
+    randomInt(maxLength),
+  ];
+  const isBingo: boolean = rolls.every((roll) => roll === rolls[0]);
+  const gameResult = [
+    emoteSelection[rolls[0]],
+    emoteSelection[rolls[1]],
+    emoteSelection[rolls[2]],
+  ];
+  const gameResultSentence = gameResult.join(" | ");
+
+  return gameResultSentence;
+};
+
+export const componentPokemon = async (
+  streamer: string,
+  messageArray: string[]
+) => {
+  const targetPokemon = messageArray[0];
+  const targetComponent = "POKEMON";
+  try {
+    const userPrisma = new UserPrisma(streamer);
+    const user: User = await userPrisma.find();
+    const component = new ComponentPrisma(user, targetComponent);
+    const isEnabled = await component.isEnabled();
+    if (!isEnabled) return `Component ${targetComponent} is not enabled`;
+    const pokemon = await pokemonAPI.get<IPokemon>(`pokemon/${targetPokemon}`);
+    return formatPokemonStats(pokemon.data);
+  } catch (error) {
+    return `Pokémon ${targetPokemon} not found`;
+  }
+};
+
+export const formatPokemonStats = (pokemon: IPokemon) => {
+  const truncatedStats = ["HP", "A", "D", "SA", "SD", "S"];
+  const stats = pokemon.stats.map(
+    (stat, i) => `${truncatedStats[i]}:${stat.base_stat}`
+  );
+  const statsString = stats.join(" ");
+  const types = pokemon.types.map(
+    (type) => type.type.name[0].toUpperCase() + type.type.name.slice(1)
+  );
+  const typesString = types.join(" & ");
+  const { name, id } = pokemon;
+  const formalName = name[0].toUpperCase() + name.slice(1);
+
+  return `${formalName} #${id} | ${typesString} | ${statsString}`;
+};
+
+componentPokemon("habbe", ["raichu"]).then((data) => {
+  console.log("data:", data);
+  // console.log("data:", data);
+});
+
+// toggleComponent("habbe", ["slots"]).then((data) => {
+//   console.log("data:", data);
+// });

@@ -30,6 +30,8 @@ import { Runner } from "@prisma/client";
 import { JsonLevels, JsonTimeTrials } from "../models/JsonArrayFile";
 import { ILevel, ITimeTrialResponse } from "../interfaces/specificGames";
 import { dkr64API } from "../config/speedrunConfig";
+import { UserPrisma } from "../models/database/user";
+import { SettingPrisma } from "../models/database/setting";
 
 const gameFromMessage = async (
   messageArray: string[],
@@ -500,7 +502,19 @@ const DiddyKongRacingTimeTrialPersonalBest = async (messageArray: string[]) => {
   return `${runner} ${track} [${formalVehicle}][${laps}-lap]${shortcut} PB: ${time}`;
 };
 
-getTimeTrialWorldRecord("habbe", ["dkr", "1", "dc", "hover"]).then((data) => {
-  console.log("data:", data);
-  return;
-});
+export const setSpeedrunComUsername = async (
+  streamer: string,
+  messageArray: string[]
+) => {
+  const newUsername: string | undefined = messageArray[0];
+  const userPrisma = new UserPrisma(streamer);
+  const user = await userPrisma.find();
+  const setting = new SettingPrisma(user);
+  const newSetting = await setting.apply("SpeedrunName", newUsername);
+  return `SpeedrunDotCom username set to: ${newSetting.value}`;
+};
+
+// getTimeTrialWorldRecord("habbe", ["dkr", "1", "dc", "hover"]).then((data) => {
+//   console.log("data:", data);
+//   return;
+// });

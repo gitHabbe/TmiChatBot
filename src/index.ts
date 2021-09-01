@@ -1,6 +1,6 @@
 import { Client } from "tmi.js";
 import { tmiOptions } from "./config/tmiConfig";
-import { CommandName } from "./interfaces/tmi";
+import { CommandName, ComponentsSupport } from "./interfaces/tmi";
 import {
   getInduvidualPersonalBest,
   getInduvidualWorldRecord,
@@ -8,6 +8,7 @@ import {
   getTimeTrialPersonalBest,
   getTimeTrialWorldRecord,
   getWorldRecord,
+  setSpeedrunComUsername,
 } from "./commands/speedrun";
 import {
   getFollowage,
@@ -26,6 +27,8 @@ import {
   removeTimestamp,
   findTimestamp,
   toggleComponent,
+  componentSlots,
+  componentPokemon,
 } from "./commands/tmi";
 import { UserPrisma } from "./models/database/user";
 import { youtubeRegex } from "./config/youtubeConfig";
@@ -42,8 +45,8 @@ try {
 }
 
 tmiClient.on("message", async (channel, userstate, message, self) => {
-  const asdf = new UserPrisma("habbe");
-  await asdf.add();
+  // const asdf = new UserPrisma("habbe");
+  // await asdf.add();
   if (self) return;
   const youtube_hit = youtubeRegex.exec(message);
   const tweet_hit = twitterRegex.exec(message);
@@ -62,6 +65,7 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
   if (message[0] !== "!") return;
   const chatterCommandUpper: string = chatterCommand.slice(1).toUpperCase();
   const messageArray: string[] = message.split(" ").slice(1);
+  console.log("chatterCommandUpper:", chatterCommandUpper);
 
   switch (chatterCommandUpper) {
     case CommandName.UPTIME:
@@ -149,6 +153,18 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
       break;
     case CommandName.TOGGLE:
       tmiClient.say(channel, await toggleComponent(streamer, messageArray));
+      break;
+    case CommandName.SETSPEEDRUNNER:
+      tmiClient.say(
+        channel,
+        await setSpeedrunComUsername(streamer, messageArray)
+      );
+      break;
+    case ComponentsSupport.SLOTS:
+      tmiClient.say(channel, await componentSlots(streamer, messageArray));
+      break;
+    case ComponentsSupport.POKEMON:
+      tmiClient.say(channel, await componentPokemon(streamer, messageArray));
       break;
     default:
       break;
