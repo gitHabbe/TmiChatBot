@@ -242,13 +242,43 @@ export const getPersonalBest = async (
       streamer
     );
     const game: JoinedGame = await getGame(gameName);
-    const categoryName: string = await categoryFromMessage(
+    let targetCategory: string = await categoryFromMessage(
       messageArray,
       streamer
     );
+    targetCategory = targetCategory.replace("hundo", "100%");
+    targetCategory = targetCategory.replace("★", "star");
+    // targetCategory =
+    //   "Logbook day 1337: this girl is still doing 16 star★ for a 15... [N64] !timesave";
+    // console.log("game.categories:", game.categories);
+    const categories = game.categories.sort(
+      (a, b) => b.name.length - a.name.length
+    );
+    const foundCategory = categories.find((category) => {
+      const includesCategory = targetCategory
+        .toUpperCase()
+        .includes(category.name.toUpperCase());
+      const minAcrynymLength = 2;
+      const hasAcronym = category.name.split(" ").length >= minAcrynymLength;
+      const includesAcronym = targetCategory.toUpperCase().includes(
+        category.name
+          .split(" ")
+          .map((word) => word[0].toUpperCase())
+          .join("")
+      );
+      if (includesCategory) {
+        return true;
+      } else if (hasAcronym && includesAcronym) {
+        return true;
+      }
+    });
+    console.log("~ foundCategory", foundCategory);
+    // console.log("categories:", categories);
     const runner = await runnerFromMessage(streamer, messageArray[0]);
     console.log("~ runner", runner);
-    const fuzzyCategory: Category = await getCategory(game, categoryName);
+    // let fuzzyCategory: Category;
+    if (foundCategory) targetCategory = foundCategory.name;
+    const fuzzyCategory: Category = await getCategory(game, targetCategory);
     return await fetchPersonalBest(game, fuzzyCategory, runner.id);
   } catch (error) {
     console.log("~ error", error.message);
@@ -551,7 +581,7 @@ export const setSpeedrunComUsername = async (
 //   console.log("data:", data);
 // });
 
-getPersonalBest("markinator_99", []).then((data) => {
+getPersonalBest("eleesuh", []).then((data) => {
   console.log("data:", data);
   // return;
 });
