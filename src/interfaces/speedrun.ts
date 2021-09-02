@@ -61,6 +61,9 @@ export interface IRunnerResponse {
 export interface IGameResponse {
   data: IGameType;
 }
+export interface IGameSearchResponse {
+  data: IGameType[];
+}
 
 export interface ICategoryType {
   id: string;

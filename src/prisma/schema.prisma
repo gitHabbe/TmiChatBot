@@ -76,7 +76,7 @@ model User {
   name      String       @unique
 
   commands    Command[]
-  settings    setting[]
+  settings    Setting[]
   timestamps  Timestamp[]
   components  Component[]
   trusts      Trust[]
@@ -127,7 +127,7 @@ model Trust {
   userId  Int
 }
 
-model setting {
+model Setting {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   type      String

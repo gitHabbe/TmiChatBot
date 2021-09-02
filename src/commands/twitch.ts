@@ -26,6 +26,7 @@ export const fetchStreamer = async (
       (name: IStreamer) =>
         name.display_name.toLowerCase() === channelName.toLowerCase()
     );
+    console.log("~ streamer", streamer);
     if (streamer === undefined) throw new Error("User not found");
 
     return streamer;

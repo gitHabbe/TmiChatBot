@@ -44,13 +44,12 @@ export class SettingPrisma extends Prisma {
   };
 
   find = async (type: string) => {
-    const setting = this.db.findFirst({
+    const setting = await this.db.findFirst({
       where: {
         userId: this.user.id,
         type: type,
       },
     });
-    if (!setting) throw new Error(`Can't find username`);
 
     return setting;
   };

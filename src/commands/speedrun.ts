@@ -11,6 +11,7 @@ import {
   IInduvidualLevelResponse,
   IInduvidualLevelWithVehicle,
   TimeTrialSupport,
+  IGameSearchResponse,
 } from "../interfaces/speedrun";
 import { fuseSearch, fuseSearchCategory } from "../utility/fusejs";
 import {
@@ -93,14 +94,31 @@ const axiosSpeedrunCom = async <T>(options: IAxiosOptions) => {
 };
 
 const gameToDatabase = async (gameName: string): Promise<Game> => {
-  const gameOptions: IAxiosOptions = {
-    type: "Game",
-    name: gameName,
-    url: `games/${gameName}`,
-  };
-  const { data: game }: IGameResponse = await axiosSpeedrunCom<IGameResponse>(
-    gameOptions
-  );
+  let game: IGameType;
+  try {
+    const gameOptions: IAxiosOptions = {
+      type: "Game",
+      name: gameName,
+      url: `games/${gameName}`,
+    };
+    const gameRes = await axiosSpeedrunCom<IGameResponse>(gameOptions);
+    game = gameRes.data;
+  } catch (error) {
+    const gameOptions: IAxiosOptions = {
+      type: "Game",
+      name: gameName,
+      url: `games?name=${gameName}`,
+    };
+    const gameRes = await axiosSpeedrunCom<IGameSearchResponse>(gameOptions);
+    const foundGame = gameRes.data.find((result) => {
+      return (
+        result.names.international.toLowerCase() === gameName.toLowerCase()
+      );
+    });
+    if (!foundGame) throw new Error(`Game ${gameName} not found`);
+    game = foundGame;
+  }
+  console.log("game:", game);
   const categoriesOptions: IAxiosOptions = {
     type: "Category",
     name: game.names.international,
@@ -224,17 +242,34 @@ export const getPersonalBest = async (
       streamer
     );
     const game: JoinedGame = await getGame(gameName);
-    const runner: Runner = await getRunner(messageArray[0]);
     const categoryName: string = await categoryFromMessage(
       messageArray,
       streamer
     );
+    const runner = await runnerFromMessage(streamer, messageArray[0]);
+    console.log("~ runner", runner);
     const fuzzyCategory: Category = await getCategory(game, categoryName);
     return await fetchPersonalBest(game, fuzzyCategory, runner.id);
   } catch (error) {
     console.log("~ error", error.message);
     return error.message;
   }
+};
+
+const runnerFromMessage = async (
+  streamer: string,
+  runner: string | undefined
+) => {
+  let runnerName = streamer;
+  if (runner === undefined) {
+    const userPrisma = new UserPrisma(streamer);
+    const user = await userPrisma.find();
+    const settingPrisma = new SettingPrisma(user);
+    const settingName = await settingPrisma.find("SpeedrunName");
+    runnerName = settingName !== null ? settingName.value : streamer;
+  }
+  return await getRunner(runnerName);
+  // return getRunner(streamer);
 };
 
 export const getInduvidualWorldRecord = async (
@@ -363,10 +398,8 @@ export const getTimeTrialWorldRecord = async (
   switch (gameName.toUpperCase()) {
     case TimeTrialSupport.DKR:
       return DiddyKongRacingTimeTrialWorldRecord(messageArray);
-
     default:
       return "No WR found";
-      break;
   }
 };
 
@@ -514,7 +547,11 @@ export const setSpeedrunComUsername = async (
   return `SpeedrunDotCom username set to: ${newSetting.value}`;
 };
 
-// getTimeTrialWorldRecord("habbe", ["dkr", "1", "dc", "hover"]).then((data) => {
+// setSpeedrunComUsername("markinator_99", ["markinator99"]).then((data) => {
 //   console.log("data:", data);
-//   return;
 // });
+
+getPersonalBest("markinator_99", []).then((data) => {
+  console.log("data:", data);
+  // return;
+});
