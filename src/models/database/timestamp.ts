@@ -47,11 +47,17 @@ export class TimestampPrisma extends Prisma {
     return timestamp;
   };
 
-  // findAll = () => {
-  //   return this.db.findMany({
-  //     where: {
-  //       userId: this.user.id,
-  //     },
-  //   });
-  // };
+  findAll = async () => {
+    const allTimestamps = await this.db.findMany({
+      where: {
+        userId: this.user.id,
+      },
+    });
+    if (allTimestamps.length === 0)
+      throw new Error(
+        `You have no timestamps. Use !ts NameHere to create one.`
+      );
+
+    return allTimestamps;
+  };
 }

@@ -141,7 +141,7 @@ export const addUserTrust = async (
     const addTrust = await trust.add(newTrust, madeBy);
     return `${addTrust.name} added to trust-list`;
   } catch (error) {
-    if (error.message) return error.message;
+    // if (error.message) return error.message;
     return "Problem creating trust";
   }
 };
@@ -161,7 +161,7 @@ export const removeUserTrust = async (
     const removeTrust = await trust.remove(deleteTrust, madeBy);
     return `${removeTrust.name} removed from trust-list`;
   } catch (error) {
-    if (error.message) return error.message;
+    // if (error.message) return error.message;
     return "Problem removing trust";
   }
 };
@@ -189,7 +189,7 @@ export const addTimestamp = async (
     );
     return `Timestamp ${newTimestamp.name} created. Use !findts ${newTimestamp.name} to watch it`;
   } catch (error) {
-    if (error.message) return error.message;
+    // if (error.message) return error.message;
     return "Problem creating timestamp";
   }
 };
@@ -200,17 +200,29 @@ export const findTimestamp = async (
 ) => {
   try {
     console.log("~ messageArray", messageArray);
-    const timestampName: string = messageArray[0];
+    const targetTimestamp: string = messageArray[0];
+    console.log("~ targetTimestamp", targetTimestamp);
     const userPrisma = new UserPrisma(streamer);
     const user: User = await userPrisma.find();
+    console.log("~ user", user);
     const timestampObj = new TimestampPrisma(user);
-    const foundTimestamp = await timestampObj.find(timestampName);
+    if (targetTimestamp === undefined) {
+      const allTimestamps = await timestampObj.findAll();
+      console.log("~ allTimestamps", allTimestamps);
+      const timestampsList = allTimestamps
+        .map((timestamp) => {
+          return timestamp.name;
+        })
+        .join(", ");
+      return `Timestamps: ${timestampsList}`;
+    }
+    const foundTimestamp = await timestampObj.find(targetTimestamp);
     const backtrackLength = 90;
     const { name, url, timestamp } = foundTimestamp;
     return `${name}: ${url}?t=${timestamp - backtrackLength}s`;
   } catch (error) {
-    if (error.message) return error.message;
-    return "Problem deleteing timestamp";
+    // if (error.message) return error.message;
+    return "Problem finding timestamp";
   }
 };
 
@@ -231,7 +243,7 @@ export const removeTimestamp = async (
     const deleteTimestamp = await timestamp.remove(timestampName);
     return `Timestamp ${deleteTimestamp.name}`;
   } catch (error) {
-    if (error.message) return error.message;
+    // if (error.message) return error.message;
     return "Problem deleteing timestamp";
   }
 };
@@ -252,7 +264,7 @@ export const toggleComponent = async (
 
     return `Component ${targetComponent} is now: ${componentStatus}`;
   } catch (error) {
-    if (error.message) return error.message;
+    // if (error.message) return error.message;
     return "Problem toggling component";
   }
 };
@@ -328,10 +340,10 @@ export const formatPokemonStats = (pokemon: IPokemon) => {
   return `${formalName} #${id} | ${typesString} | ${statsString}`;
 };
 
-componentPokemon("habbe", ["raichu"]).then((data) => {
-  console.log("data:", data);
-  // console.log("data:", data);
-});
+// componentPokemon("habbe", ["raichu"]).then((data) => {
+//    console.log("data:", data);
+// console.log("data:", data);
+// });
 
 // toggleComponent("habbe", ["slots"]).then((data) => {
 //   console.log("data:", data);
