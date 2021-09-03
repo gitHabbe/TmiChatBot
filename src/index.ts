@@ -164,6 +164,7 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
       tmiClient.say(channel, await componentSlots(streamer, messageArray));
       break;
     case ComponentsSupport.POKEMON:
+    case ComponentsSupport.PKMN:
       tmiClient.say(channel, await componentPokemon(streamer, messageArray));
       break;
     default:

@@ -33,4 +33,5 @@ export enum CommandName {
 export enum ComponentsSupport {
   SLOTS = "SLOTS",
   POKEMON = "POKEMON",
+  PKMN = "PKMN",
 }
