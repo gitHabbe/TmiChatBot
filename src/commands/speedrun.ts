@@ -197,7 +197,8 @@ export const getWorldRecord = async (
     const fuzzyCategory: Category = await getCategory(game, categoryName);
     return await fetchWorldRecord(game, fuzzyCategory);
   } catch (error) {
-    return error.message;
+    return `Can't find WR`;
+    // return error.message;
   }
 };
 
@@ -281,8 +282,9 @@ export const getPersonalBest = async (
     const fuzzyCategory: Category = await getCategory(game, targetCategory);
     return await fetchPersonalBest(game, fuzzyCategory, runner.id);
   } catch (error) {
-    console.log("~ error", error.message);
-    return error.message;
+    return `Cant find PB`;
+    // console.log("~ error", error.message);
+    // return error.message;
   }
 };
 
@@ -429,7 +431,7 @@ export const getTimeTrialWorldRecord = async (
     case TimeTrialSupport.DKR:
       return DiddyKongRacingTimeTrialWorldRecord(messageArray);
     default:
-      return "No WR found";
+      return `Game "${gameName}" not supported`;
   }
 };
 
@@ -531,7 +533,7 @@ export const getTimeTrialPersonalBest = async (
     case TimeTrialSupport.DKR:
       return DiddyKongRacingTimeTrialPersonalBest(messageArray);
     default:
-      return "Didnt' work";
+      return `Game "${gameName}" not supported`;
   }
 };
 
@@ -581,7 +583,7 @@ export const setSpeedrunComUsername = async (
 //   console.log("data:", data);
 // });
 
-getPersonalBest("eleesuh", []).then((data) => {
-  console.log("data:", data);
-  // return;
-});
+// getPersonalBest("eleesuh", []).then((data) => {
+// console.log("data:", data);
+// return;
+// });
