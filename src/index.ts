@@ -30,7 +30,6 @@ import {
   componentSlots,
   componentPokemon,
 } from "./commands/tmi";
-import { UserPrisma } from "./models/database/user";
 import { youtubeRegex } from "./config/youtubeConfig";
 import { tweetInfo, youtubeInfo } from "./commands/socialMedia";
 import { twitterRegex } from "./config/twitterConfig";
@@ -45,8 +44,6 @@ try {
 }
 
 tmiClient.on("message", async (channel, userstate, message, self) => {
-  // const asdf = new UserPrisma("habbe");
-  // await asdf.add();
   if (self) return;
   const youtube_hit = youtubeRegex.exec(message);
   const tweet_hit = twitterRegex.exec(message);

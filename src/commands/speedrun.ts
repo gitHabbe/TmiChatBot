@@ -584,6 +584,5 @@ export const setSpeedrunComUsername = async (
 // });
 
 // getPersonalBest("eleesuh", []).then((data) => {
-// console.log("data:", data);
-// return;
+//   console.log("data:", data);
 // });
