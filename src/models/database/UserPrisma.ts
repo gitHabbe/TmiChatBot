@@ -1,4 +1,5 @@
-import { Prisma } from "./database";
+import { User } from ".prisma/client";
+import { Prisma } from "./Prisma";
 
 export class UserPrisma extends Prisma {
   private db = this.prisma.user;
@@ -6,7 +7,7 @@ export class UserPrisma extends Prisma {
     super();
   }
 
-  add = () => {
+  add = (): Promise<User> => {
     return this.db.create({
       data: {
         name: this.username,
@@ -14,7 +15,7 @@ export class UserPrisma extends Prisma {
     });
   };
 
-  find = async () => {
+  find = async (): Promise<User> => {
     const user = await this.db.findFirst({
       where: {
         name: this.username,
@@ -25,7 +26,7 @@ export class UserPrisma extends Prisma {
     return user;
   };
 
-  remove = () => {
+  remove = (): Promise<User> => {
     return this.db.delete({
       where: {
         name: this.username,

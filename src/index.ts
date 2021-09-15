@@ -118,6 +118,7 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
         channel,
         await removeCommand(streamer, messageArray, userstate)
       );
+      break;
     case CommandName.TRUST:
       tmiClient.say(
         channel,

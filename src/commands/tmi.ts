@@ -1,13 +1,13 @@
 import { ChatUserstate } from "tmi.js";
 import { Command, User } from "@prisma/client";
 import { JsonStringArray } from "../models/JsonArrayFile";
-import { UserPrisma } from "../models/database/user";
-import { CommandPrisma } from "../models/database/command";
-import { TrustPrisma } from "../models/database/trust";
+import { UserPrisma } from "../models/database/UserPrisma";
+import { CommandPrisma } from "../models/database/CommandPrisma";
+import { TrustPrisma } from "../models/database/TrustPrisma";
 import { fetchStreamer, fetchStreamerVideos } from "./twitch";
-import { TimestampPrisma } from "../models/database/timestamp";
+import { TimestampPrisma } from "../models/database/TimestampPrisma";
 import { IStreamer, IVideo } from "../interfaces/twitch";
-import { ComponentPrisma } from "../models/database/component";
+import { ComponentPrisma } from "../models/database/ComponentPrisma";
 import { ComponentsSupport } from "../interfaces/tmi";
 import { randomInt } from "../utility/math";
 import { pokemonAPI } from "../config/pokemonConfig";

@@ -1,6 +1,6 @@
 import { User } from "@prisma/client";
 import { ComponentsSupport } from "../../interfaces/tmi";
-import { Prisma } from "./database";
+import { Prisma } from "./Prisma";
 
 export class ComponentPrisma extends Prisma {
   private db = this.prisma.component;

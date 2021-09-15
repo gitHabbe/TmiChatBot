@@ -1,6 +1,6 @@
 import { User } from "@prisma/client";
 import { IVideo } from "../../interfaces/twitch";
-import { Prisma } from "./database";
+import { Prisma } from "./Prisma";
 
 export class TimestampPrisma extends Prisma {
   private db = this.prisma.timestamp;

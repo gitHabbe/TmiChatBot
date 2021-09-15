@@ -1,5 +1,5 @@
 import { User } from "@prisma/client";
-import { Prisma } from "./database";
+import { Prisma } from "./Prisma";
 
 export class SettingPrisma extends Prisma {
   private db = this.prisma.setting;

@@ -1,6 +1,6 @@
 import { User } from "@prisma/client";
 import { ChatUserstate } from "tmi.js";
-import { Prisma } from "./database";
+import { Prisma } from "./Prisma";
 
 export class TrustPrisma extends Prisma {
   private db = this.prisma.trust;

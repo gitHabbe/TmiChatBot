@@ -21,26 +21,28 @@ import {
   stringFloatToHHMMSSmm,
 } from "../utility/dateFormat";
 import { getStreamerTitle, getStreamerGame } from "./twitch";
-import { GamePrisma } from "../models/database/game";
-import { RunnerPrisma } from "../models/database/runner";
+import { GamePrisma } from "../models/database/GamePrisma";
+import { RunnerPrisma } from "../models/database/RunnerPrisma";
 import { Game, Category, CategoryLink } from ".prisma/client";
 import { JoinedGame } from "../interfaces/prisma";
-import { IAxiosOptions, Speedrun } from "../models/axiosFetch";
+import { IAxiosOptions, SpeedrunCom } from "../models/axiosFetch";
 import { AxiosResponse } from "axios";
 import { Runner } from "@prisma/client";
 import { JsonLevels, JsonTimeTrials } from "../models/JsonArrayFile";
 import { ILevel, ITimeTrialResponse } from "../interfaces/specificGames";
 import { dkr64API } from "../config/speedrunConfig";
-import { UserPrisma } from "../models/database/user";
-import { SettingPrisma } from "../models/database/setting";
+import { UserPrisma } from "../models/database/UserPrisma";
+import { SettingPrisma } from "../models/database/SettingPrisma";
+import { SpeedGame } from "../models/SpeedGame";
+import { Leaderboard } from "../models/Leaderboard";
 
 const gameFromMessage = async (
   messageArray: string[],
   streamer: string
 ): Promise<string> => {
-  if (messageArray.length === 0 || messageArray[0].length === 0) {
-    const twitchGame: string = await getStreamerGame(streamer);
-    return twitchGame;
+  const game = new SpeedGame();
+  if (messageArray.length === 0) {
+    return game.twitchGame(streamer);
   }
   return messageArray[0];
 };
@@ -51,8 +53,7 @@ const categoryFromMessage = async (
 ): Promise<string> => {
   const categoryUserInput: string[] = messageArray.slice(1);
   if (categoryUserInput.length === 0) {
-    const titleCategory: string = await getStreamerTitle(streamer);
-    return titleCategory;
+    return await getStreamerTitle(streamer);
   }
   return categoryUserInput.join(" ");
 };
@@ -66,7 +67,7 @@ const gameFromDatabase = async (gameQuery: string): Promise<JoinedGame> => {
     );
 };
 
-const getGame = (gameName: string): Promise<JoinedGame> => {
+export const getGame = (gameName: string): Promise<JoinedGame> => {
   return gameFromDatabase(gameName).catch(async () => {
     const newGame: Game = await gameToDatabase(gameName);
     return gameFromDatabase(newGame.abbreviation);
@@ -75,9 +76,10 @@ const getGame = (gameName: string): Promise<JoinedGame> => {
 
 const runnerFromDatabase = async (query: string): Promise<Runner> => {
   const runnerDatabase = new RunnerPrisma();
-  return runnerDatabase
-    .getRunnerWhere({ id: query })
-    .catch(() => runnerDatabase.getRunnerWhere({ name: query }));
+  return runnerDatabase.get(query);
+  // return runnerDatabase
+  //   .get({ id: query })
+  //   .catch(() => runnerDatabase.get({ name: query }));
 };
 
 const getRunner = async (query: string): Promise<Runner> => {
@@ -88,7 +90,7 @@ const getRunner = async (query: string): Promise<Runner> => {
 };
 
 const axiosSpeedrunCom = async <T>(options: IAxiosOptions) => {
-  const speedrun = new Speedrun<T>(options);
+  const speedrun = new SpeedrunCom<T>(options);
   const res: AxiosResponse<T> = await speedrun.fetchAPI();
   return res.data;
 };
@@ -146,18 +148,19 @@ const getCategory = async (game: JoinedGame, targetCategory: string) => {
 };
 
 const runnerToDatabase = async (query: string): Promise<Runner> => {
-  const options: IAxiosOptions = {
-    type: "Runner",
-    name: query,
-    url: `/users/${query}`,
-  };
-  const axiosRunner: IRunnerResponse = await axiosSpeedrunCom<IRunnerResponse>(
-    options
-  );
-  const runner: IRunner = axiosRunner.data;
   const runnerDatabase: RunnerPrisma = new RunnerPrisma();
+  return runnerDatabase.save(query);
+  // const options: IAxiosOptions = {
+  //   type: "Runner",
+  //   name: query,
+  //   url: `/users/${query}`,
+  // };
+  // const axiosRunner: IRunnerResponse = await axiosSpeedrunCom<IRunnerResponse>(
+  //   options
+  // );
+  // const runner: IRunner = axiosRunner.data;
 
-  return await runnerDatabase.saveRunner(runner);
+  // return await runnerDatabase.save(runner);
 };
 
 const fetchWorldRecord = async (
@@ -579,10 +582,38 @@ export const setSpeedrunComUsername = async (
   return `SpeedrunDotCom username set to: ${newSetting.value}`;
 };
 
-// setSpeedrunComUsername("markinator_99", ["markinator99"]).then((data) => {
-//   console.log("data:", data);
-// });
+export const getWR = async (streamer: string, messageArray: string[]) => {
+  const { game, targetCategory } = await gameAndCategory(
+    streamer,
+    messageArray
+  );
+  const leaderboard = new Leaderboard(game);
+  const worldRecord = await leaderboard.fetchWorldRecord(targetCategory);
 
-// getPersonalBest("eleesuh", []).then((data) => {
-//   console.log("data:", data);
-// });
+  return worldRecord;
+};
+
+export const getPB = async (streamer: string, messageArray: string[]) => {
+  const { game, targetCategory } = await gameAndCategory(
+    streamer,
+    messageArray.slice(1)
+  );
+  const leaderboard = new Leaderboard(game);
+  const runnerPrisma = new RunnerPrisma();
+  const runner = await runnerPrisma.get(messageArray[0]);
+  const run = await leaderboard.fetchPersonalBest(targetCategory, runner.id);
+
+  return run;
+};
+
+const gameAndCategory = async (streamer: string, messageArray: string[]) => {
+  const gameName = await gameFromMessage(messageArray, streamer);
+  const gamePrisma = new GamePrisma();
+  const game = await gamePrisma.get(gameName);
+  const targetCategory = await categoryFromMessage(messageArray, streamer);
+
+  return {
+    game,
+    targetCategory,
+  };
+};

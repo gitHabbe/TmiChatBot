@@ -1,6 +1,7 @@
-import { Prisma } from "./database";
+import { Prisma } from "./Prisma";
 import { GameQuery, JoinedGame } from "../../interfaces/prisma";
 import { IGameType, ICategoryType } from "../../interfaces/speedrun";
+import { Game } from ".prisma/client";
 
 export class GamePrisma extends Prisma {
   private _game: IGameType | undefined = undefined;
@@ -9,6 +10,76 @@ export class GamePrisma extends Prisma {
   getGameWhere = async (gameQuery: GameQuery): Promise<JoinedGame> => {
     const game = await this.prisma.game.findFirst({
       where: gameQuery,
+      select: {
+        id: true,
+        abbreviation: true,
+        platforms: true,
+        names: true,
+        links: true,
+        categories: {
+          select: {
+            id: true,
+            gameId: true,
+            name: true,
+            links: true,
+          },
+        },
+      },
+    });
+    if (game === null) throw new Error("Game not in database");
+
+    return game;
+  };
+
+  get = async (query: string) => {
+    const game = await this.prisma.game.findFirst({
+      where: {
+        OR: [
+          {
+            abbreviation: query,
+          },
+          {
+            names: {
+              international: query,
+            },
+          },
+        ],
+      },
+      select: {
+        id: true,
+        abbreviation: true,
+        platforms: true,
+        names: true,
+        links: true,
+        categories: {
+          select: {
+            id: true,
+            gameId: true,
+            name: true,
+            links: true,
+          },
+        },
+      },
+    });
+    if (game === null) throw new Error(`Game ${query} not found.`);
+
+    return game;
+  };
+
+  getGame = async (query: string) => {
+    const game = await this.prisma.game.findFirst({
+      where: {
+        OR: [
+          {
+            abbreviation: query,
+          },
+          {
+            names: {
+              international: query,
+            },
+          },
+        ],
+      },
       select: {
         id: true,
         abbreviation: true,
@@ -49,7 +120,7 @@ export class GamePrisma extends Prisma {
   }
 
   save = async () => {
-    const newGame = await this.prisma.game.create({
+    return await this.prisma.game.create({
       data: {
         id: this.game.id,
         abbreviation: this.game.abbreviation,
@@ -67,9 +138,6 @@ export class GamePrisma extends Prisma {
         },
       },
     });
-    if (newGame === null) throw new Error("Game could not be created");
-
-    return newGame;
   };
 
   private names = () => {

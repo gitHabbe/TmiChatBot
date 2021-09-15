@@ -19,6 +19,7 @@ export interface UserQuery {
   id?: string;
   name?: string;
 }
+
 export interface JoinedGame {
   id: string;
   abbreviation: string;

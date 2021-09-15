@@ -8,7 +8,7 @@ export interface IAxiosOptions {
   url: string;
 }
 
-export class Speedrun<T> {
+export class SpeedrunCom<T> {
   constructor(private options: IAxiosOptions) {}
 
   throwError = (error: Error | AxiosError) => {
