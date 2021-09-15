@@ -94,11 +94,3 @@ export class Leaderboard {
     return personalRun;
   };
 }
-
-// const asdf = async () => {
-//   const game = await getGame("dkr");
-//   const lb = new Leaderboard(game);
-//   console.log(await lb.fetchWorldRecord("cool asjdio adiaoda atr iaosa"));
-// };
-
-// asdf();
