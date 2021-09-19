@@ -1,35 +1,25 @@
 import {
-  IGameType,
-  IGameResponse,
-  ICategoryType,
-  ICategoryResponse,
   ILeaderboardReponse,
-  IRunnerResponse,
-  IRunner,
   InduvidualLevelSupport,
-  IInduvidualLevel,
-  IInduvidualLevelResponse,
-  IInduvidualLevelWithVehicle,
   TimeTrialSupport,
-  IGameSearchResponse,
+  IRun,
 } from "../interfaces/speedrun";
-import { fuseSearch, fuseSearchCategory } from "../utility/fusejs";
+import { fuseSearch } from "../utility/fusejs";
 import {
   datesDaysDifference,
   floatToHHMMSS,
   secondsToHHMMSS,
   stringFloatToHHMMSSmm,
 } from "../utility/dateFormat";
-import { getStreamerTitle, getStreamerGame } from "./twitch";
+import { getStreamerTitle } from "./twitch";
 import { GamePrisma } from "../models/database/GamePrisma";
 import { RunnerPrisma } from "../models/database/RunnerPrisma";
-import { Game, Category, CategoryLink } from ".prisma/client";
 import { JoinedGame } from "../interfaces/prisma";
 import { IAxiosOptions, SpeedrunCom } from "../models/axiosFetch";
 import { AxiosResponse } from "axios";
 import { Runner } from "@prisma/client";
 import { JsonLevels, JsonTimeTrials } from "../models/JsonArrayFile";
-import { ILevel, ITimeTrialResponse } from "../interfaces/specificGames";
+import { ITrack, ITimeTrialResponse } from "../interfaces/specificGames";
 import { dkr64API } from "../config/speedrunConfig";
 import { UserPrisma } from "../models/database/UserPrisma";
 import { SettingPrisma } from "../models/database/SettingPrisma";
@@ -58,305 +48,166 @@ const categoryFromMessage = async (
   return categoryUserInput.join(" ");
 };
 
-const gameFromDatabase = async (gameQuery: string): Promise<JoinedGame> => {
-  const gameDatabase = new GamePrisma();
-  return gameDatabase
-    .getGameWhere({ abbreviation: gameQuery })
-    .catch(() =>
-      gameDatabase.getGameWhere({ names: { international: gameQuery } })
-    );
-};
-
-export const getGame = (gameName: string): Promise<JoinedGame> => {
-  return gameFromDatabase(gameName).catch(async () => {
-    const newGame: Game = await gameToDatabase(gameName);
-    return gameFromDatabase(newGame.abbreviation);
-  });
-};
-
-const runnerFromDatabase = async (query: string): Promise<Runner> => {
-  const runnerDatabase = new RunnerPrisma();
-  return runnerDatabase.get(query);
-  // return runnerDatabase
-  //   .get({ id: query })
-  //   .catch(() => runnerDatabase.get({ name: query }));
-};
-
-const getRunner = async (query: string): Promise<Runner> => {
-  return runnerFromDatabase(query).catch(async () => {
-    const newRunner: Runner = await runnerToDatabase(query);
-    return await runnerFromDatabase(newRunner.id);
-  });
-};
-
 const axiosSpeedrunCom = async <T>(options: IAxiosOptions) => {
   const speedrun = new SpeedrunCom<T>(options);
   const res: AxiosResponse<T> = await speedrun.fetchAPI();
   return res.data;
 };
 
-const gameToDatabase = async (gameName: string): Promise<Game> => {
-  let game: IGameType;
-  try {
-    const gameOptions: IAxiosOptions = {
-      type: "Game",
-      name: gameName,
-      url: `games/${gameName}`,
-    };
-    const gameRes = await axiosSpeedrunCom<IGameResponse>(gameOptions);
-    game = gameRes.data;
-  } catch (error) {
-    const gameOptions: IAxiosOptions = {
-      type: "Game",
-      name: gameName,
-      url: `games?name=${gameName}`,
-    };
-    const gameRes = await axiosSpeedrunCom<IGameSearchResponse>(gameOptions);
-    const foundGame = gameRes.data.find((result) => {
-      return (
-        result.names.international.toLowerCase() === gameName.toLowerCase()
-      );
-    });
-    if (!foundGame) throw new Error(`Game ${gameName} not found`);
-    game = foundGame;
-  }
-  console.log("game:", game);
-  const categoriesOptions: IAxiosOptions = {
-    type: "Category",
-    name: game.names.international,
-    url: `/games/${game.id}/categories`,
-  };
-  const { data: categories }: ICategoryResponse =
-    await axiosSpeedrunCom<ICategoryResponse>(categoriesOptions);
-  const newGame = new GamePrisma();
-  newGame.setGame = game;
-  newGame.setCategories = categories;
-  return newGame.save();
+const joinedGame = async (streamer: string, messageArray: string[]) => {
+  const gameName: string = await gameFromMessage(messageArray, streamer);
+  const gamePrisma = new GamePrisma();
+  const game: JoinedGame = await gamePrisma.get(gameName);
+
+  return game;
 };
 
-const getCategory = async (game: JoinedGame, targetCategory: string) => {
-  const validCategories = game.categories.filter((category) => {
-    return (
-      category.links.findIndex(
-        (category: CategoryLink) => category.rel === "leaderboard"
-      ) > 0
-    );
-  });
-  const fuzzyGameSearch = fuseSearchCategory(validCategories, targetCategory);
-
-  return fuzzyGameSearch[0].item;
-};
-
-const runnerToDatabase = async (query: string): Promise<Runner> => {
-  const runnerDatabase: RunnerPrisma = new RunnerPrisma();
-  return runnerDatabase.save(query);
-  // const options: IAxiosOptions = {
-  //   type: "Runner",
-  //   name: query,
-  //   url: `/users/${query}`,
-  // };
-  // const axiosRunner: IRunnerResponse = await axiosSpeedrunCom<IRunnerResponse>(
-  //   options
-  // );
-  // const runner: IRunner = axiosRunner.data;
-
-  // return await runnerDatabase.save(runner);
-};
-
-const fetchWorldRecord = async (
-  game: JoinedGame,
-  category: Category
-): Promise<string> => {
-  const options: IAxiosOptions = {
-    type: "World record",
-    name: "Run",
-    url: `leaderboards/${game.id}/category/${category.id}?top=1`,
-  };
-  const { data: worldRecord }: ILeaderboardReponse =
-    await axiosSpeedrunCom<ILeaderboardReponse>(options);
-  const worldRecordTime: string = secondsToHHMMSS(
-    worldRecord.runs[0].run.times.primary_t
-  );
-  const runnerDatabase: Runner = await getRunner(
-    worldRecord.runs[0].run.players[0].id
-  );
-
-  const daysAgo = datesDaysDifference(worldRecord.runs[0].run.date);
-
-  return `${category.name} WR: ${worldRecordTime} by ${runnerDatabase.name} - ${daysAgo} days ago`;
-};
-
-export const getWorldRecord = async (
+export const worldRecord = async (
   streamer: string,
   messageArray: string[]
 ): Promise<string> => {
+  try {
+    const game: JoinedGame = await joinedGame(streamer, messageArray);
+    const query: string = await categoryFromMessage(messageArray, streamer);
+    const leaderboard = new Leaderboard(game);
+    const fuzzyCategory = leaderboard.fuzzyCategory(query);
+    const [{ item: category }] = fuzzyCategory;
+    const worldRecord: IRun = await leaderboard.fetchWorldRecord(category);
+
+    return await formatWorldRecord(worldRecord, category.name);
+  } catch (error) {
+    if (error instanceof Error) return error.message;
+    return "Unable to find WR";
+  }
+};
+
+const formatWorldRecord = async (
+  worldRecord: IRun,
+  category: string
+): Promise<string> => {
+  const runnerPrisma = new RunnerPrisma();
+  const runnerId: string = worldRecord.run.players[0].id;
+  const runner: Runner = await runnerPrisma.get(runnerId);
+  const daysAgo: number = datesDaysDifference(worldRecord.run.date);
+  const seconds: number = worldRecord.run.times.primary_t;
+  const time: string = secondsToHHMMSS(seconds);
+
+  return `${category} WR: ${time} by ${runner.name} - ${daysAgo}d ago`;
+};
+
+export const personalBest = async (
+  streamer: string,
+  messageArray: string[]
+): Promise<string> => {
+  try {
+    const targetRunner: string = messageArray[0];
+    const runnerPrisma = new RunnerPrisma();
+    const runner: Runner = await runnerPrisma.get(targetRunner);
+    const query: string[] = messageArray.slice(1);
+    const msgCategory: string = await categoryFromMessage(query, streamer);
+    const game: JoinedGame = await joinedGame(streamer, query);
+    const leaderboard = new Leaderboard(game);
+    const fuzzyCategory = leaderboard.fuzzyCategory(msgCategory);
+    const [{ item: category }] = fuzzyCategory;
+    const run: IRun = await leaderboard.fetchPersonalBest(category, runner.id);
+
+    return formatPersonalBest(runner, run, category.name);
+  } catch (error) {
+    if (error instanceof Error) return error.message;
+    throw new Error("hmm");
+  }
+};
+
+const formatPersonalBest = async (
+  runner: Runner,
+  run: IRun,
+  category: string
+): Promise<string> => {
+  const date: string = run.run.date;
+  const daysAgo: number = datesDaysDifference(date);
+  const seconds: number = run.run.times.primary_t;
+  const time: string = secondsToHHMMSS(seconds);
+
+  return `${runner.name} ${category} PB: ${time} - ${daysAgo} days ago`;
+};
+
+export const induvidualWorldRecord = async (
+  streamer: string,
+  messageArray: string[]
+) => {
   try {
     const gameName: string = await gameFromMessage(messageArray, streamer);
-    const game: JoinedGame = await getGame(gameName);
-    const categoryName: string = await categoryFromMessage(
-      messageArray,
-      streamer
-    );
-    const fuzzyCategory: Category = await getCategory(game, categoryName);
-    return await fetchWorldRecord(game, fuzzyCategory);
+    switch (gameName.toUpperCase()) {
+      case InduvidualLevelSupport.DKR:
+        return DiddyKongRacingInduvidualWorldRecord(messageArray);
+      default:
+        throw Error(`${gameName} doesn't support !ilwr`);
+    }
   } catch (error) {
-    return `Can't find WR`;
-    // return error.message;
+    if (error instanceof Error) return error.message;
+    return "Unable to find WR";
   }
 };
 
-const fetchPersonalBest = async (
-  game: JoinedGame,
-  category: Category,
-  runnerId: string
-) => {
-  const options: IAxiosOptions = {
-    type: "Leaderboard",
-    name: category.name,
-    url: `leaderboards/${game.id}/category/${category.id}`,
-  };
-  const { data: leaderboard }: ILeaderboardReponse =
-    await axiosSpeedrunCom<ILeaderboardReponse>(options);
-  const personalRun = leaderboard.runs.find((run) => {
-    return run.run.players[0].id === runnerId;
+/**
+ * I don't know how to make this better.
+ * Send help!
+ * @param messageArray string[]
+ * @returns { string[], ITrack[] }
+ */
+const filterDiddyKongRacingQueryAndLevels = (messageArray: string[]) => {
+  const fileJson: JsonLevels = new JsonLevels();
+  let dkrLevels: ITrack[] = fileJson.data();
+  const vehicles = ["car", "hover", "plane"];
+  let query: string[] = messageArray.slice(1);
+  const specifiedVehicle = query.find((word: string) => {
+    return vehicles.includes(word);
   });
-  if (personalRun === undefined) throw new Error("Personal run not found");
-  const personalRunTime: string = secondsToHHMMSS(
-    personalRun.run.times.primary_t
-  );
-  const runnerDatabase: Runner = await getRunner(personalRun.run.players[0].id);
-  const daysAgo: number = Math.floor(
-    (new Date().getTime() - new Date(personalRun.run.date).getTime()) / 86400000
-  );
-  const runner: string =
-    runnerDatabase.name.slice(-1).toLowerCase() === "s"
-      ? runnerDatabase.name + "'"
-      : runnerDatabase.name + "'s";
-
-  return `${runner} ${category.name} PB: ${personalRunTime} - #${personalRun.place} - ${daysAgo} days ago`;
-};
-
-export const getPersonalBest = async (
-  streamer: string,
-  messageArray: string[]
-): Promise<string> => {
-  try {
-    const gameName: string = await gameFromMessage(
-      messageArray.slice(1),
-      streamer
-    );
-    const game: JoinedGame = await getGame(gameName);
-    let targetCategory: string = await categoryFromMessage(
-      messageArray,
-      streamer
-    );
-    targetCategory = targetCategory.replace("hundo", "100%");
-    targetCategory = targetCategory.replace("★", "star");
-    // targetCategory =
-    //   "Logbook day 1337: this girl is still doing 16 star★ for a 15... [N64] !timesave";
-    // console.log("game.categories:", game.categories);
-    const categories = game.categories.sort(
-      (a, b) => b.name.length - a.name.length
-    );
-    const foundCategory = categories.find((category) => {
-      const includesCategory = targetCategory
-        .toUpperCase()
-        .includes(category.name.toUpperCase());
-      const minAcrynymLength = 2;
-      const hasAcronym = category.name.split(" ").length >= minAcrynymLength;
-      const includesAcronym = targetCategory.toUpperCase().includes(
-        category.name
-          .split(" ")
-          .map((word) => word[0].toUpperCase())
-          .join("")
-      );
-      if (includesCategory) {
-        return true;
-      } else if (hasAcronym && includesAcronym) {
-        return true;
-      }
+  if (specifiedVehicle) {
+    query = query.filter((word: string) => word !== specifiedVehicle);
+    dkrLevels = dkrLevels.filter((track: ITrack) => {
+      return track.vehicle === specifiedVehicle;
     });
-    console.log("~ foundCategory", foundCategory);
-    // console.log("categories:", categories);
-    const runner = await runnerFromMessage(streamer, messageArray[0]);
-    console.log("~ runner", runner);
-    // let fuzzyCategory: Category;
-    if (foundCategory) targetCategory = foundCategory.name;
-    const fuzzyCategory: Category = await getCategory(game, targetCategory);
-    return await fetchPersonalBest(game, fuzzyCategory, runner.id);
-  } catch (error) {
-    return `Cant find PB`;
-    // console.log("~ error", error.message);
-    // return error.message;
+  } else {
+    dkrLevels = dkrLevels.filter((track: ITrack) => {
+      return track.default;
+    });
   }
-};
+  const isAbbreviated = dkrLevels.filter((track: ITrack) => {
+    return query.includes(track.abbreviation);
+  });
+  if (isAbbreviated.length > 0) {
+    query = [isAbbreviated[0].name];
+    dkrLevels = isAbbreviated;
+  }
 
-const runnerFromMessage = async (
-  streamer: string,
-  runner: string | undefined
-) => {
-  let runnerName = streamer;
-  if (runner === undefined) {
-    const userPrisma = new UserPrisma(streamer);
-    const user = await userPrisma.find();
-    const settingPrisma = new SettingPrisma(user);
-    const settingName = await settingPrisma.find("SpeedrunName");
-    runnerName = settingName !== null ? settingName.value : streamer;
-  }
-  return await getRunner(runnerName);
-  // return getRunner(streamer);
-};
-
-export const getInduvidualWorldRecord = async (
-  streamer: string,
-  messageArray: string[]
-) => {
-  const gameName: string = await gameFromMessage(messageArray, streamer);
-  switch (gameName.toUpperCase()) {
-    case InduvidualLevelSupport.DKR:
-      return DiddyKongRacingInduvidualWorldRecord(messageArray);
-    default:
-      throw Error(`${gameName} doesn't support !ilwr`);
-  }
+  return { query, dkrLevels };
 };
 
 const DiddyKongRacingInduvidualWorldRecord = async (messageArray: string[]) => {
-  // const game: JoinedGame = await getGame(gameName);
-  const jsonLevels = new JsonLevels();
-  let levelData = jsonLevels.data();
-  const targetLevel = messageArray[1];
-  levelData = levelData.filter((level) => {
-    return level.abbreviation === targetLevel;
-  });
-  if (levelData.length === 0) levelData = jsonLevels.data();
-  const targetVehicle = messageArray[2];
-  if (targetVehicle) {
-    levelData = levelData.filter((level) => {
-      return level.vehicle === targetVehicle.toLowerCase();
-    });
-  } else {
-    levelData = levelData.filter((level) => {
-      return level.default;
-    });
-  }
+  const { query, dkrLevels } =
+    filterDiddyKongRacingQueryAndLevels(messageArray);
+  const [{ item }] = fuseSearch<ITrack>(dkrLevels, query.join(" "));
+  const { name, vehicle, id } = item;
   const categoryId = "ndx0q5dq";
-  if (!targetLevel) throw new Error(`No level specified`);
-  const fuseHit = fuseSearch<ILevel>(levelData, targetLevel);
-  console.log("~ fuseHit", fuseHit.slice(0, 3));
-  const optionsLeaderboard: IAxiosOptions = {
+  const options: IAxiosOptions = {
     type: "Leaderboard",
-    name: "Induvidual level",
-    url: `leaderboards/9dow9e1p/level/${fuseHit[0].item.id}/${categoryId}?top=1`,
+    name: name,
+    url: `leaderboards/9dow9e1p/level/${id}/${categoryId}?top=1`,
   };
-  console.log("opt:", optionsLeaderboard.url);
-  const { data: leaderboardRes }: ILeaderboardReponse =
-    await axiosSpeedrunCom<ILeaderboardReponse>(optionsLeaderboard);
-  const worldRecord = leaderboardRes.runs[0].run.times.primary_t;
-  const worldRecordTime = floatToHHMMSS(worldRecord);
-  const userId = leaderboardRes.runs[0].run.players[0].id;
-  const user = await getRunner(userId);
+  const speedrunCom = new SpeedrunCom<ILeaderboardReponse>(options);
+  const {
+    data: { data: leaderboard },
+  } = await speedrunCom.fetchAPI();
+  const worldRecordNumber: number = leaderboard.runs[0].run.times.primary_t;
+  const worldRecordTime: string = floatToHHMMSS(worldRecordNumber);
+  const worldRecordDate: string = leaderboard.runs[0].run.date;
+  const runnerId: string = leaderboard.runs[0].run.players[0].id;
+  const runnerPrisma = new RunnerPrisma();
+  const runner: Runner = await runnerPrisma.get(runnerId);
+  const daysAgo: number = datesDaysDifference(worldRecordDate);
 
-  return `${fuseHit[0].item.name} ${fuseHit[0].item.vehicle} WR: ${worldRecordTime} by ${user.name}`;
+  return `${name} ${vehicle} WR: ${worldRecordTime} by ${runner.name} ${daysAgo} days ago`;
 };
 
 export const getInduvidualPersonalBest = async (
@@ -378,50 +229,36 @@ export const getInduvidualPersonalBest = async (
 const DiddyKongRacingInduvidualPersonalBest = async (
   messageArray: string[]
 ) => {
-  const jsonLevels = new JsonLevels();
-  let levelData = jsonLevels.data();
-  const runnerArg = messageArray[0];
-  console.log("~ runnerArg", runnerArg);
-  const targetLevel = messageArray[2];
-  if (!targetLevel) throw new Error(`No level specified`);
-  console.log("~ targetLevel", targetLevel);
-  console.log("~ levelData", levelData);
-  levelData = levelData.filter((level) => {
-    return level.abbreviation === targetLevel;
-  });
-  if (levelData.length === 0) levelData = jsonLevels.data();
-  const targetVehicle = messageArray[3];
-  console.log("~ targetVehicle", targetVehicle);
-  if (targetVehicle) {
-    levelData = levelData.filter((level) => {
-      return level.vehicle === targetVehicle.toLowerCase();
-    });
-  } else {
-    levelData = levelData.filter((level) => {
-      return level.default;
-    });
-  }
+  const targetRunner = messageArray[0].toLowerCase();
+  const { query, dkrLevels } = await filterDiddyKongRacingQueryAndLevels(
+    messageArray
+  );
+  const [{ item }] = fuseSearch<ITrack>(dkrLevels, query.join(" "));
+  const { name, vehicle, id } = item;
   const categoryId = "ndx0q5dq";
-  const fuseHit = fuseSearch<ILevel>(levelData, targetLevel);
-  console.log("~ fuseHit", fuseHit.slice(0, 3));
+  // console.log("~ fuseHit", fuseHit.slice(0, 3));
   const optionsLeaderboard: IAxiosOptions = {
     type: "Leaderboard",
     name: "Induvidual level",
-    url: `leaderboards/9dow9e1p/level/${fuseHit[0].item.id}/${categoryId}`,
+    url: `leaderboards/9dow9e1p/level/${id}/${categoryId}`,
   };
   console.log("opt:", optionsLeaderboard.url);
-  const runner = await getRunner(runnerArg);
+  const runnerPrisma: RunnerPrisma = new RunnerPrisma();
+  const runner: Runner = await runnerPrisma.get(targetRunner);
   console.log("~ runner", runner);
   const { data: leaderboardRes }: ILeaderboardReponse =
     await axiosSpeedrunCom<ILeaderboardReponse>(optionsLeaderboard);
-  const personalBest = leaderboardRes.runs.find((run) => {
+  const personalBest = leaderboardRes.runs.find((run: IRun) => {
     return run.run.players[0].id === runner.id;
   });
-  if (!personalBest) throw new Error(`Run not found`);
-  const personalBestTime = floatToHHMMSS(personalBest.run.times.primary_t);
+  if (!personalBest)
+    throw new Error(`PB not found for ${runner.name} in ${name}`);
+  const personalBestTime: string = floatToHHMMSS(
+    personalBest.run.times.primary_t
+  );
   console.log("~ personalBestTime", personalBestTime);
 
-  return `${runner.name} ${fuseHit[0].item.name} ${fuseHit[0].item.vehicle} PB: ${personalBestTime} by ${runner.name}`;
+  return `${runner.name} ${name} ${vehicle} PB: ${personalBestTime} by ${runner.name}`;
 };
 
 export const getTimeTrialWorldRecord = async (
@@ -437,8 +274,6 @@ export const getTimeTrialWorldRecord = async (
       return `Game "${gameName}" not supported`;
   }
 };
-
-// ttwr dkr lake
 
 const filterDiddyKongRacingTimeTrial = async (messageArray: string[]) => {
   const targetVehicle = messageArray[2];
@@ -487,7 +322,7 @@ const filterDiddyKongRacingTimeTrial = async (messageArray: string[]) => {
   console.log("~ vehicle", vehicle);
   console.log("~ tracks", tracks.length, tracks.slice(0, 3));
   const trackType = shortcut ? "shortcut" : "standard";
-  const fuseHit = fuseSearch<ILevel>(tracks, trackQuery);
+  const fuseHit = fuseSearch<ITrack>(tracks, trackQuery);
 
   return { fuseHit: fuseHit[0], laps, trackType };
 };
@@ -579,41 +414,6 @@ export const setSpeedrunComUsername = async (
   const user = await userPrisma.find();
   const setting = new SettingPrisma(user);
   const newSetting = await setting.apply("SpeedrunName", newUsername);
+
   return `SpeedrunDotCom username set to: ${newSetting.value}`;
-};
-
-export const getWR = async (streamer: string, messageArray: string[]) => {
-  const { game, targetCategory } = await gameAndCategory(
-    streamer,
-    messageArray
-  );
-  const leaderboard = new Leaderboard(game);
-  const worldRecord = await leaderboard.fetchWorldRecord(targetCategory);
-
-  return worldRecord;
-};
-
-export const getPB = async (streamer: string, messageArray: string[]) => {
-  const { game, targetCategory } = await gameAndCategory(
-    streamer,
-    messageArray.slice(1)
-  );
-  const leaderboard = new Leaderboard(game);
-  const runnerPrisma = new RunnerPrisma();
-  const runner = await runnerPrisma.get(messageArray[0]);
-  const run = await leaderboard.fetchPersonalBest(targetCategory, runner.id);
-
-  return run;
-};
-
-const gameAndCategory = async (streamer: string, messageArray: string[]) => {
-  const gameName = await gameFromMessage(messageArray, streamer);
-  const gamePrisma = new GamePrisma();
-  const game = await gamePrisma.get(gameName);
-  const targetCategory = await categoryFromMessage(messageArray, streamer);
-
-  return {
-    game,
-    targetCategory,
-  };
 };

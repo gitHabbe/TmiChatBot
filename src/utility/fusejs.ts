@@ -29,8 +29,6 @@ export const fuseSearch = <T extends hasName>(
   candidates: T[],
   target: string
 ) => {
-  // console.log("~ target", target);
-  // console.log("~ candidates", candidates);
   const fusejsOptions: Fuse.IFuseOptions<T> = fuseOptions;
   const fuseObject: Fuse<T> = new Fuse(candidates, fusejsOptions);
   const fuseSearch: Fuse.FuseResult<T>[] = fuseObject.search(target);

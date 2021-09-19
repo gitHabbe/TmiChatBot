@@ -1,4 +1,4 @@
-export interface IStreamer {
+export interface ITwitchChannel {
   id: string;
   display_name: string;
   broadcaster_login: string;
@@ -10,7 +10,7 @@ export interface IStreamer {
 }
 
 export interface IStreamerResponse {
-  data: IStreamer[];
+  data: ITwitchChannel[];
 }
 
 export interface IVideo {

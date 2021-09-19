@@ -6,12 +6,12 @@ import { CommandPrisma } from "../models/database/CommandPrisma";
 import { TrustPrisma } from "../models/database/TrustPrisma";
 import { fetchStreamer, fetchStreamerVideos } from "./twitch";
 import { TimestampPrisma } from "../models/database/TimestampPrisma";
-import { IStreamer, IVideo } from "../interfaces/twitch";
+import { ITwitchChannel, IVideo } from "../interfaces/twitch";
 import { ComponentPrisma } from "../models/database/ComponentPrisma";
 import { ComponentsSupport } from "../interfaces/tmi";
 import { randomInt } from "../utility/math";
 import { pokemonAPI } from "../config/pokemonConfig";
-import { IPokemon } from "../interfaces/pokemon";
+import { IPokemon, IPokemonStat } from "../interfaces/pokemon";
 
 export const createUser = async (
   channel: string,
@@ -179,7 +179,7 @@ export const addTimestamp = async (
     const timestampName: string = messageArray[0];
     const userPrisma = new UserPrisma(streamer);
     const user: User = await userPrisma.find();
-    const { id, started_at }: IStreamer = await fetchStreamer(streamer);
+    const { id, started_at }: ITwitchChannel = await fetchStreamer(streamer);
     const videos: IVideo[] = await fetchStreamerVideos(parseInt(id));
     const timestamp = new TimestampPrisma(user);
     const newTimestamp = await timestamp.add(
@@ -305,7 +305,7 @@ export const componentSlots = async (
   return gameResultSentence;
 };
 
-export const componentPokemon = async (
+export const pokemonComponent = async (
   streamer: string,
   messageArray: string[]
 ) => {
@@ -324,27 +324,18 @@ export const componentPokemon = async (
   }
 };
 
-export const formatPokemonStats = (pokemon: IPokemon) => {
+const formatPokemonStats = (pokemon: IPokemon) => {
   const truncatedStats = ["HP", "A", "D", "SA", "SD", "S"];
-  const stats = pokemon.stats.map(
-    (stat, i) => `${truncatedStats[i]}:${stat.base_stat}`
-  );
+  const stats = pokemon.stats.map((stat: IPokemonStat, i: number) => {
+    return `${truncatedStats[i]}:${stat.base_stat}`;
+  });
   const statsString = stats.join(" ");
-  const types = pokemon.types.map(
-    (type) => type.type.name[0].toUpperCase() + type.type.name.slice(1)
-  );
+  const types = pokemon.types.map((type) => {
+    return type.type.name[0].toUpperCase() + type.type.name.slice(1);
+  });
   const typesString = types.join(" & ");
   const { name, id } = pokemon;
   const formalName = name[0].toUpperCase() + name.slice(1);
 
   return `${formalName} #${id} | ${typesString} | ${statsString}`;
 };
-
-// componentPokemon("habbe", ["raichu"]).then((data) => {
-//    console.log("data:", data);
-// console.log("data:", data);
-// });
-
-// toggleComponent("habbe", ["slots"]).then((data) => {
-//   console.log("data:", data);
-// });

@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync } from "fs";
 import {
-  ILevel,
+  ITrack,
   ILevels,
   ITimeTrialJson,
   ITimeTrialsJson,
@@ -43,11 +43,11 @@ export class JsonStringArray {
 export class JsonLevels {
   private levels = new JsonFile<ILevels>("dkr_data");
 
-  data = (): ILevel[] => {
+  data = (): ITrack[] => {
     return this.levels.getData.levels;
   };
 
-  find = (lvl: ILevel) => {
+  find = (lvl: ITrack) => {
     return this.data().find((level) => {
       return level.abbreviation === lvl.abbreviation;
     });

@@ -15,7 +15,7 @@ export class RunnerPrisma extends Prisma {
     return runner;
   };
 
-  save = async (name: string): Promise<Runner> => {
+  private save = async (name: string): Promise<Runner> => {
     const runner = await this.fetch(name);
     return await this.prisma.runner.create({
       data: {
@@ -25,7 +25,7 @@ export class RunnerPrisma extends Prisma {
     });
   };
 
-  fetch = async (query: string): Promise<IRunner> => {
+  private fetch = async (query: string): Promise<IRunner> => {
     const options: IAxiosOptions = {
       type: "Runner",
       name: query,

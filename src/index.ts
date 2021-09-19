@@ -3,12 +3,12 @@ import { tmiOptions } from "./config/tmiConfig";
 import { CommandName, ComponentsSupport } from "./interfaces/tmi";
 import {
   getInduvidualPersonalBest,
-  getInduvidualWorldRecord,
-  getPersonalBest,
+  induvidualWorldRecord,
   getTimeTrialPersonalBest,
   getTimeTrialWorldRecord,
-  getWorldRecord,
+  worldRecord,
   setSpeedrunComUsername,
+  personalBest,
 } from "./commands/speedrun";
 import {
   getFollowage,
@@ -28,7 +28,7 @@ import {
   findTimestamp,
   toggleComponent,
   componentSlots,
-  componentPokemon,
+  pokemonComponent,
 } from "./commands/tmi";
 import { youtubeRegex } from "./config/youtubeConfig";
 import { tweetInfo, youtubeInfo } from "./commands/socialMedia";
@@ -72,16 +72,16 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
       tmiClient.say(channel, await getStreamerTitle(streamer));
       break;
     case CommandName.WR:
-      tmiClient.say(channel, await getWorldRecord(channel, messageArray));
+      tmiClient.say(channel, await worldRecord(channel, messageArray));
       break;
     case CommandName.ILWR:
       tmiClient.say(
         channel,
-        await getInduvidualWorldRecord(streamer, messageArray)
+        await induvidualWorldRecord(streamer, messageArray)
       );
       break;
     case CommandName.PB:
-      tmiClient.say(channel, await getPersonalBest(channel, messageArray));
+      tmiClient.say(channel, await personalBest(channel, messageArray));
       break;
     case CommandName.ILPB:
       tmiClient.say(
@@ -163,7 +163,7 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
       break;
     case ComponentsSupport.POKEMON:
     case ComponentsSupport.PKMN:
-      tmiClient.say(channel, await componentPokemon(streamer, messageArray));
+      tmiClient.say(channel, await pokemonComponent(streamer, messageArray));
       break;
     default:
       break;

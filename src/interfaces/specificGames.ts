@@ -1,4 +1,8 @@
-export interface ILevel {
+export interface ILevels {
+  levels: ITrack[];
+}
+
+export interface ITrack {
   id: string;
   name: string;
   abbreviation: string;
@@ -6,8 +10,8 @@ export interface ILevel {
   default: boolean;
 }
 
-export interface ILevels {
-  levels: ILevel[];
+export interface ITimeTrialsJson {
+  timetrial: ITimeTrialJson[];
 }
 
 export interface ITimeTrialJson {
@@ -18,8 +22,10 @@ export interface ITimeTrialJson {
   default: boolean;
 }
 
-export interface ITimeTrialsJson {
-  timetrial: ITimeTrialJson[];
+export interface ITimeTrialResponse {
+  status: number;
+  error: string;
+  times: ITimeTrial[];
 }
 
 export interface ITimeTrial {
@@ -35,10 +41,4 @@ export interface ITimeTrial {
   proof: string;
   time: string;
   player_profile: string;
-}
-
-export interface ITimeTrialResponse {
-  status: number;
-  error: string;
-  times: ITimeTrial[];
 }

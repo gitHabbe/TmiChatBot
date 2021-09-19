@@ -3,7 +3,7 @@ import { twitchAPI } from "../config/twitchConfig";
 import {
   IFollowage,
   IFollowageResponse,
-  IStreamer,
+  ITwitchChannel,
   IStreamerResponse,
   IVideosResponse,
 } from "../interfaces/twitch";
@@ -15,21 +15,19 @@ import {
 
 export const fetchStreamer = async (
   channelName: string
-): Promise<IStreamer> => {
+): Promise<ITwitchChannel> => {
   try {
     const {
-      data: { data: streamers },
+      data: { data: channels },
     } = await twitchAPI.get<IStreamerResponse>(
       `/search/channels?query=${channelName}`
     );
-    const streamer = streamers.find(
-      (name: IStreamer) =>
-        name.display_name.toLowerCase() === channelName.toLowerCase()
-    );
-    console.log("~ streamer", streamer);
-    if (streamer === undefined) throw new Error("User not found");
+    const channel = channels.find((name: ITwitchChannel) => {
+      return name.display_name.toLowerCase() === channelName.toLowerCase();
+    });
+    if (channel === undefined) throw new Error("User not found");
 
-    return streamer;
+    return channel;
   } catch (error) {
     throw new Error(`${channelName} is not online`);
   }
@@ -52,23 +50,23 @@ export const getStreamerTitle = async (
   channelName: string
 ): Promise<string> => {
   try {
-    const { title }: IStreamer = await fetchStreamer(channelName);
+    const { title }: ITwitchChannel = await fetchStreamer(channelName);
 
     return title;
   } catch (error) {
-    return error.message;
+    return "Unable to read title";
   }
 };
 
 export const getStreamerGame = async (channel: string): Promise<string> => {
-  const { game_name }: IStreamer = await fetchStreamer(channel);
+  const { game_name }: ITwitchChannel = await fetchStreamer(channel);
 
   return game_name;
 };
 
 export const getStreamerUptime = async (channelName: string) => {
   try {
-    const { started_at }: IStreamer = await fetchStreamer(channelName);
+    const { started_at }: ITwitchChannel = await fetchStreamer(channelName);
     if (started_at === "") throw new Error("Streamer not online");
     const date_started_at: Date = new Date(started_at);
     const date_now: Date = new Date();
@@ -79,7 +77,7 @@ export const getStreamerUptime = async (channelName: string) => {
 
     return uptime;
   } catch (error) {
-    return error.message;
+    return "Unable to get uptime";
   }
 };
 
@@ -98,7 +96,7 @@ export const fetchFollowage = async (
 
 export const getFollowage = async (channel: string, user: Userstate) => {
   if (!user["user-id"]) throw new Error(`${user.username} not found`);
-  const streamer: IStreamer = await fetchStreamer(channel);
+  const streamer: ITwitchChannel = await fetchStreamer(channel);
   const followage: IFollowage[] = await fetchFollowage(
     streamer.id,
     user["user-id"]

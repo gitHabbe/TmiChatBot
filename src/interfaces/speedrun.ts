@@ -19,16 +19,18 @@ export interface ILeaderboardReponse {
   data: ILeaderboard;
 }
 
-interface ILeaderboard {
+export interface ILeaderboard {
   game: string;
   category: string;
-  runs: {
-    place: number;
-    run: IRun;
-  }[];
+  runs: IRun[];
 }
 
-interface IRun {
+export interface IRun {
+  place: number;
+  run: IRunData;
+}
+
+export interface IRunData {
   id: string;
   players: RunPlayer[];
   date: string;
