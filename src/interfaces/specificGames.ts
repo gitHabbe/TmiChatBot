@@ -29,6 +29,7 @@ export interface ITimeTrialResponse {
 }
 
 export interface ITimeTrial {
+  ranking: string;
   player_name: string;
   username: string;
   country_iso: string;

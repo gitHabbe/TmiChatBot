@@ -2,10 +2,10 @@ import { Client } from "tmi.js";
 import { tmiOptions } from "./config/tmiConfig";
 import { CommandName, ComponentsSupport } from "./interfaces/tmi";
 import {
-  getInduvidualPersonalBest,
+  induvidualPersonalBest,
   induvidualWorldRecord,
-  getTimeTrialPersonalBest,
-  getTimeTrialWorldRecord,
+  timeTrialPersonalBest,
+  timeTrialWorldRecord,
   worldRecord,
   setSpeedrunComUsername,
   personalBest,
@@ -86,19 +86,19 @@ tmiClient.on("message", async (channel, userstate, message, self) => {
     case CommandName.ILPB:
       tmiClient.say(
         channel,
-        await getInduvidualPersonalBest(streamer, messageArray)
+        await induvidualPersonalBest(streamer, messageArray)
       );
       break;
     case CommandName.TTWR:
       tmiClient.say(
         channel,
-        await getTimeTrialWorldRecord(streamer, messageArray)
+        await timeTrialWorldRecord(streamer, messageArray)
       );
       break;
     case CommandName.TTPB:
       tmiClient.say(
         channel,
-        await getTimeTrialPersonalBest(streamer, messageArray)
+        await timeTrialPersonalBest(streamer, messageArray)
       );
       break;
     case CommandName.JOIN:

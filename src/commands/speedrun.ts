@@ -3,18 +3,11 @@ import {
   TimeTrialSupport,
   IRun,
 } from "../interfaces/speedrun";
-import {
-  datesDaysDifference,
-  floatToHHMMSS,
-  secondsToHHMMSS,
-  stringFloatToHHMMSSmm,
-} from "../utility/dateFormat";
+import { datesDaysDifference, secondsToHHMMSS } from "../utility/dateFormat";
 import { getStreamerTitle } from "./twitch";
 import { GamePrisma } from "../models/database/GamePrisma";
 import { RunnerPrisma } from "../models/database/RunnerPrisma";
 import { JoinedGame } from "../interfaces/prisma";
-import { IAxiosOptions, SpeedrunCom } from "../models/axiosFetch";
-import { AxiosResponse } from "axios";
 import { Runner } from "@prisma/client";
 import { UserPrisma } from "../models/database/UserPrisma";
 import { SettingPrisma } from "../models/database/SettingPrisma";
@@ -87,7 +80,7 @@ const formatWorldRecord = async (
   const seconds: number = worldRecord.run.times.primary_t;
   const time: string = secondsToHHMMSS(seconds);
 
-  return `${category} WR: ${time} by ${runner.name} - ${daysAgo}d ago`;
+  return `${category} WR: ${time} by ${runner.name} - ${daysAgo} days ago`;
 };
 
 export const personalBest = async (
@@ -122,8 +115,10 @@ const formatPersonalBest = async (
   const daysAgo: number = datesDaysDifference(date);
   const seconds: number = run.run.times.primary_t;
   const time: string = secondsToHHMMSS(seconds);
+  const place: number = run.place;
+  const name: string = runner.name;
 
-  return `${runner.name} ${category} PB: ${time} - ${daysAgo} days ago`;
+  return `${name} ${category} PB: ${time} - #${place} - ${daysAgo} days ago`;
 };
 
 export const induvidualWorldRecord = async (
@@ -144,15 +139,15 @@ export const induvidualWorldRecord = async (
   }
 };
 
-export const getInduvidualPersonalBest = async (
+export const induvidualPersonalBest = async (
   streamer: string,
   messageArray: string[]
 ) => {
-  const gameName: string = await gameFromMessage(
-    messageArray.slice(1),
-    streamer
-  );
   try {
+    const gameName: string = await gameFromMessage(
+      messageArray.slice(1),
+      streamer
+    );
     switch (gameName.toUpperCase()) {
       case InduvidualLevelSupport.DKR:
         return DiddyKongRacingInduvidualPersonalBest(messageArray);
@@ -165,7 +160,7 @@ export const getInduvidualPersonalBest = async (
   }
 };
 
-export const getTimeTrialWorldRecord = async (
+export const timeTrialWorldRecord = async (
   streamer: string,
   messageArray: string[]
 ) => {
@@ -180,7 +175,7 @@ export const getTimeTrialWorldRecord = async (
   } catch (error) {}
 };
 
-export const getTimeTrialPersonalBest = async (
+export const timeTrialPersonalBest = async (
   streamer: string,
   messageArray: string[]
 ): Promise<string> => {
@@ -189,7 +184,6 @@ export const getTimeTrialPersonalBest = async (
       messageArray.slice(1),
       streamer
     );
-    console.log("gameName:", gameName);
     switch (gameName.toUpperCase()) {
       case TimeTrialSupport.DKR:
         return DiddyKongRacingTimeTrialPersonalBest(messageArray);
