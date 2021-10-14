@@ -168,11 +168,14 @@ export const timeTrialWorldRecord = async (
     const gameName: string = await gameFromMessage(messageArray, streamer);
     switch (gameName.toUpperCase()) {
       case TimeTrialSupport.DKR:
-        return DiddyKongRacingTimeTrialWorldRecord(messageArray);
+        return await DiddyKongRacingTimeTrialWorldRecord(messageArray);
       default:
         return `Game "${gameName}" doesn't support !ttwr`;
     }
-  } catch (error) {}
+  } catch (error) {
+    if (error instanceof Error) return error.message;
+    return "Unable to get TT WR";
+  }
 };
 
 export const timeTrialPersonalBest = async (

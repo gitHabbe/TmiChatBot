@@ -1,4 +1,4 @@
-import { ChatUserstate } from "tmi.js";
+import { ChatUserstate, Userstate } from "tmi.js";
 
 export interface TmiMessageProps {
   channel: string;
@@ -35,3 +35,10 @@ export enum ComponentsSupport {
   POKEMON = "POKEMON",
   PKMN = "PKMN",
 }
+
+export type OnMessage = (
+  streamer: string,
+  chatter: Userstate,
+  message: string,
+  self: boolean
+) => void;
