@@ -1,8 +1,8 @@
-import { Client } from "tmi.js";
+import { Client, ChatUserstate } from "tmi.js";
 import { tmiOptions } from "./config/tmiConfig";
-import { isUserCustomCommand } from "./commands/tmi";
 import { callStandardCommand } from "./models/commands/callStandardCommand";
 import { callLinkCommand } from "./models/commands/callLinkCommand";
+import { callCustomCommand } from "./models/commands/callCustomCommand";
 
 export const tmiClient = new Client(tmiOptions);
 
@@ -13,27 +13,41 @@ try {
   console.log(`TMI Connect error: ${error}`);
 }
 
-tmiClient.on("message", async (channel, userstate, message, self) => {
-  if (self) return;
+tmiClient.on(
+  "message",
+  async (
+    channel: string,
+    userstate: ChatUserstate,
+    message: string,
+    self: boolean
+  ) => {
+    if (self) return;
 
-  const isLink = await callLinkCommand(tmiClient, channel, message);
-  if (isLink) return;
+    const isLink = await callLinkCommand(tmiClient, channel, message);
+    if (isLink) return;
 
-  const streamer: string = channel.slice(1);
-  const chatterCommand: string = message.split(" ")[0];
-  const isCommand = await isUserCustomCommand(streamer, chatterCommand);
-  if (isCommand) return tmiClient.say(channel, isCommand.content);
+    const streamer: string = channel.slice(1);
+    const chatterCommand: string = message.split(" ")[0];
 
-  if (message[0] !== "!") return;
-  const chatterCommandUpper: string = chatterCommand.slice(1).toUpperCase();
-  const messageArray: string[] = message.split(" ").slice(1);
+    const isCustomCommand = await callCustomCommand(
+      tmiClient,
+      streamer,
+      channel,
+      chatterCommand
+    );
+    if (isCustomCommand) return;
 
-  await callStandardCommand(
-    tmiClient,
-    chatterCommandUpper,
-    channel,
-    streamer,
-    messageArray,
-    userstate
-  );
-});
+    if (message[0] !== "!") return;
+    const chatterCommandUpper: string = chatterCommand.slice(1).toUpperCase();
+    const messageArray: string[] = message.split(" ").slice(1);
+
+    await callStandardCommand(
+      tmiClient,
+      chatterCommandUpper,
+      channel,
+      streamer,
+      messageArray,
+      userstate
+    );
+  }
+);
