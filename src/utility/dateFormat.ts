@@ -153,3 +153,12 @@ export const stringFloatToHHMMSSmm = (time: string) => {
   let milli = String(time).split(".");
   return str + "." + milli[1];
 };
+export const stringToProbabilityPercent = (
+  event1Count: string,
+  event2Count: string
+) => {
+  const event1 = parseInt(event1Count);
+  const totalCount = parseInt(event1Count) + parseInt(event2Count);
+
+  return Math.round((event1 / totalCount) * 100);
+};

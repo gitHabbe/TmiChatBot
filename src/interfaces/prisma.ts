@@ -1,4 +1,6 @@
 import {
+  Game,
+  Category,
   CategoryLink,
   GameLink,
   GameNames,
@@ -32,4 +34,36 @@ export interface JoinedGame {
     id: string;
     gameId: string;
   }[];
+}
+
+export enum ModelName {
+  game = "game",
+  gameNames = "gameNames",
+  gamePlatform = "gamePlatform",
+  gameLink = "gameLink",
+  category = "category",
+  categoryLink = "categoryLink",
+  runner = "runner",
+  user = "user",
+  command = "command",
+  timestamp = "timestamp",
+  component = "component",
+  trust = "trust",
+  setting = "setting",
+}
+
+export type FullGame =
+  | (Game & {
+      names: GameNames | null;
+      categories: Category[];
+      links: GameLink[];
+      platforms: GamePlatform[];
+    })
+  | null;
+
+export interface Model {
+  get(): Promise<any>;
+  getAll(): Promise<any[]>;
+  save(data: any): Promise<any>;
+  delete(): Promise<any>;
 }

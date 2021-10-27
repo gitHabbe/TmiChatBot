@@ -11,8 +11,8 @@ import { JoinedGame } from "../interfaces/prisma";
 import { Runner } from "@prisma/client";
 import { UserPrisma } from "../models/database/UserPrisma";
 import { SettingPrisma } from "../models/database/SettingPrisma";
-import { SpeedGame } from "../models/SpeedGame";
-import { Leaderboard } from "../models/Leaderboard";
+import { SpeedGame } from "../models/fetch/SpeedGame";
+import { Leaderboard } from "../models/fetch/Leaderboard";
 import {
   DiddyKongRacingInduvidualPersonalBest,
   DiddyKongRacingInduvidualWorldRecord,
@@ -26,7 +26,7 @@ const gameFromMessage = async (
 ): Promise<string> => {
   if (messageArray.length === 0) {
     const game = new SpeedGame();
-    return game.twitchGame(streamer);
+    return game.twitch(streamer);
   }
   return messageArray[0];
 };

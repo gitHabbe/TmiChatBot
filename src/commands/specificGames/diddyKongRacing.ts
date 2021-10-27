@@ -2,7 +2,7 @@ import { Runner } from ".prisma/client";
 import { dkr64API } from "../../config/speedrunConfig";
 import { ITimeTrialResponse, ITrack } from "../../interfaces/specificGames";
 import { ILeaderboardReponse, IRun } from "../../interfaces/speedrun";
-import { IAxiosOptions, SpeedrunCom } from "../../models/axiosFetch";
+import { IAxiosOptions, SpeedrunCom } from "../../models/fetch/SpeedrunCom";
 import { RunnerPrisma } from "../../models/database/RunnerPrisma";
 import { JsonLevels, JsonTimeTrials } from "../../models/JsonArrayFile";
 import {

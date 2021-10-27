@@ -11,7 +11,7 @@ interface Names {
   twitch: string;
 }
 
-interface Link {
+export interface Link {
   rel: string;
   uri: string;
 }

@@ -30,7 +30,7 @@ export const youtubeInfo = async (
     const views = numberToRoundedWithLetter(viewCount);
     const title = video.snippet.title;
     return `${title} [${duration} - ${likePercent}% - ${views}]`;
-  } catch (error) {
+  } catch (error: any) {
     if (error.message) return error.message;
     return "";
   }
@@ -50,7 +50,7 @@ export const tweetInfo = async (
     const verifiedCheck: string = verified ? "✔" : ""; // alts: ✅ 💬
 
     return `[${name}@${username}${verifiedCheck}] ${text}`;
-  } catch (error) {
+  } catch (error: any) {
     if (error.message) return error.message;
     return "";
   }

@@ -1,12 +1,12 @@
 import { Category, CategoryLink } from ".prisma/client";
-import { JoinedGame } from "../interfaces/prisma";
+import { JoinedGame } from "../../interfaces/prisma";
 import {
   ICategoryType,
   ILeaderboardReponse,
   IRun,
-} from "../interfaces/speedrun";
-import { IAxiosOptions, SpeedrunCom } from "./axiosFetch";
-import { fuseSearch } from "../utility/fusejs";
+} from "../../interfaces/speedrun";
+import { IAxiosOptions, SpeedrunCom } from "./SpeedrunCom";
+import { fuseSearch } from "../../utility/fusejs";
 
 export class Leaderboard {
   constructor(private game: JoinedGame) {}
