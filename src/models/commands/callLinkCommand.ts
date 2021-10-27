@@ -2,12 +2,13 @@ import { Client } from "tmi.js";
 import { tweetInfo, youtubeInfo } from "../../commands/socialMedia";
 import { twitterRegex } from "../../config/twitterConfig";
 import { youtubeRegex } from "../../config/youtubeConfig";
+import { MessageData } from "../Tmi";
 
 export const callLinkCommand = async (
   tmiClient: Client,
-  channel: string,
-  message: string
+  messageData: MessageData
 ): Promise<boolean> => {
+  const { message, channel } = messageData;
   const youtube_hit = youtubeRegex.exec(message);
   const tweet_hit = twitterRegex.exec(message);
 

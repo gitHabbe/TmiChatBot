@@ -3,8 +3,9 @@ import { tmiOptions } from "./config/tmiConfig";
 import { callStandardCommand } from "./models/commands/callStandardCommand";
 import { callLinkCommand } from "./models/commands/callLinkCommand";
 import { callCustomCommand } from "./models/commands/callCustomCommand";
+import { MessageData } from "./models/Tmi";
 
-export const tmiClient = new Client(tmiOptions);
+const tmiClient = new Client(tmiOptions);
 
 try {
   tmiClient.connect();
@@ -17,37 +18,23 @@ tmiClient.on(
   "message",
   async (
     channel: string,
-    userstate: ChatUserstate,
+    chatter: ChatUserstate,
     message: string,
     self: boolean
   ) => {
     if (self) return;
+    const messageData = new MessageData(channel, chatter, message);
 
-    const isLink = await callLinkCommand(tmiClient, channel, message);
+    const isLink = await callLinkCommand(tmiClient, messageData);
     if (isLink) return;
 
     const streamer: string = channel.slice(1);
-    const chatterCommand: string = message.split(" ")[0];
 
-    const isCustomCommand = await callCustomCommand(
-      tmiClient,
-      streamer,
-      channel,
-      chatterCommand
-    );
+    const isCustomCommand = await callCustomCommand(tmiClient, messageData);
     if (isCustomCommand) return;
 
     if (message[0] !== "!") return;
-    const chatterCommandUpper: string = chatterCommand.slice(1).toUpperCase();
-    const messageArray: string[] = message.split(" ").slice(1);
 
-    await callStandardCommand(
-      tmiClient,
-      chatterCommandUpper,
-      channel,
-      streamer,
-      messageArray,
-      userstate
-    );
+    await callStandardCommand(tmiClient, messageData);
   }
 );

@@ -10,8 +10,8 @@ import {
 } from "../../commands/speedrun";
 import {
   getFollowage,
-  getStreamerTitle,
   getStreamerUptime,
+  getStreamerTitle,
 } from "../../commands/twitch";
 import {
   createUser,
@@ -27,22 +27,24 @@ import {
   componentSlots,
   pokemonComponent,
 } from "../../commands/tmi";
-import { ChatUserstate, Client, Userstate } from "tmi.js";
+import { Client } from "tmi.js";
+import { MessageData } from "../Tmi";
 
-export async function callStandardCommand(
+export const callStandardCommand = async (
   tmiClient: Client,
-  chatterCommandUpper: string,
-  channel: string,
-  streamer: string,
-  messageArray: string[],
-  userstate: ChatUserstate
-): Promise<void> {
+  messageData: MessageData
+): Promise<void> => {
+  const { channel, message, chatter } = messageData;
+  const chatterCommand: string = message.split(" ")[0];
+  const chatterCommandUpper: string = chatterCommand.slice(1).toUpperCase();
+  const messageArray: string[] = message.split(" ").slice(1);
+
   switch (chatterCommandUpper) {
     case CommandName.UPTIME:
-      tmiClient.say(channel, await getStreamerUptime(streamer));
+      tmiClient.say(channel, await getStreamerUptime(channel));
       break;
     case CommandName.TITLE:
-      tmiClient.say(channel, await getStreamerTitle(streamer));
+      tmiClient.say(channel, await getStreamerTitle(channel));
       break;
     case CommandName.WR:
       tmiClient.say(channel, await worldRecord(channel, messageArray));
@@ -50,7 +52,7 @@ export async function callStandardCommand(
     case CommandName.ILWR:
       tmiClient.say(
         channel,
-        await induvidualWorldRecord(streamer, messageArray)
+        await induvidualWorldRecord(channel, messageArray)
       );
       break;
     case CommandName.PB:
@@ -59,86 +61,80 @@ export async function callStandardCommand(
     case CommandName.ILPB:
       tmiClient.say(
         channel,
-        await induvidualPersonalBest(streamer, messageArray)
+        await induvidualPersonalBest(channel, messageArray)
       );
       break;
     case CommandName.TTWR:
-      tmiClient.say(
-        channel,
-        await timeTrialWorldRecord(streamer, messageArray)
-      );
+      tmiClient.say(channel, await timeTrialWorldRecord(channel, messageArray));
       break;
     case CommandName.TTPB:
       tmiClient.say(
         channel,
-        await timeTrialPersonalBest(streamer, messageArray)
+        await timeTrialPersonalBest(channel, messageArray)
       );
       break;
     case CommandName.JOIN:
-      tmiClient.say(channel, await createUser(channel, userstate));
+      tmiClient.say(channel, await createUser(channel, chatter));
       break;
     case CommandName.PART:
-      tmiClient.say(channel, await removeUser(userstate));
+      tmiClient.say(channel, await removeUser(chatter));
       break;
     case CommandName.NEWCMD:
-      tmiClient.say(
-        channel,
-        await newCommand(streamer, messageArray, userstate)
-      );
+      tmiClient.say(channel, await newCommand(channel, messageArray, chatter));
       break;
     case CommandName.DELCMD:
       tmiClient.say(
         channel,
-        await removeCommand(streamer, messageArray, userstate)
+        await removeCommand(channel, messageArray, chatter)
       );
       break;
     case CommandName.TRUST:
       tmiClient.say(
         channel,
-        await addUserTrust(streamer, messageArray, userstate)
+        await addUserTrust(channel, messageArray, chatter)
       );
       break;
     case CommandName.UNTRUST:
       tmiClient.say(
         channel,
-        await removeUserTrust(streamer, messageArray, userstate)
+        await removeUserTrust(channel, messageArray, chatter)
       );
       break;
     case CommandName.TS:
       tmiClient.say(
         channel,
-        await addTimestamp(streamer, messageArray, userstate)
+        await addTimestamp(channel, messageArray, chatter)
       );
       break;
     case CommandName.FINDTS:
-      tmiClient.say(channel, await findTimestamp(streamer, messageArray));
+      tmiClient.say(channel, await findTimestamp(channel, messageArray));
       break;
     case CommandName.DTS:
       tmiClient.say(
         channel,
-        await removeTimestamp(streamer, messageArray, userstate)
+        await removeTimestamp(channel, messageArray, chatter)
       );
       break;
     case CommandName.FOLLOWAGE:
-      tmiClient.say(channel, await getFollowage(streamer, userstate));
+      tmiClient.say(channel, await getFollowage(channel, chatter));
       break;
     case CommandName.TOGGLE:
-      tmiClient.say(channel, await toggleComponent(streamer, messageArray));
+      tmiClient.say(channel, await toggleComponent(channel, messageArray));
       break;
     case CommandName.SETSPEEDRUNNER:
       tmiClient.say(
         channel,
-        await setSpeedrunComUsername(streamer, messageArray)
+        await setSpeedrunComUsername(channel, messageArray)
       );
       break;
     case ComponentsSupport.SLOTS:
-      tmiClient.say(channel, await componentSlots(streamer, messageArray));
+      tmiClient.say(channel, await componentSlots(channel, messageArray));
       break;
     case ComponentsSupport.POKEMON:
     case ComponentsSupport.PKMN:
-      tmiClient.say(channel, await pokemonComponent(streamer, messageArray));
+      tmiClient.say(channel, await pokemonComponent(channel, messageArray));
       break;
     default:
       break;
   }
-}
+};
