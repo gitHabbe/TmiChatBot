@@ -29,6 +29,7 @@ export const youtubeInfo = async (
     return "";
   }
 };
+
 export const tweetInfo = async (
     tweet_hit: RegExpExecArray
 ): Promise<string> => {
@@ -48,6 +49,7 @@ export const tweetInfo = async (
     return "";
   }
 };
+
 export const callLinkCommand = async (
   tmiClient: Client,
   messageData: MessageData

@@ -9,7 +9,7 @@ import { MessageData } from "./MessageData";
 export class Tmi {
   private client: Client = new Client(tmiOptions);
 
-  constructor() {
+  connect = () => {
     this.client.connect().then(r => { console.log(r)} )
     this.client.on("message", this.onMessage)
   }
