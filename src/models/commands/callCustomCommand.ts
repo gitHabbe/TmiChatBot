@@ -1,35 +1,36 @@
-import {Client} from "tmi.js";
-import {Command} from "@prisma/client";
-import {UserModel} from "../database/UserPrisma";
-import {CommandPrisma} from "../database/CommandPrisma";
-import {MessageData} from "../MessageData";
+import { Command } from "@prisma/client";
+import { UserModel } from "../database/UserPrisma";
+import { CommandPrisma } from "../database/CommandPrisma";
+import { MessageData } from "../MessageData";
+import { ICommand } from "../../interfaces/Command";
 
-export const isUserCustomCommand = async (
-    streamer: string,
-    targetCommand: string
-): Promise<Command | undefined> => {
-  const userPrisma = new UserModel(streamer);
-  const user = await userPrisma.get();
-  if (!user) throw new Error(`User not found`);
-  const command = new CommandPrisma(user);
-  const commands = await command.findAll();
-  const isCommand = commands.find(
-      (command: Command) => command.name === targetCommand
-  );
+export class CustomCommand implements ICommand {
 
-  return isCommand;
-};
-export const callCustomCommand = async (
-  tmiClient: Client,
-  messageData: MessageData
-): Promise<boolean> => {
-  const { message, channel } = messageData;
-  const chatterCommand: string = message.split(" ")[0];
-  const isCommand = await isUserCustomCommand(channel, chatterCommand);
-  if (isCommand) {
-    tmiClient.say(channel, isCommand.content);
-    return true;
+  constructor(public messageData: MessageData) {}
+
+  private allCommands = async (user: any): Promise<Command[]> => {
+    const command = new CommandPrisma(user);
+    const commands = await command.findAll();
+    return commands;
+  };
+
+  isCustomCommand = async (
+      streamer: string,
+      targetCommand: string
+  ): Promise<Command | undefined> => {
+    const userPrisma = new UserModel(streamer);
+    const user = await userPrisma.get();
+    if (!user) throw new Error(`User not found`);
+    const commands = await this.allCommands(user);
+    return commands.find((command: Command) => command.name === targetCommand);
   }
 
-  return false;
-};
+  run = async (): Promise<string> => {
+    const { message, channel } = this.messageData;
+    const chatterCommand: string = message.split(" ")[0];
+    const isCommand = await this.isCustomCommand(channel, chatterCommand);
+    if (!isCommand) throw new Error("User command does not exist")
+
+    return isCommand.content
+  }
+}

@@ -2,7 +2,7 @@ import { ChatUserstate, Client } from "tmi.js";
 import { tmiOptions } from "../config/tmiConfig";
 import { OnMessage } from "../interfaces/tmi";
 import { ChatLink } from "./commands/callLinkCommand";
-import { callCustomCommand } from "./commands/callCustomCommand";
+import { CustomCommand } from "./commands/callCustomCommand";
 import { callStandardCommand } from "./commands/callStandardCommand";
 import { MessageData } from "./MessageData";
 
@@ -30,9 +30,13 @@ export class Tmi {
     } catch (error) {
       return
     }
-
-    const isCustomCommand = await callCustomCommand(this.client, messageData);
-    if (isCustomCommand) return;
+    try {
+      const customCommand = new CustomCommand(messageData)
+      const command = await customCommand.run();
+      await this.client.say(streamer, command)
+    } catch (error) {
+      return
+    }
 
     if (message[0] !== "!") return;
 
