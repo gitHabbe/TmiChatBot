@@ -28,8 +28,6 @@ tmiClient.on(
     const isLink = await callLinkCommand(tmiClient, messageData);
     if (isLink) return;
 
-    const streamer: string = channel.slice(1);
-
     const isCustomCommand = await callCustomCommand(tmiClient, messageData);
     if (isCustomCommand) return;
 

@@ -1,4 +1,4 @@
-interface IletterFormatedDate {
+interface ILetterFormatedDate {
   dayDistance: number;
   hourDistance: number;
   minuteDistance: number;
@@ -7,7 +7,7 @@ interface IletterFormatedDate {
 
 export const extractMillisecondsToObject = (
   milliseconds: number
-): IletterFormatedDate => {
+): ILetterFormatedDate => {
   const seconds = milliseconds / 1000;
   const dayDistance: number = Math.floor((seconds % 31536000) / 86400);
   const hourDistance: number = Math.floor(
@@ -28,7 +28,7 @@ export const extractMillisecondsToObject = (
   };
 };
 
-export const dateToLetters = (dateObject: IletterFormatedDate): string => {
+export const dateToLetters = (dateObject: ILetterFormatedDate): string => {
   const days: string =
     dateObject.dayDistance > 0 ? `${dateObject.dayDistance}d` : "";
   const hours: string =
@@ -89,10 +89,10 @@ export const youtubeDurationToHHMMSS = (youtubeDuration: string) => {
   return paddedTime;
 };
 
-export const numberToRoundedWithLetter = (views: string) => {
-  const viewsNum = parseInt(views);
-  let suffix;
-  let zeros;
+export const numberToRoundedWithLetter = (views: string): string => {
+  const viewsNum: number = parseInt(views);
+  let suffix: string;
+  let zeros: number;
   if (viewsNum > Math.pow(10, 9)) {
     suffix = "B";
     zeros = 9;
@@ -111,6 +111,14 @@ export const numberToRoundedWithLetter = (views: string) => {
 
 export const floatToHHMMSS = (time: number) => {
   let str = "";
+  let hrs = Math.floor((((time % 31536000) % 86400) / 3600));
+  if (hrs > 0) {
+    if (hrs < 10) {
+      str += "0" + hrs + ":";
+    } else {
+      str += hrs + ":";
+    }
+  }
   let mins = Math.floor((((time % 31536000) % 86400) % 3600) / 60);
   if (mins > 0) {
     if (mins < 10) {
@@ -128,7 +136,8 @@ export const floatToHHMMSS = (time: number) => {
     }
   }
   let milli = String(time).split(".");
-  return str + "." + milli[1];
+  if(milli[1] != undefined) return str + "." + milli[1]
+  return str;
 };
 
 export const stringFloatToHHMMSSmm = (time: string) => {

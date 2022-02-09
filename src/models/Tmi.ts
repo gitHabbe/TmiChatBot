@@ -31,5 +31,5 @@ const onMessage: OnMessage = async (
   if (self) return;
 };
 
-const tmi = new Tmi();
-tmi.on("message", onMessage);
+// const tmi = new Tmi();
+// tmi.on("message", onMessage);

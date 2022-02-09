@@ -1,140 +1,70 @@
-import { CommandName, ComponentsSupport } from "../../interfaces/tmi";
-import {
-  induvidualPersonalBest,
-  induvidualWorldRecord,
-  timeTrialPersonalBest,
-  timeTrialWorldRecord,
-  worldRecord,
-  setSpeedrunComUsername,
-  personalBest,
-} from "../../commands/speedrun";
-import {
-  getFollowage,
-  getStreamerUptime,
-  getStreamerTitle,
-} from "../../commands/twitch";
-import {
-  createUser,
-  newCommand,
-  removeCommand,
-  removeUser,
-  addUserTrust,
-  removeUserTrust,
-  addTimestamp,
-  removeTimestamp,
-  findTimestamp,
-  toggleComponent,
-  componentSlots,
-  pokemonComponent,
-} from "../../commands/tmi";
+import {CommandName, ComponentsSupport} from "../../interfaces/tmi";
 import { Client } from "tmi.js";
 import { MessageData } from "../Tmi";
+import {Followage, TwitchTitle, TwitchUptime} from "./Twitch";
+
+import {
+  IndividualPersonalBest,
+  IndividualWorldRecord,
+  PersonalBest,
+  SetSpeedrunner, TimeTrialPersonalBest,
+  TimeTrialWorldRecord,
+  WorldRecord
+} from "./Speedrun";
+import { ICommand } from "../../interfaces/Command";
+import {
+  DeleteCommand,
+  DeleteTimestamp,
+  FindTimestamp,
+  NewCommand,
+  Pokemon,
+  Slots,
+  Timestamp, ToggleComponent,
+  Trust,
+  UnTrust, UserJoin, UserLeave
+} from "./Tmi";
 
 export const callStandardCommand = async (
   tmiClient: Client,
   messageData: MessageData
 ): Promise<void> => {
-  const { channel, message, chatter } = messageData;
+  const { channel, message } = messageData;
   const chatterCommand: string = message.split(" ")[0];
   const chatterCommandUpper: string = chatterCommand.slice(1).toUpperCase();
-  const messageArray: string[] = message.split(" ").slice(1);
+  console.log(chatterCommandUpper)
 
-  switch (chatterCommandUpper) {
-    case CommandName.UPTIME:
-      tmiClient.say(channel, await getStreamerUptime(channel));
-      break;
-    case CommandName.TITLE:
-      tmiClient.say(channel, await getStreamerTitle(channel));
-      break;
-    case CommandName.WR:
-      tmiClient.say(channel, await worldRecord(channel, messageArray));
-      break;
-    case CommandName.ILWR:
-      tmiClient.say(
-        channel,
-        await induvidualWorldRecord(channel, messageArray)
-      );
-      break;
-    case CommandName.PB:
-      tmiClient.say(channel, await personalBest(channel, messageArray));
-      break;
-    case CommandName.ILPB:
-      tmiClient.say(
-        channel,
-        await induvidualPersonalBest(channel, messageArray)
-      );
-      break;
-    case CommandName.TTWR:
-      tmiClient.say(channel, await timeTrialWorldRecord(channel, messageArray));
-      break;
-    case CommandName.TTPB:
-      tmiClient.say(
-        channel,
-        await timeTrialPersonalBest(channel, messageArray)
-      );
-      break;
-    case CommandName.JOIN:
-      tmiClient.say(channel, await createUser(channel, chatter));
-      break;
-    case CommandName.PART:
-      tmiClient.say(channel, await removeUser(chatter));
-      break;
-    case CommandName.NEWCMD:
-      tmiClient.say(channel, await newCommand(channel, messageArray, chatter));
-      break;
-    case CommandName.DELCMD:
-      tmiClient.say(
-        channel,
-        await removeCommand(channel, messageArray, chatter)
-      );
-      break;
-    case CommandName.TRUST:
-      tmiClient.say(
-        channel,
-        await addUserTrust(channel, messageArray, chatter)
-      );
-      break;
-    case CommandName.UNTRUST:
-      tmiClient.say(
-        channel,
-        await removeUserTrust(channel, messageArray, chatter)
-      );
-      break;
-    case CommandName.TS:
-      tmiClient.say(
-        channel,
-        await addTimestamp(channel, messageArray, chatter)
-      );
-      break;
-    case CommandName.FINDTS:
-      tmiClient.say(channel, await findTimestamp(channel, messageArray));
-      break;
-    case CommandName.DTS:
-      tmiClient.say(
-        channel,
-        await removeTimestamp(channel, messageArray, chatter)
-      );
-      break;
-    case CommandName.FOLLOWAGE:
-      tmiClient.say(channel, await getFollowage(channel, chatter));
-      break;
-    case CommandName.TOGGLE:
-      tmiClient.say(channel, await toggleComponent(channel, messageArray));
-      break;
-    case CommandName.SETSPEEDRUNNER:
-      tmiClient.say(
-        channel,
-        await setSpeedrunComUsername(channel, messageArray)
-      );
-      break;
-    case ComponentsSupport.SLOTS:
-      tmiClient.say(channel, await componentSlots(channel, messageArray));
-      break;
-    case ComponentsSupport.POKEMON:
-    case ComponentsSupport.PKMN:
-      tmiClient.say(channel, await pokemonComponent(channel, messageArray));
-      break;
-    default:
-      break;
+  const commandMap = new Map<string, ICommand>();
+  commandMap.set(CommandName.UPTIME, new TwitchUptime(messageData))
+  commandMap.set(CommandName.TITLE, new TwitchTitle(messageData))
+  commandMap.set(CommandName.WR, new WorldRecord(messageData))
+  commandMap.set(CommandName.ILWR, new IndividualWorldRecord(messageData))
+  commandMap.set(CommandName.PB, new PersonalBest(messageData))
+  commandMap.set(CommandName.ILPB, new IndividualPersonalBest(messageData))
+  commandMap.set(CommandName.FOLLOWAGE, new Followage(messageData))
+  commandMap.set(CommandName.TRUST, new Trust(messageData))
+  commandMap.set(CommandName.UNTRUST, new UnTrust(messageData))
+  commandMap.set(CommandName.TS, new Timestamp(messageData))
+  commandMap.set(CommandName.DTS, new DeleteTimestamp(messageData))
+  commandMap.set(CommandName.FINDTS, new FindTimestamp(messageData))
+  commandMap.set(CommandName.NEWCMD, new NewCommand(messageData))
+  commandMap.set(CommandName.DELCMD, new DeleteCommand(messageData))
+  commandMap.set(CommandName.SETSPEEDRUNNER, new SetSpeedrunner(messageData))
+  commandMap.set(CommandName.TOGGLE, new ToggleComponent(messageData))
+  commandMap.set(CommandName.JOIN, new UserJoin(messageData, tmiClient))
+  commandMap.set(CommandName.PART, new UserLeave(messageData, tmiClient))
+  commandMap.set(CommandName.TTWR, new TimeTrialWorldRecord(messageData))
+  commandMap.set(CommandName.TTPB, new TimeTrialPersonalBest(messageData))
+  commandMap.set(ComponentsSupport.POKEMON, new Pokemon(messageData))
+  commandMap.set(ComponentsSupport.SLOTS, new Slots(messageData))
+
+  if (commandMap.has(chatterCommandUpper)) {
+    // @ts-ignore
+    const command: ICommand = commandMap.get(chatterCommandUpper)
+    const response: string = await command.run()
+    console.log("channel:", channel)
+    await tmiClient.say(channel, response)
+    return
   }
+
+  throw new Error("Command doesn't exist.")
 };

@@ -1,5 +1,5 @@
 import { Category, CategoryLink } from ".prisma/client";
-import { JoinedGame } from "../../interfaces/prisma";
+import { FullGame, JoinedGame } from "../../interfaces/prisma";
 import {
   ICategoryType,
   ILeaderboardReponse,
@@ -9,7 +9,7 @@ import { IAxiosOptions, SpeedrunCom } from "./SpeedrunCom";
 import { fuseSearch } from "../../utility/fusejs";
 
 export class Leaderboard {
-  constructor(private game: JoinedGame) {}
+  constructor(private game: FullGame) {}
 
   private validCategories = () => {
     const hasLeaderboard = ({ rel }: CategoryLink) => rel === "leaderboard";

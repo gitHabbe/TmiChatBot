@@ -13,8 +13,8 @@ export class CommandPrisma extends Prisma {
     content: string,
     creator: string
   ): Promise<Command> => {
-    const comment = await this.find(name);
-    if (comment) throw new Error("Command already exists");
+    const command = await this.find(name);
+    if (command) throw new Error("Command already exists");
     return this.db.create({
       data: {
         name: name,
@@ -26,23 +26,22 @@ export class CommandPrisma extends Prisma {
   };
 
   remove = async (name: string): Promise<Command> => {
-    const comment = await this.find(name);
-    if (!comment) throw new Error("Comment not found");
+    const command = await this.find(name);
+    if (!command) throw new Error("Command not found");
     return await this.db.delete({
       where: {
-        id: comment.id,
+        id: command.id,
       },
     });
   };
 
-  find = async (name: string): Promise<Command> => {
+  find = async (name: string): Promise<Command | null> => {
     const command = await this.db.findFirst({
       where: {
         userId: this.user.id,
         name: name,
       },
     });
-    if (command === null) throw new Error(`Command ${name} not found`);
 
     return command;
   };

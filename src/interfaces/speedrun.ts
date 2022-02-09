@@ -90,6 +90,13 @@ export enum SpeedrunComErrorMessage {
   Generic = "Problem getting data from",
 }
 
+export enum TwitchTvErrorMessage {
+  NotFound = "not found on TwitchTv",
+  ServerError = "Twitch is having network problems",
+  GenericAxios = "Problem getting data from TwitchTv",
+  Generic = "Problem getting data from",
+}
+
 export enum InduvidualLevelSupport {
   DKR = "DKR",
 }

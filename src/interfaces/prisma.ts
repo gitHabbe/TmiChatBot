@@ -52,14 +52,13 @@ export enum ModelName {
   setting = "setting",
 }
 
-export type FullGame =
-  | (Game & {
-      names: GameNames | null;
-      categories: Category[];
-      links: GameLink[];
-      platforms: GamePlatform[];
-    })
-  | null;
+export type FullGame = Game & {
+  names: GameNames | null;
+  platforms: GamePlatform[];
+  categories: (Category & {
+    links: CategoryLink[];
+  })[];
+};
 
 export interface Model {
   get(): Promise<any>;

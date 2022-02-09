@@ -7,15 +7,25 @@ import {
   ICategoryResponse,
   Link,
 } from "../../interfaces/speedrun";
-import { SpeedrunDotCom } from "../fetch/SpeedrunCom";
-import { FetchCategories, FetchGame } from "../fetch/SpeedGame";
+import { speedrunAPI } from "../../config/speedrunConfig";
+import { Api, CategoryApi, GameApi } from "../fetch/SpeedrunCom";
 
 export class GameModel {
   private db = DatabaseSingleton.getInstance().get();
   private client = this.db[ModelName.game];
   constructor(private name: string) {}
 
-  get = async (): Promise<FullGame> => {
+  pull = async (): Promise<FullGame | null> => {
+    const game: FullGame | null = await this.get();
+    if (game === null) {
+      const savedGame = await this.save();
+      this.name = savedGame.abbreviation;
+      return await this.get();
+    }
+    return game;
+  };
+
+  get = async () => {
     return this.client.findFirst({
       where: {
         OR: [
@@ -30,8 +40,11 @@ export class GameModel {
         ],
       },
       include: {
-        categories: true,
-        links: true,
+        categories: {
+          include: {
+            links: true,
+          },
+        },
         names: true,
         platforms: true,
       },
@@ -43,15 +56,15 @@ export class GameModel {
   };
 
   save = async () => {
-    const speedrunGameApi = new SpeedrunDotCom<IGameResponse>();
-    const fetchGame = new FetchGame(speedrunGameApi, this.name);
-    const game: IGameType = await fetchGame.get();
+    const apiGame = new Api<IGameResponse>(speedrunAPI);
+    const gameApi = new GameApi(apiGame, this.name);
+    const { data: game }: IGameResponse = await gameApi.fetch();
 
-    const categoriesApi = new SpeedrunDotCom<ICategoryResponse>();
-    const fetchCategories = new FetchCategories(categoriesApi, game);
-    const categories: ICategoryType[] = await fetchCategories.get();
+    const apiCategories = new Api<ICategoryResponse>(speedrunAPI);
+    const categoriesApi = new CategoryApi(apiCategories, game);
+    const { data: categories }: ICategoryResponse = await categoriesApi.fetch();
 
-    return this.client.create({
+    return await this.client.create({
       data: {
         id: game.id,
         abbreviation: game.abbreviation,

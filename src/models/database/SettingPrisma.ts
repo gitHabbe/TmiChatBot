@@ -17,6 +17,7 @@ export class SettingPrisma extends Prisma {
   };
 
   delete = async (id: number) => {
+  // delete = async (setting: SettingPrisma) => {
     return this.db.delete({
       where: {
         id: id,
@@ -24,21 +25,21 @@ export class SettingPrisma extends Prisma {
     });
   };
 
-  apply = async (type: string, name: string) => {
-    let setting = await this.find(type);
-    if (setting === null) {
-      return this.add(type, name);
-    }
-    if (name === undefined) {
-      return this.delete(setting.id);
-    }
+  update = async (id: number, type: string, value: string | undefined) => {
+    // let setting = await this.find(type);
+    // if (setting === null) {
+    //   return this.add(type, value);
+    // }
+    // if (value === undefined) {
+    //   return this.delete(id);
+    // }
 
     return this.db.update({
       where: {
-        id: setting.id,
+        id: id,
       },
       data: {
-        value: name,
+        value: value,
       },
     });
   };
