@@ -11,7 +11,7 @@ interface Names {
   twitch: string;
 }
 
-interface Link {
+export interface Link {
   rel: string;
   uri: string;
 }
@@ -87,6 +87,13 @@ export enum SpeedrunComErrorMessage {
   NotFound = "not found on SpeedrunCom",
   ServerError = "SpeedrunCom is having network problems",
   GenericAxios = "Problem getting data from SpeedrunCom",
+  Generic = "Problem getting data from",
+}
+
+export enum TwitchTvErrorMessage {
+  NotFound = "not found on TwitchTv",
+  ServerError = "Twitch is having network problems",
+  GenericAxios = "Problem getting data from TwitchTv",
   Generic = "Problem getting data from",
 }
 

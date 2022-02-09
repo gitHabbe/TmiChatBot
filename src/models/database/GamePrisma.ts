@@ -1,171 +1,91 @@
-import { Prisma } from "./Prisma";
-import { GameQuery, JoinedGame } from "../../interfaces/prisma";
-import { IGameType, ICategoryType } from "../../interfaces/speedrun";
-import { Game } from ".prisma/client";
+import { DatabaseSingleton } from "./Prisma";
+import { FullGame, ModelName } from "../../interfaces/prisma";
+import {
+  IGameType,
+  ICategoryType,
+  IGameResponse,
+  ICategoryResponse,
+  Link,
+} from "../../interfaces/speedrun";
+import { speedrunAPI } from "../../config/speedrunConfig";
+import { Api, CategoryApi, GameApi } from "../fetch/SpeedrunCom";
 
-export class GamePrisma extends Prisma {
-  private _game: IGameType | undefined = undefined;
-  private _categories: ICategoryType[] | undefined;
+export class GameModel {
+  private db = DatabaseSingleton.getInstance().get();
+  private client = this.db[ModelName.game];
+  constructor(private name: string) {}
 
-  getGameWhere = async (gameQuery: GameQuery): Promise<JoinedGame> => {
-    const game = await this.prisma.game.findFirst({
-      where: gameQuery,
-      select: {
-        id: true,
-        abbreviation: true,
-        platforms: true,
-        names: true,
-        links: true,
-        categories: {
-          select: {
-            id: true,
-            gameId: true,
-            name: true,
-            links: true,
-          },
-        },
-      },
-    });
-    if (game === null) throw new Error("Game not in database");
-
+  pull = async (): Promise<FullGame | null> => {
+    const game: FullGame | null = await this.get();
+    if (game === null) {
+      const savedGame = await this.save();
+      this.name = savedGame.abbreviation;
+      return await this.get();
+    }
     return game;
   };
 
-  get = async (query: string) => {
-    const game = await this.prisma.game.findFirst({
+  get = async () => {
+    return this.client.findFirst({
       where: {
         OR: [
           {
-            abbreviation: query,
+            abbreviation: this.name,
           },
           {
             names: {
-              international: query,
+              international: this.name,
             },
           },
         ],
       },
-      select: {
-        id: true,
-        abbreviation: true,
-        platforms: true,
-        names: true,
-        links: true,
+      include: {
         categories: {
-          select: {
-            id: true,
-            gameId: true,
-            name: true,
+          include: {
             links: true,
           },
         },
-      },
-    });
-    if (game === null) throw new Error(`Game ${query} not found.`);
-
-    return game;
-  };
-
-  getGame = async (query: string) => {
-    const game = await this.prisma.game.findFirst({
-      where: {
-        OR: [
-          {
-            abbreviation: query,
-          },
-          {
-            names: {
-              international: query,
-            },
-          },
-        ],
-      },
-      select: {
-        id: true,
-        abbreviation: true,
-        platforms: true,
         names: true,
-        links: true,
-        categories: {
-          select: {
-            id: true,
-            gameId: true,
-            name: true,
-            links: true,
-          },
-        },
+        platforms: true,
       },
     });
-    if (game === null) throw new Error("Game not in database");
-
-    return game;
   };
 
-  set setGame(game: IGameType | undefined) {
-    this._game = game;
-  }
-
-  get game() {
-    if (this._game === undefined) throw new Error("GAME NOT SET");
-    return this._game;
-  }
-
-  set setCategories(categories: ICategoryType[] | undefined) {
-    this._categories = categories;
-  }
-
-  get categories() {
-    if (this._categories === undefined) throw new Error("CATEGORIES NOT SET");
-    return this._categories;
-  }
+  getAll = () => {
+    throw new Error(`Uncallable`);
+  };
 
   save = async () => {
-    return await this.prisma.game.create({
+    const apiGame = new Api<IGameResponse>(speedrunAPI);
+    const gameApi = new GameApi(apiGame, this.name);
+    const { data: game }: IGameResponse = await gameApi.fetch();
+
+    const apiCategories = new Api<ICategoryResponse>(speedrunAPI);
+    const categoriesApi = new CategoryApi(apiCategories, game);
+    const { data: categories }: ICategoryResponse = await categoriesApi.fetch();
+
+    return await this.client.create({
       data: {
-        id: this.game.id,
-        abbreviation: this.game.abbreviation,
-        names: {
-          create: this.names(),
+        id: game.id,
+        abbreviation: game.abbreviation,
+        categories: {
+          create: this.categories(categories),
         },
         links: {
-          create: this.links(),
+          create: this.links(game),
+        },
+        names: {
+          create: this.names(game),
         },
         platforms: {
-          create: this.platforms(),
-        },
-        categories: {
-          create: this.gameCategories(),
+          create: this.platforms(game),
         },
       },
     });
   };
 
-  private names = () => {
-    return {
-      twitch: this.game.names.twitch,
-      international: this.game.names.international,
-    };
-  };
-
-  private links = () => {
-    return this.game.links.map((link) => {
-      return {
-        rel: link.rel,
-        uri: link.uri,
-      };
-    });
-  };
-
-  private platforms = () => {
-    return this.game.platforms.map((platform) => {
-      return {
-        platformId: platform,
-      };
-    });
-  };
-
-  private gameCategories = () => {
-    return this.categories.map((category) => {
+  private categories = (categories: ICategoryType[]) => {
+    return categories.map((category: ICategoryType) => {
       return {
         id: category.id,
         name: category.name,
@@ -179,5 +99,33 @@ export class GamePrisma extends Prisma {
         },
       };
     });
+  };
+
+  private links = (game: IGameType) => {
+    return game.links.map((link: Link) => {
+      return {
+        rel: link.rel,
+        uri: link.uri,
+      };
+    });
+  };
+
+  private names = (game: IGameType) => {
+    return {
+      twitch: game.names.twitch,
+      international: game.names.international,
+    };
+  };
+
+  private platforms = (game: IGameType) => {
+    return game.platforms.map((platform) => {
+      return {
+        platformId: platform,
+      };
+    });
+  };
+
+  delete = () => {
+    throw new Error(`Uncallable`);
   };
 }

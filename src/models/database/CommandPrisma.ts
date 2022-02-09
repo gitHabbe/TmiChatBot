@@ -1,5 +1,6 @@
 import { User } from "@prisma/client";
 import { Prisma } from "./Prisma";
+import { Command } from ".prisma/client";
 
 export class CommandPrisma extends Prisma {
   private db = this.prisma.command;
@@ -7,9 +8,13 @@ export class CommandPrisma extends Prisma {
     super();
   }
 
-  add = async (name: string, content: string, creator: string) => {
-    const comment = await this.find(name);
-    if (comment) throw new Error("Command already exists");
+  add = async (
+    name: string,
+    content: string,
+    creator: string
+  ): Promise<Command> => {
+    const command = await this.find(name);
+    if (command) throw new Error("Command already exists");
     return this.db.create({
       data: {
         name: name,
@@ -20,27 +25,29 @@ export class CommandPrisma extends Prisma {
     });
   };
 
-  remove = async (name: string) => {
-    const comment = await this.find(name);
-    if (!comment) throw new Error("Comment not found");
+  remove = async (name: string): Promise<Command> => {
+    const command = await this.find(name);
+    if (!command) throw new Error("Command not found");
     return await this.db.delete({
       where: {
-        id: comment.id,
+        id: command.id,
       },
     });
   };
 
-  find = (name: string) => {
-    return this.db.findFirst({
+  find = async (name: string): Promise<Command | null> => {
+    const command = await this.db.findFirst({
       where: {
         userId: this.user.id,
         name: name,
       },
     });
+
+    return command;
   };
 
-  findAll = () => {
-    return this.db.findMany({
+  findAll = async (): Promise<Command[]> => {
+    return await this.db.findMany({
       where: {
         userId: this.user.id,
       },

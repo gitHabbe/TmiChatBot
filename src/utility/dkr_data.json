@@ -1,0 +1,680 @@
+{
+  "levels": [
+    {
+      "id": "ldy33p93",
+      "name": "Ancient Lake",
+      "vehicle": "car",
+      "abbreviation": "al",
+      "default": true
+    },
+    {
+      "id": "gdryyewz",
+      "name": "Ancient Lake",
+      "vehicle": "hover",
+      "abbreviation": "al",
+      "default": false
+    },
+    {
+      "id": "nwl22odv",
+      "name": "Ancient Lake",
+      "vehicle": "plane",
+      "abbreviation": "al",
+      "default": false
+    },
+    {
+      "id": "yweqqlwl",
+      "name": "Fossil Canyon",
+      "vehicle": "car",
+      "abbreviation": "fc",
+      "default": true
+    },
+    {
+      "id": "69z88x91",
+      "name": "Fossil Canyon",
+      "vehicle": "hover",
+      "abbreviation": "fc",
+      "default": false
+    },
+    {
+      "id": "r9g77j92",
+      "name": "Fossil Canyon",
+      "vehicle": "plane",
+      "abbreviation": "fc",
+      "default": false
+    },
+    {
+      "id": "o9xxx39l",
+      "name": "Jungle Falls",
+      "vehicle": "car",
+      "abbreviation": "jf",
+      "default": true
+    },
+    {
+      "id": "495mmmwp",
+      "name": "Jungle Falls",
+      "vehicle": "hover",
+      "abbreviation": "jf",
+      "default": false
+    },
+    {
+      "id": "rdqnnodx",
+      "name": "Jungle Falls",
+      "vehicle": "plane",
+      "abbreviation": "jf",
+      "default": false
+    },
+    {
+      "id": "5d722qwy",
+      "name": "Hot Top Volcano",
+      "vehicle": "hover",
+      "abbreviation": "htv",
+      "default": false
+    },
+    {
+      "id": "kwjvv0wg",
+      "name": "Hot Top Volcano",
+      "vehicle": "plane",
+      "abbreviation": "htv",
+      "default": true
+    },
+    {
+      "id": "owo33jw6",
+      "name": "Whale Bay",
+      "vehicle": "hover",
+      "abbreviation": "wb",
+      "default": true
+    },
+    {
+      "id": "xd144zdo",
+      "name": "Pirate Lagoon",
+      "vehicle": "hover",
+      "abbreviation": "pl",
+      "default": true
+    },
+    {
+      "id": "ewp88y9n",
+      "name": "Crescent Island",
+      "vehicle": "car",
+      "abbreviation": "ci",
+      "default": true
+    },
+    {
+      "id": "y9m22zd5",
+      "name": "Crescent Island",
+      "vehicle": "hover",
+      "abbreviation": "ci",
+      "default": false
+    },
+    {
+      "id": "5wkqqvw4",
+      "name": "Treasure Caves",
+      "vehicle": "car",
+      "abbreviation": "tc",
+      "default": true
+    },
+    {
+      "id": "592447w6",
+      "name": "Treasure Caves",
+      "vehicle": "hover",
+      "abbreviation": "tc",
+      "default": false
+    },
+    {
+      "id": "29vzzqdv",
+      "name": "Treasure Caves",
+      "vehicle": "plane",
+      "abbreviation": "tc",
+      "default": false
+    },
+    {
+      "id": "xd4kkqwm",
+      "name": "Everfrost Peak",
+      "vehicle": "car",
+      "abbreviation": "ep",
+      "default": false
+    },
+    {
+      "id": "xd044mwq",
+      "name": "Everfrost Peak",
+      "vehicle": "hover",
+      "abbreviation": "ep",
+      "default": false
+    },
+    {
+      "id": "rw6mmp97",
+      "name": "Everfrost Peak",
+      "vehicle": "plane",
+      "abbreviation": "ep",
+      "default": true
+    },
+    {
+      "id": "n93ml2d0",
+      "name": "Walrus Cove",
+      "vehicle": "car",
+      "abbreviation": "wc",
+      "default": true
+    },
+    {
+      "id": "z98m5rwl",
+      "name": "Walrus Cove",
+      "vehicle": "hover",
+      "abbreviation": "wc",
+      "default": false
+    },
+    {
+      "id": "rdnqx5dm",
+      "name": "Snowball Valley",
+      "vehicle": "car",
+      "abbreviation": "sv",
+      "default": true
+    },
+    {
+      "id": "ldy3kp93",
+      "name": "Snowball Valley",
+      "vehicle": "hover",
+      "abbreviation": "sv",
+      "default": false
+    },
+    {
+      "id": "gdryoewz",
+      "name": "Frosty Village",
+      "vehicle": "car",
+      "abbreviation": "fv",
+      "default": true
+    },
+    {
+      "id": "nwl2zodv",
+      "name": "Frosty Village",
+      "vehicle": "hover",
+      "abbreviation": "fv",
+      "default": false
+    },
+    {
+      "id": "yweq3lwl",
+      "name": "Frosty Village",
+      "vehicle": "plane",
+      "abbreviation": "fv",
+      "default": false
+    },
+    {
+      "id": "69z86x91",
+      "name": "Boulder Canyon",
+      "vehicle": "hover",
+      "abbreviation": "bc",
+      "default": true
+    },
+    {
+      "id": "r9g7nj92",
+      "name": "Greenwood Village",
+      "vehicle": "car",
+      "abbreviation": "gv",
+      "default": true
+    },
+    {
+      "id": "o9xxo39l",
+      "name": "Greenwood Village",
+      "vehicle": "hover",
+      "abbreviation": "gv",
+      "default": false
+    },
+    {
+      "id": "495mzmwp",
+      "name": "Windmill Plains",
+      "vehicle": "car",
+      "abbreviation": "wp",
+      "default": false
+    },
+    {
+      "id": "rdqnoodx",
+      "name": "Windmill Plains",
+      "vehicle": "hover",
+      "abbreviation": "wp",
+      "default": false
+    },
+    {
+      "id": "5d72xqwy",
+      "name": "Windmill Plains",
+      "vehicle": "plane",
+      "abbreviation": "wp",
+      "default": true
+    },
+    {
+      "id": "kwjv60wg",
+      "name": "Haunted Woods",
+      "vehicle": "car",
+      "abbreviation": "hw",
+      "default": true
+    },
+    {
+      "id": "owo35jw6",
+      "name": "Haunted Woods",
+      "vehicle": "hover",
+      "abbreviation": "hw",
+      "default": false
+    },
+    {
+      "id": "z98m4rwl",
+      "name": "Spacedust Alley",
+      "vehicle": "car",
+      "abbreviation": "sda",
+      "default": false
+    },
+    {
+      "id": "xd14yzdo",
+      "name": "Spacedust Alley",
+      "vehicle": "hover",
+      "abbreviation": "sda",
+      "default": false
+    },
+    {
+      "id": "ewp8oy9n",
+      "name": "Spacedust Alley",
+      "vehicle": "plane",
+      "abbreviation": "sda",
+      "default": true
+    },
+    {
+      "id": "y9m2gzd5",
+      "name": "Darkmoon Caverns",
+      "vehicle": "car",
+      "abbreviation": "dc",
+      "default": true
+    },
+    {
+      "id": "5wkqevw4",
+      "name": "Darkmoon Caverns",
+      "vehicle": "hover",
+      "abbreviation": "dc",
+      "default": false
+    },
+    {
+      "id": "5924r7w6",
+      "name": "Star City",
+      "vehicle": "car",
+      "abbreviation": "sc",
+      "default": true
+    },
+    {
+      "id": "29vz0qdv",
+      "name": "Star City",
+      "vehicle": "hover",
+      "abbreviation": "sc",
+      "default": false
+    },
+    {
+      "id": "xd4keqwm",
+      "name": "Star City",
+      "vehicle": "plane",
+      "abbreviation": "sc",
+      "default": false
+    },
+    {
+      "id": "xd04nmwq",
+      "name": "Spaceport Alpha",
+      "vehicle": "car",
+      "abbreviation": "spa",
+      "default": false
+    },
+    {
+      "id": "rw6mgp97",
+      "name": "Spaceport Alpha",
+      "vehicle": "hover",
+      "abbreviation": "spa",
+      "default": false
+    },
+    {
+      "id": "n93mz2d0",
+      "name": "Spaceport Alpha",
+      "vehicle": "plane",
+      "abbreviation": "spa",
+      "default": true
+    },
+    {
+      "id": "z98m1gwl",
+      "name": "Car Challenge",
+      "vehicle": "",
+      "abbreviation": "cc",
+      "default": true
+    },
+    {
+      "id": "rdnqeqdm",
+      "name": "Hover Challenge",
+      "vehicle": "",
+      "abbreviation": "hc",
+      "default": true
+    },
+    {
+      "id": "ldy3mk93",
+      "name": "Plane Challenge",
+      "vehicle": "",
+      "abbreviation": "pc",
+      "default": true
+    },
+    {
+      "id": "gdry56wz",
+      "name": "Tricky the Triceratops",
+      "vehicle": "",
+      "abbreviation": "ttt",
+      "default": true
+    },
+    {
+      "id": "nwl2r0dv",
+      "name": "Bluey the Walrus",
+      "vehicle": "",
+      "abbreviation": "btw",
+      "default": true
+    },
+    {
+      "id": "yweq6ywl",
+      "name": "Bubbler the Octopus",
+      "vehicle": "",
+      "abbreviation": "bto",
+      "default": true
+    },
+    {
+      "id": "69z8kl91",
+      "name": "Smokey the Dragon",
+      "vehicle": "",
+      "abbreviation": "mtd",
+      "default": true
+    },
+    {
+      "id": "r9g7v592",
+      "name": "Wizpig 1",
+      "vehicle": "car",
+      "abbreviation": "wiz1",
+      "default": true
+    },
+    {
+      "id": "o9xxp09l",
+      "name": "Wizpig 2",
+      "vehicle": "plane",
+      "abbreviation": "wiz2",
+      "default": true
+    }
+  ],
+  "timetrial": [
+    {
+      "name": "ancient-lake",
+      "abbreviation": "al",
+      "vehicle": "car",
+      "default": true
+    },
+    {
+      "name": "ancient-lake",
+      "abbreviation": "al",
+      "vehicle": "hover",
+      "default": false
+    },
+    {
+      "name": "ancient-lake",
+      "abbreviation": "al",
+      "vehicle": "plane",
+      "default": false
+    },
+    {
+      "name": "fossil-canyon",
+      "abbreviation": "fc",
+      "vehicle": "car",
+      "default": true
+    },
+    {
+      "name": "fossil-canyon",
+      "abbreviation": "fc",
+      "vehicle": "hover",
+      "default": false
+    },
+    {
+      "name": "fossil-canyon",
+      "abbreviation": "fc",
+      "vehicle": "plane",
+      "default": false
+    },
+    {
+      "name": "jungle-falls",
+      "abbreviation": "jf",
+      "vehicle": "car",
+      "default": true
+    },
+    {
+      "name": "jungle-falls",
+      "abbreviation": "jf",
+      "vehicle": "hover",
+      "default": false
+    },
+    {
+      "name": "jungle-falls",
+      "abbreviation": "jf",
+      "vehicle": "plane",
+      "default": false
+    },
+    {
+      "name": "hot-top-volcano",
+      "abbreviation": "htv",
+      "vehicle": "hover",
+      "default": false
+    },
+    {
+      "name": "hot-top-volcano",
+      "abbreviation": "htv",
+      "vehicle": "plane",
+      "default": true
+    },
+    {
+      "name": "whale-bay",
+      "abbreviation": "wb",
+      "vehicle": "hover",
+      "default": true
+    },
+    {
+      "name": "pirate-lagoon",
+      "abbreviation": "pl",
+      "vehicle": "hover",
+      "default": true
+    },
+    {
+      "name": "crescent-island",
+      "abbreviation": "ci",
+      "vehicle": "car",
+      "default": true
+    },
+    {
+      "name": "crescent-island",
+      "abbreviation": "ci",
+      "vehicle": "hover",
+      "default": false
+    },
+    {
+      "name": "treasure-caves",
+      "abbreviation": "tc",
+      "vehicle": "car",
+      "default": true
+    },
+    {
+      "name": "treasure-caves",
+      "abbreviation": "tc",
+      "vehicle": "hover",
+      "default": false
+    },
+    {
+      "name": "treasure-caves",
+      "abbreviation": "tc",
+      "vehicle": "plane",
+      "default": false
+    },
+    {
+      "name": "everfrost-peak",
+      "abbreviation": "ep",
+      "vehicle": "car",
+      "default": false
+    },
+    {
+      "name": "everfrost-peak",
+      "abbreviation": "ep",
+      "vehicle": "hover",
+      "default": false
+    },
+    {
+      "name": "everfrost-peak",
+      "abbreviation": "ep",
+      "vehicle": "plane",
+      "default": true
+    },
+    {
+      "name": "walrus-cove",
+      "abbreviation": "wc",
+      "vehicle": "car",
+      "default": true
+    },
+    {
+      "name": "walrus-cove",
+      "abbreviation": "wc",
+      "vehicle": "hover",
+      "default": false
+    },
+    {
+      "name": "snowball-valley",
+      "abbreviation": "sv",
+      "vehicle": "car",
+      "default": true
+    },
+    {
+      "name": "snowball-valley",
+      "abbreviation": "sv",
+      "vehicle": "hover",
+      "default": false
+    },
+    {
+      "name": "frosty-village",
+      "abbreviation": "fv",
+      "vehicle": "car",
+      "default": true
+    },
+    {
+      "name": "frosty-village",
+      "abbreviation": "fv",
+      "vehicle": "hover",
+      "default": false
+    },
+    {
+      "name": "frosty-village",
+      "abbreviation": "fv",
+      "vehicle": "plane",
+      "default": false
+    },
+    {
+      "name": "boulder-canyon",
+      "abbreviation": "bc",
+      "vehicle": "hover",
+      "default": true
+    },
+    {
+      "name": "greenwood-village",
+      "abbreviation": "gv",
+      "vehicle": "car",
+      "default": true
+    },
+    {
+      "name": "greenwood-village",
+      "abbreviation": "gv",
+      "vehicle": "hover",
+      "default": false
+    },
+    {
+      "name": "windmill-plains",
+      "abbreviation": "wp",
+      "vehicle": "car",
+      "default": false
+    },
+    {
+      "name": "windmill-plains",
+      "abbreviation": "wp",
+      "vehicle": "hover",
+      "default": false
+    },
+    {
+      "name": "windmill-plains",
+      "abbreviation": "wp",
+      "vehicle": "plane",
+      "default": true
+    },
+    {
+      "name": "haunted-woods",
+      "abbreviation": "hw",
+      "vehicle": "car",
+      "default": true
+    },
+    {
+      "name": "haunted-woods",
+      "abbreviation": "hw",
+      "vehicle": "hover",
+      "default": false
+    },
+    {
+      "name": "spacedust-alley",
+      "abbreviation": "sda",
+      "vehicle": "car",
+      "default": false
+    },
+    {
+      "name": "spacedust-alley",
+      "abbreviation": "sda",
+      "vehicle": "hover",
+      "default": false
+    },
+    {
+      "name": "spacedust-alley",
+      "abbreviation": "sda",
+      "vehicle": "plane",
+      "default": true
+    },
+    {
+      "name": "darkmoon-caverns",
+      "abbreviation": "dc",
+      "vehicle": "car",
+      "default": true
+    },
+    {
+      "name": "darkmoon-caverns",
+      "abbreviation": "dc",
+      "vehicle": "hover",
+      "default": false
+    },
+    {
+      "name": "star-city",
+      "abbreviation": "sc",
+      "vehicle": "car",
+      "default": true
+    },
+    {
+      "name": "star-city",
+      "abbreviation": "sc",
+      "vehicle": "hover",
+      "default": false
+    },
+    {
+      "name": "star-city",
+      "abbreviation": "sc",
+      "vehicle": "plane",
+      "default": false
+    },
+    {
+      "name": "spaceport-alpha",
+      "abbreviation": "spa",
+      "vehicle": "car",
+      "default": false
+    },
+    {
+      "name": "spaceport-alpha",
+      "abbreviation": "spa",
+      "vehicle": "hover",
+      "default": false
+    },
+    {
+      "name": "spaceport-alpha",
+      "abbreviation": "spa",
+      "vehicle": "plane",
+      "default": true
+    }
+  ]
+}

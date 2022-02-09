@@ -6,7 +6,7 @@ dotenv.config();
 
 export const tmiOptions: Options = {
   options: {
-    clientId: process.env.TWITCH_CLIENT_ID,
+    clientId: process.env.TWITCH_CLIENT_ID2,
     debug: true,
   },
   connection: {

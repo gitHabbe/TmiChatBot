@@ -1,7 +1,52 @@
-import { User } from "@prisma/client";
+import { User, Trust } from "@prisma/client";
 import { ChatUserstate } from "tmi.js";
-import { Prisma } from "./Prisma";
+import { Model, ModelName } from "../../interfaces/prisma";
+import { DatabaseSingleton, Prisma } from "./Prisma";
 
+interface NewUser {
+  madeBy: string;
+}
+export class TrustModel implements Model {
+  private db = DatabaseSingleton.getInstance().get();
+  private client = this.db[ModelName.trust];
+  constructor(private user: User, private trustee: string) {}
+
+  get = (): Promise<Trust | null> => {
+    return this.client.findFirst({
+      where: {
+        userId: this.user.id,
+        name: this.trustee,
+      },
+    });
+  };
+
+  getAll = (): Promise<Trust[]> => {
+    return this.client.findMany({
+      where: {
+        userId: this.user.id,
+      },
+    });
+  };
+
+  delete = () => {
+    return this.client.deleteMany({
+      where: {
+        userId: this.user.id,
+        name: this.trustee,
+      },
+    });
+  };
+
+  save = (madeBy: string): Promise<Trust> => {
+    return this.client.create({
+      data: {
+        userId: this.user.id,
+        name: this.trustee,
+        madeBy: madeBy,
+      },
+    });
+  };
+}
 export class TrustPrisma extends Prisma {
   private db = this.prisma.trust;
   constructor(private user: User) {

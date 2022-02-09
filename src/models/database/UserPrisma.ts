@@ -1,36 +1,33 @@
-import { User } from ".prisma/client";
-import { Prisma } from "./Prisma";
+import { Model, ModelName } from "../../interfaces/prisma";
+import { DatabaseSingleton } from "./Prisma";
 
-export class UserPrisma extends Prisma {
-  private db = this.prisma.user;
-  constructor(private username: string) {
-    super();
-  }
+export class UserModel implements Model {
+  private db = DatabaseSingleton.getInstance().get();
+  private client = this.db[ModelName.user];
+  constructor(private name: string) {}
 
-  add = (): Promise<User> => {
-    return this.db.create({
-      data: {
-        name: this.username,
+  get = () => {
+    return this.client.findFirst({
+      where: { name: this.name },
+      include: {
+        commands: true,
+        components: true,
+        settings: true,
+        timestamps: true,
+        trusts: true,
       },
     });
   };
 
-  find = async (): Promise<User> => {
-    const user = await this.db.findFirst({
-      where: {
-        name: this.username,
-      },
-    });
-    if (user === null) throw new Error("User not found");
-
-    return user;
+  getAll = () => {
+    throw new Error(`Uncallable`);
   };
 
-  remove = (): Promise<User> => {
-    return this.db.delete({
-      where: {
-        name: this.username,
-      },
-    });
+  save = (name: string) => {
+    return this.client.create({ data: { name: name } });
+  };
+
+  delete = () => {
+    return this.client.delete({ where: { name: this.name } });
   };
 }
