@@ -52,3 +52,11 @@ export interface ITwitterTweetResponse {
     users: ITwitterUser[];
   };
 }
+
+export interface RegexLink {
+    text: string;
+    pattern: RegExp;
+    parse: () => boolean;
+    print: () => Promise<string>;
+    // print: (regex_hit: RegExpExecArray) => Promise<string>;
+}

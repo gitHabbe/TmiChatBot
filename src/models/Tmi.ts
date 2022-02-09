@@ -1,7 +1,7 @@
 import { ChatUserstate, Client } from "tmi.js";
 import { tmiOptions } from "../config/tmiConfig";
 import { OnMessage } from "../interfaces/tmi";
-import { callLinkCommand } from "./commands/callLinkCommand";
+import { ChatLink } from "./commands/callLinkCommand";
 import { callCustomCommand } from "./commands/callCustomCommand";
 import { callStandardCommand } from "./commands/callStandardCommand";
 import { MessageData } from "./MessageData";
@@ -23,8 +23,13 @@ export class Tmi {
     if (self) return;
     const messageData = new MessageData(streamer, chatter, message);
 
-    const isLink = await callLinkCommand(this.client, messageData);
-    if (isLink) return;
+    try {
+      const chatLink = new ChatLink(messageData);
+      const linkInfo = await chatLink.print()
+      await this.client.say(streamer, linkInfo)
+    } catch (error) {
+      return
+    }
 
     const isCustomCommand = await callCustomCommand(this.client, messageData);
     if (isCustomCommand) return;
