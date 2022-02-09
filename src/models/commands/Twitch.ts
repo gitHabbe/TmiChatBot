@@ -3,8 +3,8 @@ import {IFollowage, IFollowageResponse, IStreamerResponse, ITwitchChannel} from 
 import {datesDaysDifference, dateToLetters, extractMillisecondsToObject,} from "../../utility/dateFormat";
 import {Api} from "../fetch/SpeedrunCom";
 import {TwitchChannel} from "../fetch/TwitchTv";
-import {MessageData} from "../Tmi";
 import {ICommand} from "../../interfaces/Command";
+import {MessageData} from "../MessageData";
 
 abstract class TwitchFetch {
   constructor(public messageData: MessageData) {}

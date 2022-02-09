@@ -1,8 +1,8 @@
 import {Client} from "tmi.js";
-import {MessageData} from "../Tmi";
 import {Command} from "@prisma/client";
 import {UserModel} from "../database/UserPrisma";
 import {CommandPrisma} from "../database/CommandPrisma";
+import {MessageData} from "../MessageData";
 
 export const isUserCustomCommand = async (
     streamer: string,

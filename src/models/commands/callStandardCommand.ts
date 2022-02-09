@@ -1,6 +1,5 @@
 import {CommandName, ComponentsSupport} from "../../interfaces/tmi";
 import { Client } from "tmi.js";
-import { MessageData } from "../Tmi";
 import {Followage, TwitchTitle, TwitchUptime} from "./Twitch";
 
 import {
@@ -23,6 +22,7 @@ import {
   Trust,
   UnTrust, UserJoin, UserLeave
 } from "./Tmi";
+import {MessageData} from "../MessageData";
 
 export const callStandardCommand = async (
   tmiClient: Client,

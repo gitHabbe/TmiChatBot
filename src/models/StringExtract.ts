@@ -2,7 +2,7 @@ import { twitchAPI } from "../config/twitchConfig";
 import { IStreamerResponse, ITwitchChannel } from "../interfaces/twitch";
 import { Api } from "./fetch/SpeedrunCom";
 import { TwitchChannel } from "./fetch/TwitchTv";
-import { MessageData } from "./Tmi";
+import {MessageData} from "./MessageData";
 
 export class StringExtract {
   constructor(private messageData: MessageData) {}

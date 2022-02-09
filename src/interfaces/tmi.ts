@@ -38,7 +38,7 @@ export enum ComponentsSupport {
 
 export type OnMessage = (
   streamer: string,
-  chatter: Userstate,
+  chatter: ChatUserstate,
   message: string,
   self: boolean
 ) => void;

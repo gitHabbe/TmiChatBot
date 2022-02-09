@@ -1,18 +1,17 @@
 import {ICommand} from "../../interfaces/Command";
-import {MessageData} from "../Tmi";
 import {ChatUserstate, Client} from "tmi.js";
 import {TrustPrisma} from "../database/TrustPrisma";
 import {UserModel} from "../database/UserPrisma";
 import {TimestampPrisma} from "../database/TimestampPrisma";
-import {ITwitchChannel, IVideo, IVideosResponse} from "../../interfaces/twitch";
+import {IStreamerResponse, ITwitchChannel, IVideo, IVideosResponse} from "../../interfaces/twitch";
 import {ComponentPrisma} from "../database/ComponentPrisma";
 import {pokemonAPI} from "../../config/pokemonConfig";
 import {IPokemon, IPokemonStat} from "../../interfaces/pokemon";
 import {CommandPrisma} from "../database/CommandPrisma";
 import {randomInt} from "../../utility/math";
 import {JsonStringArray} from "../JsonArrayFile";
-import {fetchStreamer} from "./Twitch";
 import {twitchAPI} from "../../config/twitchConfig";
+import {MessageData} from "../MessageData";
 
 export class Trust implements ICommand {
     constructor(public messageData: MessageData) {
@@ -106,6 +105,20 @@ export class Timestamp implements ICommand {
         }
     };
 
+    private fetchStreamer = async (
+        channelName: string
+    ): Promise<ITwitchChannel> => {
+        const query = `/search/channels?query=${channelName}`;
+        const {data} = await twitchAPI.get<IStreamerResponse>(query);
+        const channels: ITwitchChannel[] = data.data;
+        const channel = channels.find((name: ITwitchChannel) => {
+            return name.display_name.toLowerCase() === channelName.toLowerCase();
+        });
+        if (!channel) throw new Error("User not found");
+
+        return channel;
+    };
+
     // TODO: Uniqueness
     run = async () => {
         const { channel, message, chatter } = this.messageData;
@@ -113,7 +126,7 @@ export class Timestamp implements ICommand {
         await this.isTrusted(channel, chatter);
         const timestampName: string = message.split(" ")[1];
         const user = await this.getUser(channel);
-        const { id, started_at }: ITwitchChannel = await fetchStreamer(channel);
+        const { id, started_at }: ITwitchChannel = await this.fetchStreamer(channel);
         const videos: IVideo[] = await this.fetchStreamerVideos(parseInt(id));
         const timestamp = new TimestampPrisma(user);
         const newTimestamp = await timestamp.add(

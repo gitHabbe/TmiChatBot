@@ -1,9 +1,9 @@
-import {Client} from "tmi.js";
-import {twitterAPI, twitterRegex} from "../../config/twitterConfig";
-import {youtubeAPI, youtubeRegex} from "../../config/youtubeConfig";
-import {MessageData} from "../Tmi";
-import {ITwitterTweet, ITwitterTweetResponse, ITwitterUser, IYoutubePagination} from "../../interfaces/socialMedia";
-import {numberToRoundedWithLetter, youtubeDurationToHHMMSS} from "../../utility/dateFormat";
+import { Client } from "tmi.js";
+import { twitterAPI, twitterRegex } from "../../config/twitterConfig";
+import { youtubeAPI, youtubeRegex } from "../../config/youtubeConfig";
+import { ITwitterTweet, ITwitterTweetResponse, ITwitterUser, IYoutubePagination } from "../../interfaces/socialMedia";
+import { numberToRoundedWithLetter, youtubeDurationToHHMMSS } from "../../utility/dateFormat";
+import { MessageData } from "../MessageData";
 
 export const youtubeInfo = async (
     youtube_hit: RegExpExecArray

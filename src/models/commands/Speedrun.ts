@@ -21,11 +21,11 @@ import {
 } from "../fetch/SpeedrunCom";
 import {JsonLevels, JsonTimeTrials} from "../JsonArrayFile";
 import { StringExtract } from "../StringExtract";
-import { MessageData } from "../Tmi";
 import { ICommand } from "../../interfaces/Command";
 import {UserModel} from "../database/UserPrisma";
 import {SettingPrisma} from "../database/SettingPrisma";
 import {formatWorldRecord} from "../../utility/math";
+import {MessageData} from "../MessageData";
 
 export class WorldRecord implements ICommand {
   constructor(public messageData: MessageData) {}
