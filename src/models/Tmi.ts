@@ -3,7 +3,7 @@ import { tmiOptions } from "../config/tmiConfig";
 import { OnMessage } from "../interfaces/tmi";
 import { ChatLink } from "./commands/callLinkCommand";
 import { CustomCommand } from "./commands/callCustomCommand";
-import { callStandardCommand } from "./commands/callStandardCommand";
+import { StandardCommand } from "./commands/callStandardCommand";
 import { MessageData } from "./MessageData";
 
 export class Tmi {
@@ -27,20 +27,29 @@ export class Tmi {
       const chatLink = new ChatLink(messageData);
       const linkInfo = await chatLink.print()
       await this.client.say(streamer, linkInfo)
-    } catch (error) {
       return
+    } catch (error) {
+      console.log("Not a link")
     }
     try {
       const customCommand = new CustomCommand(messageData)
       const command = await customCommand.run();
       await this.client.say(streamer, command)
-    } catch (error) {
       return
+    } catch (error) {
+      console.log("Not a custom command")
     }
 
     if (message[0] !== "!") return;
 
-    await callStandardCommand(this.client, messageData);
+    try {
+      const standardCommand = new StandardCommand(messageData, this.client);
+      const command = await standardCommand.run();
+      await this.client.say(streamer, command);
+      return
+    } catch (error) {
+      console.log("Not standard command")
+    }
   }
 }
 
