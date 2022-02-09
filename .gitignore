@@ -3,6 +3,7 @@ package-lock.json
 build/
 private/
 .vscode/
+.idea/
 
 src/prisma/migrations
 
