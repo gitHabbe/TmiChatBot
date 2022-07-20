@@ -4,6 +4,9 @@ import { OnMessage } from "../interfaces/tmi";
 import { ChatLink } from "./commands/callLinkCommand";
 import { CustomCommand } from "./commands/callCustomCommand";
 import { callStandardCommand } from "./commands/callStandardCommand";
+import { LinkCommand } from "./commands/LinkCommand";
+import { CustomCommand } from "./commands/CustomCommand";
+import { StandardCommand } from "./commands/StandardCommand";
 import { MessageData } from "./MessageData";
 
 export class Tmi {
@@ -24,7 +27,7 @@ export class Tmi {
     const messageData = new MessageData(streamer, chatter, message);
 
     try {
-      const chatLink = new ChatLink(messageData);
+      const chatLink = new LinkCommand(messageData);
       const linkInfo = await chatLink.print()
       await this.client.say(streamer, linkInfo)
     } catch (error) {
