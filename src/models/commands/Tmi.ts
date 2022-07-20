@@ -1,17 +1,17 @@
-import {ICommand} from "../../interfaces/Command";
-import {ChatUserstate, Client} from "tmi.js";
-import {TrustPrisma} from "../database/TrustPrisma";
-import {UserModel} from "../database/UserPrisma";
-import {TimestampPrisma} from "../database/TimestampPrisma";
-import {IStreamerResponse, ITwitchChannel, IVideo, IVideosResponse} from "../../interfaces/twitch";
-import {ComponentPrisma} from "../database/ComponentPrisma";
-import {pokemonAPI} from "../../config/pokemonConfig";
-import {IPokemon, IPokemonStat} from "../../interfaces/pokemon";
-import {CommandPrisma} from "../database/CommandPrisma";
-import {randomInt} from "../../utility/math";
-import {JsonStringArray} from "../JsonArrayFile";
-import {twitchAPI} from "../../config/twitchConfig";
-import {MessageData} from "../MessageData";
+import { ICommand } from "../../interfaces/Command";
+import { ChatUserstate, Client } from "tmi.js";
+import { TrustPrisma } from "../database/TrustPrisma";
+import { UserModel } from "../database/UserPrisma";
+import { TimestampPrisma } from "../database/TimestampPrisma";
+import { IStreamerResponse, ITwitchChannel, IVideo, IVideosResponse } from "../../interfaces/twitch";
+import { ComponentPrisma } from "../database/ComponentPrisma";
+import { pokemonAPI } from "../../config/pokemonConfig";
+import { IPokemon, IPokemonStat } from "../../interfaces/pokemon";
+import { CommandPrisma } from "../database/CommandPrisma";
+import { randomInt } from "../../utility/math";
+import { JsonStringArray } from "../JsonArrayFile";
+import { twitchAPI } from "../../config/twitchConfig";
+import { MessageData } from "../MessageData";
 
 export class Trust implements ICommand {
     constructor(public messageData: MessageData) {
@@ -31,7 +31,7 @@ export class Trust implements ICommand {
     }
 
     run = async () => {
-        const { channel, message, chatter } = this.messageData;
+        const {channel, message, chatter} = this.messageData;
         if (!chatter.username) throw new Error("Creator not specified");
         const newTrust = message.split(" ")[1];
         if (!newTrust) throw new Error("No user specified");
@@ -53,7 +53,7 @@ export class UnTrust implements ICommand {
     }
 
     run = async () => {
-        const { channel, message, chatter } = this.messageData;
+        const {channel, message, chatter} = this.messageData;
         if (!chatter.username) throw new Error("Creator not specified");
         const deleteTrust = message.split(" ")[1];
         if (!deleteTrust) throw new Error("No user specified");
@@ -121,12 +121,12 @@ export class Timestamp implements ICommand {
 
     // TODO: Uniqueness
     run = async () => {
-        const { channel, message, chatter } = this.messageData;
+        const {channel, message, chatter} = this.messageData;
         if (!chatter.username) throw new Error("Creator not specified");
         await this.isTrusted(channel, chatter);
         const timestampName: string = message.split(" ")[1];
         const user = await this.getUser(channel);
-        const { id, started_at }: ITwitchChannel = await this.fetchStreamer(channel);
+        const {id, started_at}: ITwitchChannel = await this.fetchStreamer(channel);
         const videos: IVideo[] = await this.fetchStreamerVideos(parseInt(id));
         const timestamp = new TimestampPrisma(user);
         const newTimestamp = await timestamp.add(
@@ -150,7 +150,7 @@ export class FindTimestamp implements ICommand {
     }
 
     run = async () => {
-        const { channel, message, chatter } = this.messageData;
+        const {channel, message, chatter} = this.messageData;
         const user = await this.getUser(channel);
         console.log("~ user", user);
         const timestampObj = new TimestampPrisma(user);
@@ -168,10 +168,11 @@ export class FindTimestamp implements ICommand {
         }
         const foundTimestamp = await timestampObj.find(targetTimestamp);
         const backtrackLength = 90;
-        const { name, url, timestamp } = foundTimestamp;
+        const {name, url, timestamp} = foundTimestamp;
         return `${name}: ${url}?t=${timestamp - backtrackLength}s`;
     }
 }
+
 export class DeleteTimestamp implements ICommand {
     constructor(public messageData: MessageData) {
     }
@@ -190,7 +191,7 @@ export class DeleteTimestamp implements ICommand {
     }
 
     run = async () => {
-        const { channel, message, chatter } = this.messageData;
+        const {channel, message, chatter} = this.messageData;
         if (!chatter.username) throw new Error("Creator not specified");
         await this.isTrusted(channel, chatter);
         const timestampName: string = message.split(" ")[1];
@@ -213,7 +214,7 @@ export class ToggleComponent implements ICommand {
     }
 
     run = async () => {
-        const { channel, message } = this.messageData;
+        const {channel, message} = this.messageData;
         let targetComponent = message.split(" ")[1].toUpperCase();
         const user = await this.getUser(channel);
         const component = new ComponentPrisma(user, targetComponent);
@@ -246,14 +247,14 @@ export class Pokemon implements ICommand {
             return type.type.name[0].toUpperCase() + type.type.name.slice(1);
         });
         const typesString = types.join(" & ");
-        const { name, id } = pokemon;
+        const {name, id} = pokemon;
         const formalName = name[0].toUpperCase() + name.slice(1);
 
         return `${formalName} #${id} | ${typesString} | ${statsString}`;
     };
 
     run = async () => {
-        const { channel, message } = this.messageData;
+        const {channel, message} = this.messageData;
         const targetPokemon = message.split(" ")[1];
         const targetComponent = "POKEMON";
         const userPrisma = new UserModel(channel);
@@ -265,8 +266,10 @@ export class Pokemon implements ICommand {
         return this.formatPokemonStats(pokemon.data);
     }
 }
+
 export class NewCommand implements ICommand {
-    constructor(public messageData: MessageData) { }
+    constructor(public messageData: MessageData) {
+    }
 
     private isTrusted = async (channel: string, chatter: ChatUserstate) => {
         const isTrusted = await isTrustedUser(channel, chatter);
@@ -281,7 +284,7 @@ export class NewCommand implements ICommand {
     }
 
     run = async () => {
-        const { channel, message, chatter } = this.messageData;
+        const {channel, message, chatter} = this.messageData;
         if (!chatter.username) throw new Error("Creator not specified");
         await this.isTrusted(channel, chatter);
         const commandName = message.split(" ")[1];
@@ -296,6 +299,7 @@ export class NewCommand implements ICommand {
         return `Command ${command.name} created`;
     }
 }
+
 export class DeleteCommand implements ICommand {
     constructor(public messageData: MessageData) {
     }
@@ -306,7 +310,7 @@ export class DeleteCommand implements ICommand {
     }
 
     run = async () => {
-        const { channel, message, chatter } = this.messageData;
+        const {channel, message, chatter} = this.messageData;
         if (!chatter.username) throw new Error("Creator not specified");
         await this.isTrusted(channel, chatter);
         const commandName = message.split(" ")[1];
@@ -321,11 +325,13 @@ export class DeleteCommand implements ICommand {
 
     }
 }
+
 export class Slots implements ICommand {
-    constructor(public messageData: MessageData) { }
+    constructor(public messageData: MessageData) {
+    }
 
     run = async () => {
-        const { channel, message, chatter } = this.messageData;
+        const {channel, message, chatter} = this.messageData;
         const targetComponent = "SLOTS";
         const userPrisma = new UserModel(channel);
         const user = await userPrisma.get();
@@ -361,10 +367,11 @@ export class Slots implements ICommand {
 }
 
 export class UserJoin implements ICommand {
-    constructor(public messageData: MessageData, private tmiClient: Client) {}
+    constructor(public messageData: MessageData, private tmiClient: Client) {
+    }
 
     run = async () => {
-        const { channel, message, chatter } = this.messageData;
+        const {channel, message, chatter} = this.messageData;
         const botName = process.env.TWITCH_USERNAME;
         if (channel !== botName) {
             throw new Error(`!join only works in ${botName}'s channel`);
@@ -383,12 +390,13 @@ export class UserJoin implements ICommand {
         return `I have joined channel: ${newPrismaUser.name}`;
     }
 }
+
 export class UserLeave implements ICommand {
     constructor(public messageData: MessageData, private tmiClient: Client) {
     }
 
     run = async () => {
-        const { channel, message, chatter } = this.messageData;
+        const {channel, message, chatter} = this.messageData;
         if (!chatter.username) {
             throw new Error("User not found");
         }
