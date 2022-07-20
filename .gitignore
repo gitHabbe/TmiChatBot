@@ -4,6 +4,7 @@ build/
 private/
 .vscode/
 .idea/
+changelog.config.js
 
 src/prisma/migrations
 
