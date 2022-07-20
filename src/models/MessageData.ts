@@ -1,4 +1,4 @@
-import {ChatUserstate} from "tmi.js";
+import { ChatUserstate } from "tmi.js";
 
 export class MessageData {
     public channel: string;
