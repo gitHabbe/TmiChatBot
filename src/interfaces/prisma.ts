@@ -1,14 +1,10 @@
-import {
-  Game,
-  Category,
-  CategoryLink,
-  GameLink,
-  GameNames,
-  GamePlatform,
-} from ".prisma/client";
-export interface User {
-  name: string;
-}
+import { Category, CategoryLink, Game, GameLink, GameNames, GamePlatform, } from ".prisma/client";
+import { Command, Component, Setting, Timestamp, Trust, User } from "@prisma/client";
+// import { Timestamp, Trust } from "../models/commands/Tmi";
+
+// export interface User {
+//   name: string;
+// }
 
 export interface GameQuery {
   abbreviation?: string;
@@ -65,4 +61,24 @@ export interface Model {
   getAll(): Promise<any[]>;
   save(data: any): Promise<any>;
   delete(): Promise<any>;
+}
+
+// export interface JoinedUser {
+//   user: (User & {
+//     commands: Command[],
+//     components: Component[],
+//     settings: Setting[],
+//     timestamps: Timestamp[],
+//     trusts: Trust[]
+//   });
+// }
+
+export interface JoinedUser extends User {
+  // id: string;
+  // name: string;
+  commands: Command[],
+  components: Component[],
+  settings: Setting[],
+  timestamps: Timestamp[],
+  trusts: Trust[]
 }
