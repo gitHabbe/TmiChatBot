@@ -9,6 +9,7 @@ import {
 } from "../../interfaces/socialMedia";
 import { numberToRoundedWithLetter, youtubeDurationToHHMMSS } from "../../utility/dateFormat";
 import { MessageData } from "../MessageData";
+import { ICommand } from "../../interfaces/Command";
 
 abstract class LinkPattern {
   protected constructor(public pattern: RegExp, public text: string) {}
@@ -66,7 +67,7 @@ class TwitterLink extends LinkPattern implements RegexLink {
   }
 }
 
-export class LinkCommand {
+export class LinkCommand implements ICommand {
   private regexLinks: RegexLink[] = [
       new YoutubeLink(youtubeRegex, this.messageData.message),
       new TwitterLink(twitterRegex, this.messageData.message)
@@ -80,7 +81,7 @@ export class LinkCommand {
     })
   }
 
-  print = () => {
+  run = () => {
     const isLink = this.isLink()
     if (isLink === undefined) throw new Error("Not a link")
     return isLink.print()
