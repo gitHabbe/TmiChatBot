@@ -66,7 +66,7 @@ class TwitterLink extends LinkPattern implements RegexLink {
   }
 }
 
-export class ChatLink {
+export class LinkCommand {
   private regexLinks: RegexLink[] = [
       new YoutubeLink(youtubeRegex, this.messageData.message),
       new TwitterLink(twitterRegex, this.messageData.message)
