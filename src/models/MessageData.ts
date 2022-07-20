@@ -2,6 +2,7 @@ import { ChatUserstate } from "tmi.js";
 
 export class MessageData {
     public channel: string;
+    public targetChannel: string;
 
     constructor(
         channel: string,
@@ -9,5 +10,6 @@ export class MessageData {
         public message: string
     ) {
         this.channel = channel.slice(1);
+        this.targetChannel = channel;
     }
 }
