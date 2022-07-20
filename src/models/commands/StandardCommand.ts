@@ -62,7 +62,7 @@ export class StandardCommand implements ICommand {
     return chatterCommandUpper;
   };
 
-  run = async () => {
+  run: () => Promise<string> = async () => {
     const commandName = this.getCommandName();
 
     if (this.commandMap.has(commandName)) {
