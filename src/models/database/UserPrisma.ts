@@ -1,12 +1,13 @@
-import { Model, ModelName } from "../../interfaces/prisma";
+import { JoinedUser, Model, ModelName } from "../../interfaces/prisma";
 import { DatabaseSingleton } from "./Prisma";
+import { User } from "@prisma/client";
 
 export class UserModel implements Model {
   private db = DatabaseSingleton.getInstance().get();
   private client = this.db[ModelName.user];
   constructor(private name: string) {}
 
-  get = () => {
+  get = (): Promise<JoinedUser | null> => {
     return this.client.findFirst({
       where: { name: this.name },
       include: {
@@ -23,11 +24,13 @@ export class UserModel implements Model {
     throw new Error(`Uncallable`);
   };
 
-  save = (name: string) => {
-    return this.client.create({ data: { name: name } });
+  save = async (): Promise<User> => {
+    const oldUser = await this.get()
+    if (oldUser) throw new Error("User already exists")
+    return await this.client.create({ data: { name: this.name } });
   };
 
-  delete = () => {
+  delete = (): Promise<User> => {
     return this.client.delete({ where: { name: this.name } });
   };
 }
