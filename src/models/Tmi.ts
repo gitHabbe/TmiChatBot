@@ -1,9 +1,6 @@
 import { ChatUserstate, Client } from "tmi.js";
 import { tmiOptions } from "../config/tmiConfig";
 import { OnMessage } from "../interfaces/tmi";
-import { ChatLink } from "./commands/callLinkCommand";
-import { CustomCommand } from "./commands/callCustomCommand";
-import { callStandardCommand } from "./commands/callStandardCommand";
 import { LinkCommand } from "./commands/LinkCommand";
 import { CustomCommand } from "./commands/CustomCommand";
 import { StandardCommand } from "./commands/StandardCommand";
@@ -43,7 +40,13 @@ export class Tmi {
 
     if (message[0] !== "!") return;
 
-    await callStandardCommand(this.client, messageData);
+    try {
+      const standardCommand = new StandardCommand(messageData, this.client);
+      const command = await standardCommand.run();
+      await this.client.say(streamer, command);
+    } catch (error) {
+      return this.client.say(streamer, error.message)
+    }
   }
 }
 
