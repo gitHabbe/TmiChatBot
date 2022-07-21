@@ -19,13 +19,13 @@ import {
   Pokemon,
   Slots,
   Timestamp, ToggleComponent,
-  NewTrust,
-  UnTrust, UserJoin, UserLeave
+  NewTrust, UnTrust, UserJoin, UserLeave
 } from "./Tmi";
 import { MessageData } from "../MessageData";
 
 export class StandardCommand implements ICommand {
   private commandMap = new Map<string, ICommand>();
+
   constructor(public messageData: MessageData, private tmiClient: Client) {
     this.buildCommands()
   }

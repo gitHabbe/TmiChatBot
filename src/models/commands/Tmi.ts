@@ -41,6 +41,31 @@ export class Trust implements ICommand {
     }
 }
 
+export class NewTrust implements ICommand {
+    constructor(public messageData: MessageData) {
+    }
+
+    private getUser = async (channel: string) => {
+        const userPrisma = new UserModel(channel);
+        const user = await userPrisma.get();
+        if (!user) throw new Error(`User not found`);
+        return user;
+    }
+
+    run = async () => {
+        const { channel, message, chatter } = this.messageData;
+        if (!chatter.username) throw new Error("Creator not specified");
+        const newTrust = message.split(" ")[1];
+        if (!newTrust) throw new Error("No user specified");
+        const user = await this.getUser(channel);
+        const trust = new TrustPrisma(user);
+        const addTrust = await trust.addTrust(user, newTrust, chatter);
+        this.messageData.response = `${addTrust.name} added to trust-list`;
+
+        return this.messageData;
+    }
+}
+
 export class UnTrust implements ICommand {
     constructor(public messageData: MessageData) {
     }
