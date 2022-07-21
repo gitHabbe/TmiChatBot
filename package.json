@@ -25,6 +25,18 @@
     "tmi",
     "tmijs"
   ],
+  "jest": {
+    "rootDir": "./test/",
+    "transform": {
+      ".(ts|tsx)": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ]
+  },
   "author": "gitHabbe",
   "license": "MIT",
   "bugs": {
@@ -38,12 +50,15 @@
     "tmi.js": "^1.8.3"
   },
   "devDependencies": {
+    "@types/jest": "^28.1.6",
     "@types/node": "^15.12.2",
     "@types/tmi.js": "^1.7.1",
     "concurrently": "^6.2.0",
     "dotenv": "^10.0.0",
+    "jest": "^28.1.3",
     "nodemon": "^2.0.7",
     "prisma": "^2.27.0",
+    "ts-jest": "^28.0.7",
     "typescript": "^4.3.2"
   },
   "prisma": {
