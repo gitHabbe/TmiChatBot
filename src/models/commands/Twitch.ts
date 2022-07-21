@@ -26,14 +26,17 @@ export class TwitchUptime extends TwitchFetch implements ICommand {
   run = async () => {
     const { channel } = this.messageData;
     const { started_at } = await this.twitchChannel();
-    if (!started_at) return `${channel} not online`;
+    if (!started_at) {
+      this.messageData.response = `${channel} not online`;
+    }
     const start: number = new Date(started_at).getTime();
     const today: number = new Date().getTime();
     const time_diff_milliseconds: number = today - start;
     const dateDataObject = extractMillisecondsToObject(time_diff_milliseconds);
     const uptime: string = dateToLetters(dateDataObject);
+    this.messageData.response = uptime
 
-    return uptime;
+    return this.messageData;
   };
 }
 
@@ -44,8 +47,9 @@ export class TwitchTitle extends TwitchFetch implements ICommand {
 
   run = async () => {
     const { title } = await this.twitchChannel();
+    this.messageData.response = title;
 
-    return title;
+    return this.messageData;
   };
 }
 
@@ -88,12 +92,14 @@ export class Followage extends TwitchFetch implements ICommand {
     const { id }: ITwitchChannel = await this.fetchStreamer(this.messageData.channel);
     const followage: IFollowage[] = await this.fetchFollowage(id, user["user-id"]);
     if (followage.length === 0) {
-      return `${user.username} is not following ${this.messageData.channel}`;
+      this.messageData.response = `${user.username} is not following ${this.messageData.channel}`;
+      return this.messageData
     }
     const days_ago: number = datesDaysDifference(followage[0].followed_at);
     console.log("day_difference:", days_ago);
+    this.messageData.response = `${user.username} followage: ${days_ago} days`;
 
-    return `${user.username} followage: ${days_ago} days`;
+    return this.messageData
 
   }
 }

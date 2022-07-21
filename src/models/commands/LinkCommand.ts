@@ -81,9 +81,10 @@ export class LinkCommand implements ICommand {
     })
   }
 
-  run = () => {
+  run = async (): Promise<MessageData> => {
     const isLink = this.isLink()
     if (isLink === undefined) throw new Error("Not a link")
-    return isLink.print()
+    this.messageData.response = await isLink.print()
+    return this.messageData
   }
 }

@@ -30,7 +30,7 @@ export class StandardCommand implements ICommand {
     this.buildCommands()
   }
 
-  buildCommands = () => {
+  private buildCommands = () => {
     this.commandMap.set(CommandName.UPTIME, new TwitchUptime(this.messageData))
     this.commandMap.set(CommandName.TITLE, new TwitchTitle(this.messageData))
     this.commandMap.set(CommandName.WR, new WorldRecord(this.messageData))
@@ -59,12 +59,12 @@ export class StandardCommand implements ICommand {
     const { message } = this.messageData;
     const chatterCommand: string = message.split(" ")[0];
     const chatterCommandUpper: string = chatterCommand.slice(1).toUpperCase();
+
     return chatterCommandUpper;
   };
 
-  run: () => Promise<string> = async () => {
+  run: () => Promise<MessageData> = async () => {
     const commandName = this.getCommandName();
-
     if (this.commandMap.has(commandName)) {
       // @ts-ignore
       return this.commandMap.get(commandName).run()

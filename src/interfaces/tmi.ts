@@ -1,4 +1,5 @@
 import { ChatUserstate, Userstate } from "tmi.js";
+import { MessageData } from "../models/MessageData";
 
 export interface TmiMessageProps {
   channel: string;
@@ -41,4 +42,4 @@ export type OnMessage = (
   chatter: ChatUserstate,
   message: string,
   self: boolean
-) => void;
+) => Promise<MessageData>;

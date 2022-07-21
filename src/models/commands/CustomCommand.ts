@@ -10,8 +10,7 @@ export class CustomCommand implements ICommand {
 
   private allCommands = async (user: any): Promise<Command[]> => {
     const command = new CommandPrisma(user);
-    const commands = await command.findAll();
-    return commands;
+    return await command.findAll();
   };
 
   isCustomCommand = async (
@@ -25,12 +24,13 @@ export class CustomCommand implements ICommand {
     return commands.find((command: Command) => command.name === targetCommand);
   }
 
-  run = async (): Promise<string> => {
+  run = async (): Promise<MessageData> => {
     const { message, channel } = this.messageData;
     const chatterCommand: string = message.split(" ")[0];
     const isCommand = await this.isCustomCommand(channel, chatterCommand);
     if (!isCommand) throw new Error("User command does not exist")
+    this.messageData.response = isCommand.content
 
-    return isCommand.content
+    return this.messageData
   }
 }
