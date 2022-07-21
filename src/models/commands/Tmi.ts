@@ -60,7 +60,9 @@ export class UnTrust implements ICommand {
         const user = await this.getUser(channel);
         const trust = new TrustPrisma(user);
         const removeTrust = await trust.remove(deleteTrust, chatter);
-        return `${removeTrust.name} removed from trust-list`;
+        this.messageData.response = `${removeTrust.name} removed from trust-list`;
+
+        return this.messageData;
     }
 }
 
@@ -134,7 +136,9 @@ export class Timestamp implements ICommand {
             timestampName,
             chatter.username
         );
-        return `Timestamp ${newTimestamp.name} created. Use !findts ${newTimestamp.name} to watch it`;
+        this.messageData.response = `Timestamp ${newTimestamp.name} created. Use !findts ${newTimestamp.name} to watch it`;
+
+        return this.messageData;
     }
 }
 
@@ -164,12 +168,15 @@ export class FindTimestamp implements ICommand {
                     return timestamp.name;
                 })
                 .join(", ");
-            return `Timestamps: ${timestampsList}`;
+            this.messageData.response = `Timestamps: ${timestampsList}`;
+            return this.messageData;
         }
         const foundTimestamp = await timestampObj.find(targetTimestamp);
         const backtrackLength = 90;
         const { name, url, timestamp } = foundTimestamp;
-        return `${name}: ${url}?t=${timestamp - backtrackLength}s`;
+        this.messageData.response = `${name}: ${url}?t=${timestamp - backtrackLength}s`;
+
+        return this.messageData;
     }
 }
 
@@ -198,7 +205,9 @@ export class DeleteTimestamp implements ICommand {
         const user = await this.getUser(channel);
         const timestamp = new TimestampPrisma(user);
         const deleteTimestamp = await timestamp.remove(timestampName);
-        return `Timestamp ${deleteTimestamp.name} deleted`;
+        this.messageData.response = `Timestamp ${deleteTimestamp.name} deleted`;
+
+        return this.messageData;
     }
 }
 
@@ -221,8 +230,9 @@ export class ToggleComponent implements ICommand {
         await component.toggle();
         const componentStatus =
             (await component.isEnabled()) === true ? "Enabled" : "Disabled";
+        this.messageData.response = `Component ${targetComponent} is now: ${componentStatus}`;
 
-        return `Component ${targetComponent} is now: ${componentStatus}`;
+        return this.messageData;
 
     }
 }
@@ -261,9 +271,14 @@ export class Pokemon implements ICommand {
         const user = await this.getUser(userPrisma);
         const component = new ComponentPrisma(user, targetComponent);
         const isEnabled = await component.isEnabled();
-        if (!isEnabled) return `Component ${targetComponent} is not enabled`;
+        if (!isEnabled) {
+            this.messageData.response = `Component ${targetComponent} is not enabled`;
+            return this.messageData
+        }
         const pokemon = await pokemonAPI.get<IPokemon>(`pokemon/${targetPokemon}`);
-        return this.formatPokemonStats(pokemon.data);
+        this.messageData.response = this.formatPokemonStats(pokemon.data);
+
+        return this.messageData;
     }
 }
 
@@ -296,7 +311,9 @@ export class NewCommand implements ICommand {
             commandContent,
             chatter.username
         );
-        return `Command ${command.name} created`;
+        this.messageData.response = `Command ${command.name} created`;
+
+        return this.messageData;
     }
 }
 
@@ -320,8 +337,9 @@ export class DeleteCommand implements ICommand {
         if (!user) throw new Error("user not found");
         const command = new CommandPrisma(user);
         const delCommand = await command.remove(commandName);
+        this.messageData.response = `Command ${delCommand.name} deleted`;
 
-        return `Command ${delCommand.name} deleted`;
+        return this.messageData;
 
     }
 }
@@ -338,7 +356,10 @@ export class Slots implements ICommand {
         if (!user) throw new Error(`msg`);
         const component = new ComponentPrisma(user, targetComponent);
         const isEnabled = await component.isEnabled();
-        if (!isEnabled) return `Component ${targetComponent} is not enabled`;
+        if (!isEnabled) {
+            this.messageData.response = `Component ${targetComponent} is not enabled`;
+            return this.messageData
+        }
 
         const emoteSelection = [
             "PogChamp",
@@ -360,8 +381,9 @@ export class Slots implements ICommand {
             emoteSelection[rolls[2]],
         ];
         const gameResultSentence = gameResult.join(" | ");
+        this.messageData.response = gameResultSentence;
 
-        return gameResultSentence;
+        return this.messageData;
 
     }
 }
@@ -371,7 +393,7 @@ export class UserJoin implements ICommand {
     }
 
     run = async () => {
-        const { channel, message, chatter } = this.messageData;
+        const { channel,  chatter } = this.messageData;
         const botName = process.env.TWITCH_USERNAME;
         if (channel !== botName) {
             throw new Error(`!join only works in ${botName}'s channel`);
@@ -380,14 +402,16 @@ export class UserJoin implements ICommand {
             throw new Error("User not found");
         }
         const user = new UserModel(chatter.username);
-        const newPrismaUser = await user.save(chatter.username);
+        const newPrismaUser = await user.save();
 
         if (newPrismaUser) {
             const jsonUser = new JsonStringArray();
             jsonUser.add(newPrismaUser.name);
             await this.tmiClient.join(newPrismaUser.name)
         }
-        return `I have joined channel: ${newPrismaUser.name}`;
+        this.messageData.response = `I have joined channel: ${newPrismaUser.name}`;
+
+        return this.messageData;
     }
 }
 
@@ -407,6 +431,8 @@ export class UserLeave implements ICommand {
             jsonUser.remove(removedUser.name);
             await this.tmiClient.part(removedUser.name)
         }
-        return `I have left channel: ${removedUser.name}`;
+        this.messageData.response = `I have left channel: ${removedUser.name}`;
+
+        return this.messageData;
     }
 }
