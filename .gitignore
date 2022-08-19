@@ -5,6 +5,7 @@ private/
 .vscode/
 .idea/
 changelog.config.js
+test/coverage
 
 src/prisma/migrations
 
