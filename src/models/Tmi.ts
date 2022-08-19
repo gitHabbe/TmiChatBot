@@ -2,8 +2,12 @@ import { Client } from "tmi.js";
 import { tmiOptions } from "../config/tmiConfig";
 
 export class Tmi {
-  client: Client = new Client(tmiOptions);
   private events: { [name: string]: Function } = {};
+  client: Client;
+
+  constructor(client: Client = new Client(tmiOptions)) {
+    this.client = client;
+  }
 
   connect = () => {
     this.client.connect().then();

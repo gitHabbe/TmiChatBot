@@ -3,6 +3,7 @@ import { Events } from "./models/Events";
 
 const tmi: Tmi = new Tmi();
 const events = new Events(tmi.client);
+
 tmi.addEvent("message", events.onMessage)
 try {
   tmi.connect()
