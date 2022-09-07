@@ -1,17 +1,19 @@
 import { Trust } from "@prisma/client";
 import { JoinedUser, Model, ModelName } from "../../interfaces/prisma";
 import { DatabaseSingleton } from "./Prisma";
+import { Userstate } from "tmi.js";
 
 export class TrustModel {
   private db = DatabaseSingleton.getInstance().get();
   private client = this.db[ModelName.trust];
-  constructor(private user: JoinedUser, private trustee: string) {}
+
+  constructor(private user: JoinedUser, private trustee: Userstate) {}
 
   get = (): Promise<Trust | null> => {
     return this.client.findFirst({
       where: {
         userId: this.user.id,
-        name: this.trustee,
+        name: this.trustee.username,
       },
     });
   };
@@ -32,7 +34,7 @@ export class TrustModel {
     return this.client.deleteMany({
       where: {
         userId: this.user.id,
-        name: this.trustee,
+        name: this.trustee.username,
       },
     });
   };
@@ -43,7 +45,7 @@ export class TrustModel {
     return this.client.create({
       data: {
         userId: this.user.id,
-        name: this.trustee,
+        name: this.trustee.username,
         madeBy: madeBy,
       },
     });

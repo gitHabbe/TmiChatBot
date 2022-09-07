@@ -1,6 +1,6 @@
 import { ICommand } from "../../interfaces/Command";
 import { ChatUserstate, Client } from "tmi.js";
-import { TrustPrisma } from "../database/TrustPrisma";
+import { TrustModel } from "../database/TrustPrisma";
 import { UserModel } from "../database/UserPrisma";
 import { TimestampPrisma } from "../database/TimestampPrisma";
 import { IStreamerResponse, ITwitchChannel, IVideo, IVideosResponse } from "../../interfaces/twitch";
@@ -98,8 +98,8 @@ export const isTrustedUser = async (
     const userPrisma = new UserModel(streamer);
     const user = await userPrisma.get();
     if (!user) throw new Error("user not found");
-    const trust = new TrustPrisma(user);
-    return trust.isTrusted(madeBy);
+    const trust = new TrustModel(user, madeBy);
+    return trust.get();
 };
 
 export class Timestamp implements ICommand {
