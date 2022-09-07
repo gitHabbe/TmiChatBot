@@ -15,7 +15,7 @@ export interface Link {
   rel: string;
   uri: string;
 }
-export interface ILeaderboardReponse {
+export interface ILeaderboardResponse {
   data: ILeaderboard;
 }
 
