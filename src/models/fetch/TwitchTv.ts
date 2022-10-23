@@ -1,7 +1,7 @@
 import { IStreamerResponse, ITwitchChannel } from "../../interfaces/twitch";
 import { IAPI, IAxiosOptions } from "./SpeedrunCom";
 
-export class TwitchChannel {
+export class TwitchChannelApi {
   private options: IAxiosOptions = {
     name: this.name,
     type: "channel",
@@ -10,18 +10,15 @@ export class TwitchChannel {
 
   constructor(private api: IAPI<IStreamerResponse>, private name: string) {}
 
-  fetch = async () => {
+  fetch = async (): Promise<IStreamerResponse> => {
     const { data } = await this.api.fetch(this.options);
     return data;
   };
 
-  find = async () => {
+  get = async (): Promise<ITwitchChannel | undefined> => {
     const channels = await this.fetch();
-    const channel = channels.data.find((channel: ITwitchChannel) => {
-      return channel.broadcaster_login === this.name.toLowerCase();
+    return channels.data.find((channel: ITwitchChannel) => {
+      return channel.broadcaster_login.toLowerCase() === this.name.toLowerCase();
     });
-
-    if (!channel) throw new Error(`Channel: ${this.name} not found`);
-    return channel;
   };
 }

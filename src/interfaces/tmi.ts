@@ -42,4 +42,4 @@ export type OnMessage = (
   chatter: ChatUserstate,
   message: string,
   self: boolean
-) => Promise<MessageData>;
+) => void;
