@@ -2,7 +2,7 @@ import { Category, CategoryLink } from ".prisma/client";
 import { FullGame, JoinedGame } from "../../interfaces/prisma";
 import {
   ICategoryType,
-  ILeaderboardReponse,
+  ILeaderboardResponse,
   IRun,
 } from "../../interfaces/speedrun";
 import { IAxiosOptions, SpeedrunCom } from "./SpeedrunCom";
@@ -35,11 +35,11 @@ export class Leaderboard {
   };
 
   private checkAcronym = (target: string): string => {
-    const minAcrynymLength = 3;
+    const minAcronymLength = 3;
     const isAcronym = this.game.categories.find((category) => {
       const categoryAsArray = category.name.toLowerCase().split(" ");
       const acronym = categoryAsArray.map((word) => word[0]).join("");
-      const hasAcronym = acronym.length >= minAcrynymLength;
+      const hasAcronym = acronym.length >= minAcronymLength;
       return hasAcronym && target.toLowerCase().includes(acronym);
     });
     if (isAcronym) return isAcronym.name;
@@ -59,7 +59,7 @@ export class Leaderboard {
       name: "World record",
       url: `leaderboards/${this.game.id}/category/${category.id}?top=1`,
     };
-    const speedrunCom = new SpeedrunCom<ILeaderboardReponse>(options);
+    const speedrunCom = new SpeedrunCom<ILeaderboardResponse>(options);
     const {
       data: {
         data: {
@@ -80,7 +80,7 @@ export class Leaderboard {
       name: "Personal Best",
       url: `leaderboards/${this.game.id}/category/${category.id}`,
     };
-    const speedrunCom = new SpeedrunCom<ILeaderboardReponse>(options);
+    const speedrunCom = new SpeedrunCom<ILeaderboardResponse>(options);
     const {
       data: { data: runs },
     } = await speedrunCom.fetchAPI();
