@@ -19,11 +19,3 @@ export class DatabaseSingleton {
 
   get = () => this.client;
 }
-
-// const asdf = async () => {
-//   const ye = new GameModel("dkr");
-//   const yoo = await ye.get();
-//   console.log("yoo:", yoo);
-// };
-
-// asdf();
