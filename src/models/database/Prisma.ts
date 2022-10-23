@@ -8,7 +8,7 @@ export abstract class Prisma {
 
 export class DatabaseSingleton {
   private static instance: DatabaseSingleton;
-  private client = prisma;
+  private client: PrismaClient = prisma;
 
   public static getInstance = (): DatabaseSingleton => {
     if (!DatabaseSingleton.instance) {
