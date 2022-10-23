@@ -1,4 +1,6 @@
 import { ITwitterTweetResponse, IYoutubePagination } from "../src/interfaces/socialMedia";
+import { ITwitchChannel } from "../src/interfaces/twitch";
+import { MessageData } from "../src/models/MessageData";
 
 export const tweetMockData: ITwitterTweetResponse = {
   data: {
@@ -60,3 +62,14 @@ export const commandMockData = {
   userId: 2,
   updatedAt: new Date()
 }
+export const twitchFetchMockData: ITwitchChannel[] = [ {
+    id: "0",
+    started_at: "",
+    display_name: "Habbe",
+    title: "Mock title",
+    broadcaster_login: "habbe",
+    game_id: "123",
+    game_name: "Diddy Kong Racing",
+    islive: true
+} ];
+export const messageDataMock = new MessageData("#habbe", {}, "This is a test message");
