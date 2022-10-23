@@ -1,7 +1,6 @@
 import { TwitterLink, YoutubeLink } from "../src/models/fetch/SocialMedia";
 import { twitterRegex } from "../src/config/twitterConfig";
 import { youtubeRegex } from "../src/config/youtubeConfig";
-// @ts-ignore
 import { tweetMockData, youtubeVideoMockData } from "./mockData";
 
 describe("Social media module", () => {
