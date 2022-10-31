@@ -1,4 +1,4 @@
-import { TwitchFetch, TwitchUptime } from "../src/models/commands/Twitch";
+import { TwitchFetch, TwitchTitle, TwitchUptime } from "../src/models/commands/Twitch";
 import { ITwitchChannel } from "../src/interfaces/twitch";
 import { messageDataMock, offlineTwitchChannelMock, onlineTwitchChannelMock } from "./mockData";
 import { MessageData } from "../src/models/MessageData";
@@ -23,6 +23,17 @@ describe("Standard commands", () => {
         const updatedMessageData: MessageData = await twitchUptime.run();
         const response: string = updatedMessageData.response;
         const exp = "habbe not online";
+        expect(response).toBe(exp)
+        spy.mockRestore()
+    })
+
+    it("Title", async () => {
+        const twitchFetch = new TwitchFetch(messageDataMock);
+        const spy = mockGetChannelsMethod(twitchFetch, onlineTwitchChannelMock);
+        const twitchTitle = new TwitchTitle(messageDataMock, twitchFetch);
+        const updatedMessageData: MessageData = await twitchTitle.run();
+        const response: string = updatedMessageData.response;
+        const exp = "Mock title";
         expect(response).toBe(exp)
         spy.mockRestore()
     })
