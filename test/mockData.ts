@@ -1,6 +1,8 @@
 import { ITwitterTweetResponse, IYoutubePagination } from "../src/interfaces/socialMedia";
 import { ITwitchChannel } from "../src/interfaces/twitch";
 import { MessageData } from "../src/models/MessageData";
+import { JoinedUser } from "../src/interfaces/prisma";
+import { Tmi } from "../src/models/Tmi";
 
 export const tweetMockData: ITwitterTweetResponse = {
   data: {
@@ -62,7 +64,8 @@ export const commandMockData = {
   userId: 2,
   updatedAt: new Date()
 }
-export const twitchFetchMockData: ITwitchChannel[] = [ {
+
+export const offlineTwitchChannelMock: ITwitchChannel[] = [ {
     id: "0",
     started_at: "",
     display_name: "Habbe",
@@ -72,4 +75,32 @@ export const twitchFetchMockData: ITwitchChannel[] = [ {
     game_name: "Diddy Kong Racing",
     islive: true
 } ];
+
+let onlineDate = new Date()
+onlineDate.setHours(onlineDate.getHours() - 2)
+onlineDate.setMinutes(onlineDate.getMinutes() - 5)
+onlineDate.setSeconds(onlineDate.getSeconds() - 34)
+export const onlineTwitchChannelMock: ITwitchChannel[] = [ {
+  id: "0",
+  started_at: onlineDate.toISOString(),
+  display_name: "Habbe",
+  title: "Mock title",
+  broadcaster_login: "habbe",
+  game_id: "123",
+  game_name: "Diddy Kong Racing",
+  islive: true
+} ];
+
 export const messageDataMock = new MessageData("#habbe", {}, "This is a test message");
+
+export const joinedUserMock: JoinedUser = {
+  id: 1,
+  name: "habb",
+  createdAt: new Date("28-10-2022"),
+  updatedAt: new Date("29-10-2022"),
+  components: [],
+  commands: [],
+  settings: [],
+  timestamps: [],
+  trusts: []
+}
