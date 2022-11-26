@@ -1,12 +1,8 @@
 import { Runner } from ".prisma/client";
 import { dkr64API, speedrunAPI } from "../../config/speedrunConfig";
 import { FullGame } from "../../interfaces/prisma";
-import { ITimeTrial, ITimeTrialJson, ITimeTrialResponse, ITrack } from "../../interfaces/specificGames";
-import {
-    ILeaderboardReponse,
-    InduvidualLevelSupport,
-    IRun, TimeTrialSupport,
-} from "../../interfaces/speedrun";
+import { ITimeTrialJson, ITimeTrialResponse, ITrack } from "../../interfaces/specificGames";
+import { ILeaderboardResponse, InduvidualLevelSupport, IRun, TimeTrialSupport, } from "../../interfaces/speedrun";
 import { datesDaysDifference, floatToHHMMSS } from "../../utility/dateFormat";
 import { fuseSearch } from "../../utility/fusejs";
 import { GameModel } from "../database/GamePrisma";
@@ -19,13 +15,14 @@ import {
     TimeTrialWorldRecordApi,
     WorldRecordApi
 } from "../fetch/SpeedrunCom";
-import { JsonLevels, JsonTimeTrials } from "../JsonArrayFile";
+import { JsonTimeTrials } from "../JsonArrayFile";
 import { StringExtract } from "../StringExtract";
 import { ICommand } from "../../interfaces/Command";
 import { UserModel } from "../database/UserPrisma";
 import { SettingPrisma } from "../database/SettingPrisma";
 import { formatWorldRecord } from "../../utility/math";
 import { MessageData } from "../MessageData";
+import { ParseMessage } from "../../utility/ParseMessage";
 
 export class WorldRecord implements ICommand {
     constructor(public messageData: MessageData) {}
@@ -33,11 +30,10 @@ export class WorldRecord implements ICommand {
     run = async () => {
         const stringExtract = new StringExtract(this.messageData);
         const gameName: string = await stringExtract.game();
-        const gameModel = new GameModel(gameName);
-        const game: FullGame | null = await gameModel.pull();
+        const game = await this.getGame(gameName);
         const query: string = await stringExtract.category();
         if (!game) {
-            this.messageData.response = `Game ${gameName} not found`;
+            this.messageData.response = `Game ${gameName} not found on SpeedrunDotCom`;
             return this.messageData;
         }
         const leaderboard = new Leaderboard(game);
@@ -48,6 +44,11 @@ export class WorldRecord implements ICommand {
 
         return this.messageData;
     };
+
+    private async getGame(gameName: string): Promise<FullGame | null> {
+        const gameModel = new GameModel(gameName);
+        return await gameModel.pull();
+    }
 }
 
 export class IndividualWorldRecord implements ICommand {
@@ -65,44 +66,14 @@ export class IndividualWorldRecord implements ICommand {
     };
 }
 
-export class IndividualWorldRecordDiddyKongRacing implements ICommand {
-    private levels: ITrack[] = new JsonLevels().data();
+export class IndividualWorldRecordDiddyKongRacing extends ParseMessage implements ICommand {
 
-    constructor(public messageData: MessageData) {}
-
-    parseMessage = () => {
-        const { message } = this.messageData;
-        const vehicles = [ "car", "hover", "plane" ];
-
-        let query = message.split(" ").slice(2);
-        const specifiedVehicle = query.find((word: string) => {
-            return vehicles.includes(word);
-        });
-        if (specifiedVehicle) {
-            query = query.filter((word: string) => word !== specifiedVehicle);
-            this.levels = this.levels.filter((track: ITrack) => {
-                return track.vehicle === specifiedVehicle;
-            });
-        } else {
-            this.levels = this.levels.filter((track: ITrack) => {
-                return track.default;
-            });
-        }
-        const isAbbreviated = this.levels.filter((track: ITrack) => {
-            return query.includes(track.abbreviation);
-        });
-        if (isAbbreviated.length > 0) {
-            query = [ isAbbreviated[0].name ];
-            this.levels = isAbbreviated;
-        }
-
-        return { query, dkrLevels: this.levels };
-    };
+    constructor(public messageData: MessageData) {super(messageData);}
 
     run = async () => {
         const { query, dkrLevels } = this.parseMessage();
         const [ { item } ] = fuseSearch<ITrack>(dkrLevels, query.join(" "));
-        const apiLeaderboard = new Api<ILeaderboardReponse>(speedrunAPI);
+        const apiLeaderboard = new Api<ILeaderboardResponse>(speedrunAPI);
         const leaderboardApi = new WorldRecordApi(apiLeaderboard, item);
         const { data: leaderboard } = await leaderboardApi.fetch();
         const { name, vehicle } = item;
@@ -173,47 +144,15 @@ export class IndividualPersonalBest implements ICommand {
     };
 }
 
+export class IndividualPersonalBestDiddyKongRacing extends ParseMessage implements ICommand {
 
-export class IndividualPersonalBestDiddyKongRacing implements ICommand {
-    private levels: ITrack[] = new JsonLevels().data();
-
-    constructor(public messageData: MessageData) {}
-
-    parseMessage = () => {
-        const { message } = this.messageData;
-        console.log("message:", message)
-        const vehicles = [ "car", "hover", "plane" ];
-
-        let query = message.split(" ").slice(2);
-        const specifiedVehicle = query.find((word: string) => {
-            return vehicles.includes(word);
-        });
-        if (specifiedVehicle) {
-            query = query.filter((word: string) => word !== specifiedVehicle);
-            this.levels = this.levels.filter((track: ITrack) => {
-                return track.vehicle === specifiedVehicle;
-            });
-        } else {
-            this.levels = this.levels.filter((track: ITrack) => {
-                return track.default;
-            });
-        }
-        const isAbbreviated = this.levels.filter((track: ITrack) => {
-            return query.includes(track.abbreviation);
-        });
-        if (isAbbreviated.length > 0) {
-            query = [ isAbbreviated[0].name ];
-            this.levels = isAbbreviated;
-        }
-
-        return { query, dkrLevels: this.levels };
-    };
+    constructor(messageData: MessageData) { super(messageData); }
 
     run = async () => {
         const { query, dkrLevels } = this.parseMessage();
         // console.log(query, dkrLevels)
         const [ { item } ] = fuseSearch<ITrack>(dkrLevels, query.join(" "));
-        const apiLeaderboard = new Api<ILeaderboardReponse>(speedrunAPI);
+        const apiLeaderboard = new Api<ILeaderboardResponse>(speedrunAPI);
         const leaderboardApi = new LeaderboardApi(apiLeaderboard, item);
         const { data: leaderboard } = await leaderboardApi.fetch();
         const { name, vehicle } = item;
