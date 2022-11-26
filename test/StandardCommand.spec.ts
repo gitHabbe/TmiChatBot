@@ -6,7 +6,7 @@ import { MessageData } from "../src/models/MessageData";
 describe("Standard commands", () => {
 
     it("Uptime channel online", async () => {
-        const twitchFetch = new TwitchFetch(messageDataMock);
+        const twitchFetch = new TwitchFetch();
         const spy = mockGetChannelsMethod(twitchFetch, onlineTwitchChannelMock);
         const twitchUptime = new TwitchUptime(messageDataMock, twitchFetch);
         const updatedMessageData: MessageData = await twitchUptime.run();
@@ -17,7 +17,7 @@ describe("Standard commands", () => {
     })
 
     it("Uptime channel offline", async () => {
-        const twitchFetch = new TwitchFetch(messageDataMock);
+        const twitchFetch = new TwitchFetch();
         const spy = mockGetChannelsMethod(twitchFetch, offlineTwitchChannelMock);
         const twitchUptime = new TwitchUptime(messageDataMock, twitchFetch);
         const updatedMessageData: MessageData = await twitchUptime.run();
@@ -28,7 +28,7 @@ describe("Standard commands", () => {
     })
 
     it("Title", async () => {
-        const twitchFetch = new TwitchFetch(messageDataMock);
+        const twitchFetch = new TwitchFetch();
         const spy = mockGetChannelsMethod(twitchFetch, onlineTwitchChannelMock);
         const twitchTitle = new TwitchTitle(messageDataMock, twitchFetch);
         const updatedMessageData: MessageData = await twitchTitle.run();
