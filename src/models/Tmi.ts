@@ -5,12 +5,12 @@ import { MessageData } from "./MessageData";
 import { StandardCommand } from "./commands/StandardCommand";
 import { CustomCommand } from "./commands/CustomCommand";
 import { LinkCommand } from "./commands/LinkCommand";
+import { UserModel } from "./database/UserPrisma";
+import { JoinedUser } from "../interfaces/prisma";
+import channels from "../private/tmi_channels.json";
 
 export class Tmi {
-  client: Client;
-
-  constructor(client: Client = new Client(tmiOptions)) {
-    this.client = client;
+  constructor(public client: Client = new Client(tmiOptions)) {
     this.addMessageEvent()
   }
 
@@ -18,21 +18,21 @@ export class Tmi {
     this.client.connect().then();
   }
 
-  addMessageEvent = (): void => {
+  private addMessageEvent = (): void => {
     this.client.on("message", this.onMessage)
   }
 
   private onMessage: OnMessage = async (streamer: string, chatter: ChatUserstate, message: string, self: boolean) => {
-    if (self) return //"Bot self message";
+    if (self) return // Bot self message;
     try {
       let messageData: MessageData = new MessageData(streamer, chatter, message);
 
       const standardCommand = new StandardCommand(messageData, this.client);
       messageData = await standardCommand.run();
-      console.log(messageData)
-      if (messageData.response.length > 0) {
-        return await this.client.say(messageData.targetChannel, messageData.response)
-      }
+      // console.log(messageData)
+      // if (messageData.response.length > 0) {
+      //   return await this.client.say(messageData.targetChannel, messageData.response)
+      // }
       //
       // const customCommand = new CustomCommand(messageData);
       // messageData = await customCommand.run();

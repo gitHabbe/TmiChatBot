@@ -18,7 +18,7 @@ export class Trust implements ICommand {
     }
 
     private addTrust = async (user: any, newTrust: string, chatter: ChatUserstate) => {
-        const trust = new TrustPrisma(user);
+        const trust = new TrustModel(user);
         const addTrust = await trust.add(newTrust, chatter);
         return addTrust;
     }

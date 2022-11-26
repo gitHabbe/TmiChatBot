@@ -1,7 +1,8 @@
 import { Prisma } from "./Prisma";
 import { Runner } from ".prisma/client";
 import { IRunner, IRunnerResponse } from "../../interfaces/speedrun";
-import { IAxiosOptions, SpeedrunCom } from "../fetch/SpeedrunCom";
+import { SpeedrunCom } from "../fetch/SpeedrunCom";
+import { IAxiosOptions } from "../../interfaces/Axios";
 
 export class RunnerPrisma extends Prisma {
   get = async (query: string): Promise<Runner> => {

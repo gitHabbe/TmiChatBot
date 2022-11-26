@@ -8,7 +8,7 @@ import {
   Link,
 } from "../../interfaces/speedrun";
 import { speedrunAPI } from "../../config/speedrunConfig";
-import { Api, CategoryApi, GameApi } from "../fetch/SpeedrunCom";
+import { Api, CategoriesApi, GameApi } from "../fetch/SpeedrunCom";
 
 export class GameModel {
   private db = DatabaseSingleton.getInstance().get();
@@ -61,7 +61,7 @@ export class GameModel {
     const { data: game }: IGameResponse = await gameApi.fetch();
 
     const apiCategories = new Api<ICategoryResponse>(speedrunAPI);
-    const categoriesApi = new CategoryApi(apiCategories, game);
+    const categoriesApi = new CategoriesApi(apiCategories, game);
     const { data: categories }: ICategoryResponse = await categoriesApi.fetch();
 
     return await this.client.create({
