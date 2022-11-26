@@ -1,14 +1,26 @@
 import { JoinedUser, Model, ModelName } from "../../interfaces/prisma";
 import { DatabaseSingleton } from "./Prisma";
-import { User } from "@prisma/client";
+import { Component, User } from "@prisma/client";
 
 export class UserModel implements Model {
   private db = DatabaseSingleton.getInstance().get();
   private client = this.db[ModelName.user];
   constructor(private name: string) {}
 
-  get = (): Promise<JoinedUser | null> => {
-    return this.client.findFirst({
+  get = async (): Promise<JoinedUser> => {
+    let findFirst: JoinedUser | null = await this.getFirst();
+    if (findFirst === null) {
+      await this.client.create({ data: { name: this.name } });
+      findFirst = await this.getFirst();
+    }
+    if (findFirst === null) {
+      throw new Error("Database error")
+    }
+    return findFirst
+  };
+
+  private async getFirst(): Promise<JoinedUser | null> {
+    return await this.client.findFirst({
       where: { name: this.name },
       include: {
         commands: true,
@@ -18,7 +30,7 @@ export class UserModel implements Model {
         trusts: true,
       },
     });
-  };
+  }
 
   getAll = () => {
     throw new Error(`Uncallable`);
@@ -33,4 +45,12 @@ export class UserModel implements Model {
   delete = (): Promise<User> => {
     return this.client.delete({ where: { name: this.name } });
   };
+
+  isComponentEnabled(commandName: string, components: Component[]): Component | undefined {
+    return components.find((component: Component) => {
+      const componentName = component.name.toLowerCase();
+      const targetCommand = commandName.toLowerCase();
+      return componentName === targetCommand;
+    });
+  }
 }
