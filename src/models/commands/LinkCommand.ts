@@ -1,43 +1,29 @@
 import { twitterAPI, twitterRegex } from "../../config/twitterConfig";
 import { youtubeAPI, youtubeRegex } from "../../config/youtubeConfig";
-import {
-  ITwitterTweet,
-  ITwitterTweetResponse,
-  ITwitterUser,
-  IYoutubePagination,
-  RegexLink
-} from "../../interfaces/socialMedia";
+import { ITwitterTweet, ITwitterTweetResponse, ITwitterUser, IYoutubePagination } from "../../interfaces/socialMedia";
 import { numberToRoundedWithLetter, youtubeDurationToHHMMSS } from "../../utility/dateFormat";
 import { MessageData } from "../MessageData";
 import { ICommand } from "../../interfaces/Command";
 
-abstract class LinkPattern {
-  protected constructor(public pattern: RegExp, public text: string) {}
+export class RegexPattern {
+  constructor(public pattern: RegExp, public text: string) {}
 
-  parse = () => {
-    return this.pattern.test(this.text)
-  }
-
-  exec = () => {
-    return this.pattern.exec(this.text)
-  }
+  parse = (): boolean => this.pattern.test(this.text)
+  exec = (): RegExpExecArray | null => this.pattern.exec(this.text)
 }
 
+class YoutubeLink implements SocialMediaLink {
 
-class YoutubeLink extends LinkPattern implements RegexLink {
-
-  constructor(public pattern: RegExp, public text: string) {
-    super(pattern, text);
-  }
+  constructor(public regexPattern: RegexPattern) {}
 
   print = async (): Promise<string> => {
-    const regex_exec = this.exec();
+    const regex_exec = this.regexPattern.exec();
     if (regex_exec === null) throw new Error("Not a Youtube link");
     const youtube_id = regex_exec[3];
     const query = `/videos?id=${youtube_id}&key=${process.env.YOUTUBE_API_KEY}&part=snippet,contentDetails,statistics,status`
-    const {data: youtube_pagination} = await youtubeAPI.get<IYoutubePagination>(query);
+    const { data: youtube_pagination } = await youtubeAPI.get<IYoutubePagination>(query);
     const video = youtube_pagination.items[0];
-    const {viewCount, likeCount } = video.statistics;
+    const { viewCount, likeCount } = video.statistics;
     const duration = youtubeDurationToHHMMSS(video.contentDetails.duration);
     const views = numberToRoundedWithLetter(viewCount);
     const title = video.snippet.title;
@@ -47,20 +33,24 @@ class YoutubeLink extends LinkPattern implements RegexLink {
 }
 
 
-class TwitterLink extends LinkPattern implements RegexLink {
+interface SocialMediaLink {
+  regexPattern: RegexPattern;
 
-  constructor(public pattern: RegExp, public text: string) {
-    super(pattern, text);
-  }
+  print: () => Promise<string>;
+}
+
+class TwitterLink implements SocialMediaLink {
+
+  constructor(public regexPattern: RegexPattern) {}
 
   print = async (): Promise<string> => {
-    const regex_exec = this.exec();
+    const regex_exec = this.regexPattern.exec();
     if (regex_exec === null) throw new Error("Not a Twitter link");
     const tweet_id = regex_exec[1];
     const query = `/tweets/${tweet_id}?expansions=author_id&user.fields=name,username,verified&tweet.fields=public_metrics,created_at`
-    const {data: tweet} = await twitterAPI.get<ITwitterTweetResponse>(query);
-    const {text}: ITwitterTweet = tweet.data;
-    const {name, username, verified}: ITwitterUser = tweet.includes.users[0];
+    const { data: tweet } = await twitterAPI.get<ITwitterTweetResponse>(query);
+    const { text }: ITwitterTweet = tweet.data;
+    const { name, username, verified }: ITwitterUser = tweet.includes.users[0];
     const verifiedCheck: string = verified ? "✔" : ""; // alts: ✅ 💬
 
     return `[${name}@${username}${verifiedCheck}] ${text}`;
@@ -68,21 +58,23 @@ class TwitterLink extends LinkPattern implements RegexLink {
 }
 
 export class LinkCommand implements ICommand {
-  private regexLinks: RegexLink[] = [
-      new YoutubeLink(youtubeRegex, this.messageData.message),
-      new TwitterLink(twitterRegex, this.messageData.message)
-  ]
+  private socialMediaLinks: SocialMediaLink[] = []
 
-  constructor(public messageData: MessageData) {}
+  constructor(public messageData: MessageData) {
+    this.socialMediaLinks = [
+      new YoutubeLink(new RegexPattern(youtubeRegex, this.messageData.message)),
+      new TwitterLink(new RegexPattern(twitterRegex, this.messageData.message))
+    ]
+  }
 
-  isLink = (): RegexLink | undefined => {
-    return this.regexLinks.find((regexLink: RegexLink) => {
-      if (regexLink.parse()) return regexLink;
+  getLink = () => {
+    return this.socialMediaLinks.find((socialMediaLink) => {
+      if (socialMediaLink.regexPattern.parse()) return socialMediaLink;
     })
   }
 
   run = async (): Promise<MessageData> => {
-    const isLink = this.isLink()
+    const isLink = this.getLink()
     if (isLink === undefined) throw new Error("Not a link")
     this.messageData.response = await isLink.print()
     return this.messageData
