@@ -4,6 +4,7 @@ import { Prisma } from "./Prisma";
 
 export class TimestampPrisma extends Prisma {
   private db = this.prisma.timestamp;
+
   constructor(private user: User) {
     super();
   }

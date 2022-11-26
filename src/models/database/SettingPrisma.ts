@@ -3,9 +3,11 @@ import { Prisma } from "./Prisma";
 
 export class SettingPrisma extends Prisma {
   private db = this.prisma.setting;
+
   constructor(private user: User) {
     super();
   }
+
   add = async (type: string, name: string) => {
     return this.db.create({
       data: {

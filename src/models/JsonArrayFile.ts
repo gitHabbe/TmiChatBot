@@ -5,6 +5,7 @@ import {
   ITimeTrialJson,
   ITimeTrialsJson,
 } from "../interfaces/specificGames";
+
 export class JsonFile<T> {
   jsonFile: string = `./src/private/${this.filename}.json`;
   private data = JSON.parse(readFileSync(this.jsonFile, "utf8"));
@@ -61,7 +62,7 @@ export class JsonTimeTrials {
     return this.levels.getData.timetrial;
   };
 
-  find = (lvl: ITimeTrialJson) => {
+  find = (lvl: ITimeTrialJson): ITimeTrialJson | undefined => {
     return this.data().find((level) => {
       return level.abbreviation === lvl.abbreviation;
     });
