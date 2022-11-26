@@ -1,39 +1,30 @@
-import {
-  ICategoryResponse,
-  ICategoryType,
-  IGameResponse,
-  IGameType,
-} from "../../interfaces/speedrun";
-import { IAPI, IAxiosOptions } from "./SpeedrunCom";
+import { ICategoryResponse, ICategoryType, IGameResponse, IGameType, } from "../../interfaces/speedrun";
+import { IAPI, IAxiosOptions } from "../../interfaces/Axios";
 
-export class FetchGame {
+export class SpeedrunGame {
   private options: IAxiosOptions = {
     type: "Game",
     name: this.name,
     url: `/games/${this.name}`,
   };
-  constructor(private api: IAPI<IGameResponse>, private name: string) {}
+  constructor(private instance: IAPI<IGameResponse>, private name: string) {}
 
-  get = async (): Promise<IGameType> => {
-    const { data } = await this.api.fetch(this.options);
-    const game = data.data;
-
-    return game;
-  };
+  async fetch(): Promise<IGameType> {
+    const { data } = await this.instance.fetch(this.options);
+    return data.data;
+  }
 }
 
-export class FetchCategories {
+export class SpeedrunCategories {
   private options: IAxiosOptions = {
     type: "Categories",
     name: this.game.names.international,
     url: `games/${this.game.id}/categories`,
   };
-  constructor(private api: IAPI<ICategoryResponse>, private game: IGameType) {}
+  constructor(private instance: IAPI<ICategoryResponse>, private game: IGameType) {}
 
-  get = async (): Promise<ICategoryType[]> => {
-    const { data } = await this.api.fetch(this.options);
-    const categories = data.data;
-
-    return categories;
-  };
+  async fetch(): Promise<ICategoryType[]> {
+    const { data } = await this.instance.fetch(this.options);
+    return data.data;
+  }
 }
