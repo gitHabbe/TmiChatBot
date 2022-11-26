@@ -1,24 +1,23 @@
-interface ILetterFormatedDate {
+interface ILetterFormattedDate {
   dayDistance: number;
   hourDistance: number;
   minuteDistance: number;
   secondDistance: number;
 }
 
-export const extractMillisecondsToObject = (
+export const millisecondsToDistance = (
   milliseconds: number
-): ILetterFormatedDate => {
-  const seconds = milliseconds / 1000;
-  const dayDistance: number = Math.floor((seconds % 31536000) / 86400);
-  const hourDistance: number = Math.floor(
-    ((seconds % 31536000) % 86400) / 3600
-  );
-  const minuteDistance: number = Math.floor(
-    (((seconds % 31536000) % 86400) % 3600) / 60
-  );
-  const secondDistance: number = Math.floor(
-    (((seconds % 31536000) % 86400) % 3600) % 60
-  );
+): ILetterFormattedDate => {
+  const seconds: number = milliseconds / 1000;
+  const secondsInYear = 31536000;
+  const secondsInDay = 86400;
+  const secondsInHour = 3600;
+  const secondsInMinute = 60;
+  const yearsLeftover = seconds % secondsInYear;
+  const dayDistance: number = Math.floor(yearsLeftover / secondsInDay);
+  const hourDistance: number = Math.floor((yearsLeftover % secondsInDay) / secondsInHour);
+  const minuteDistance: number = Math.floor(((yearsLeftover % secondsInDay) % secondsInHour) / secondsInMinute);
+  const secondDistance: number = Math.floor(((yearsLeftover % secondsInDay) % secondsInHour) % secondsInMinute);
 
   return {
     dayDistance,
@@ -28,15 +27,11 @@ export const extractMillisecondsToObject = (
   };
 };
 
-export const dateToLetters = (dateObject: ILetterFormatedDate): string => {
-  const days: string =
-    dateObject.dayDistance > 0 ? `${dateObject.dayDistance}d` : "";
-  const hours: string =
-    dateObject.hourDistance > 0 ? `${dateObject.hourDistance}h` : "";
-  const minutes: string =
-    dateObject.minuteDistance > 0 ? `${dateObject.minuteDistance}m` : "";
-  const seconds: string =
-    dateObject.secondDistance > 0 ? `${dateObject.secondDistance}s` : "";
+export const dateToLetters = (dateObject: ILetterFormattedDate): string => {
+  const days: string = dateObject.dayDistance > 0 ? `${dateObject.dayDistance}d` : "";
+  const hours: string = dateObject.hourDistance > 0 ? `${dateObject.hourDistance}h` : "";
+  const minutes: string = dateObject.minuteDistance > 0 ? `${dateObject.minuteDistance}m` : "";
+  const seconds: string = dateObject.secondDistance > 0 ? `${dateObject.secondDistance}s` : "";
 
   return `${days} ${hours} ${minutes} ${seconds}`.trim();
 };
