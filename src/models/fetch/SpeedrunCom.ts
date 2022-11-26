@@ -1,24 +1,35 @@
-import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosInstance } from "axios";
 import { speedrunAPI } from "../../config/speedrunConfig";
-import { twitchAPI } from "../../config/twitchConfig";
 import { ITrack } from "../../interfaces/specificGames";
-import {
-  IGameResponse,
-  IGameType,
-  SpeedrunComErrorMessage,
-  StatusCode,
-  TwitchTvErrorMessage,
-} from "../../interfaces/speedrun";
+import { IGameType, SpeedrunComErrorMessage, StatusCode, } from "../../interfaces/speedrun";
+import { IAPI, IAxiosOptions } from "../../interfaces/Axios";
 
-export interface IAxiosOptions {
-  name: string;
-  type: string;
-  url: string;
-}
+export class Api<T> implements IAPI<T> {
+  constructor(private instance: AxiosInstance) {}
 
-export interface IAPI<T> {
-  fetch(options: IAxiosOptions): Promise<AxiosResponse<T>>;
-  throw(options: IAxiosOptions, error: Error | AxiosError): never;
+  fetch = async (options: IAxiosOptions) => {
+    try {
+      return await this.instance.get<T>(options.url);
+    } catch (error: any) {
+      return this.throw(options, error);
+    }
+  };
+
+  throw = (options: IAxiosOptions, error: Error | AxiosError) => {
+    if (!axios.isAxiosError(error))
+      throw new Error(SpeedrunComErrorMessage.Generic);
+    if (!error.response) throw new Error(SpeedrunComErrorMessage.GenericAxios);
+    const { type, name } = options;
+    const { NotFound, ServerError } = StatusCode;
+    switch (error.response.status) {
+      case NotFound:
+        throw new Error(`${type} ${name} ${SpeedrunComErrorMessage.NotFound}`);
+      case ServerError:
+        throw new Error(`${SpeedrunComErrorMessage.ServerError}`);
+      default:
+        throw new Error(`${SpeedrunComErrorMessage.Generic} ${type} ${name}`);
+    }
+  };
 }
 
 export class GameApi<T> {
@@ -36,7 +47,7 @@ export class GameApi<T> {
   };
 }
 
-export class CategoryApi<T> {
+export class CategoriesApi<T> {
   private options: IAxiosOptions = {
     name: this.game.names.international,
     type: "category",
@@ -117,33 +128,6 @@ export class LeaderboardApi<T> {
   };
 }
 
-export class Api<T> implements IAPI<T> {
-  constructor(private instance: AxiosInstance) {}
-
-  fetch = async (options: IAxiosOptions) => {
-    try {
-      return await this.instance.get<T>(options.url);
-    } catch (error: any) {
-      return this.throw(options, error);
-    }
-  };
-
-  throw = (options: IAxiosOptions, error: Error | AxiosError) => {
-    if (!axios.isAxiosError(error))
-      throw new Error(SpeedrunComErrorMessage.Generic);
-    if (!error.response) throw new Error(SpeedrunComErrorMessage.GenericAxios);
-    const { type, name } = options;
-    const { NotFound, ServerError } = StatusCode;
-    switch (error.response.status) {
-      case NotFound:
-        throw new Error(`${type} ${name} ${SpeedrunComErrorMessage.NotFound}`);
-      case ServerError:
-        throw new Error(`${SpeedrunComErrorMessage.ServerError}`);
-      default:
-        throw new Error(`${SpeedrunComErrorMessage.Generic} ${type} ${name}`);
-    }
-  };
-}
 
 // export class GameAPI<T> implements API2<T> {
 //   public options: IAxiosOptions = {
