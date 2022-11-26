@@ -1,19 +1,18 @@
-import { twitchAPI } from "../config/twitchConfig";
-import { IStreamerResponse } from "../interfaces/twitch";
-import { Api } from "./fetch/SpeedrunCom";
-import { TwitchChannelApi } from "./fetch/TwitchTv";
 import { MessageData } from "./MessageData";
 import { TwitchFetch } from "./commands/Twitch";
+import { twitchAPI } from "../config/twitchConfig";
+import { ITwitchChannel } from "../interfaces/twitch";
+import { speedrunAPI } from "../config/speedrunConfig";
 
 export class StringExtract {
-  private twitchFetch = new TwitchFetch(this.messageData);
+  private twitchFetch = new TwitchFetch();
   constructor(private messageData: MessageData) {}
 
   game = async (): Promise<string> => {
     const { message } = this.messageData;
     const messageArray = message.split(" ").slice(1);
     if (!messageArray || !messageArray[0]) {
-      const twitchChannels = await this.twitchFetch.getChannels()
+      const twitchChannels = await this.twitchFetch.getChannels("CHANGE ME")
       const { game_name } = this.twitchFetch.filteredChannel(twitchChannels);
       return game_name;
     }
@@ -24,10 +23,20 @@ export class StringExtract {
     const { message } = this.messageData;
     const messageArray = message.split(" ").slice(2);
     if (!messageArray || !messageArray[0]) {
-      const twitchChannels = await this.twitchFetch.getChannels();
+      const twitchChannels = await this.twitchFetch.getChannels("CHANGE ME");
       const { title } = this.twitchFetch.filteredChannel(twitchChannels);
       return title;
     }
     return messageArray.join(" ");
   };
+}
+
+class MessageParser {
+  constructor(private messageData: MessageData) {}
+
+  getWordNum(num: number): string {
+    const { message } = this.messageData;
+    const messageArray = message.split(" ").slice(num);
+    return messageArray[0];
+  }
 }
