@@ -5,8 +5,9 @@ import {
   ILeaderboardResponse,
   IRun,
 } from "../../interfaces/speedrun";
-import { IAxiosOptions, SpeedrunCom } from "./SpeedrunCom";
+import { SpeedrunCom } from "./SpeedrunCom";
 import { fuseSearch } from "../../utility/fusejs";
+import { IAxiosOptions } from "../../interfaces/Axios";
 
 export class Leaderboard {
   constructor(private game: FullGame) {}

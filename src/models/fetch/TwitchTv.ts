@@ -1,5 +1,5 @@
 import { IStreamerResponse, ITwitchChannel } from "../../interfaces/twitch";
-import { IAPI, IAxiosOptions } from "./SpeedrunCom";
+import { IAPI, IAxiosOptions } from "../../interfaces/Axios";
 
 export class TwitchChannelApi {
   private options: IAxiosOptions = {
