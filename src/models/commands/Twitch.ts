@@ -1,6 +1,6 @@
 import { twitchAPI } from "../../config/twitchConfig";
-import { IFollowage, IFollowageResponse, ITwitchChannel } from "../../interfaces/twitch";
-import { datesDaysDifference, dateToLetters, extractMillisecondsToObject, } from "../../utility/dateFormat";
+import { IFollowage, IFollowageResponse, ITwitchChannl } from "../../interfaces/twitch";
+import { datesDaysDifference, dateToLetters, millisecondsToDistance, } from "../../utility/dateFormat";
 import { ICommand } from "../../interfaces/Command";
 import { MessageData } from "../MessageData";
 import { ChatUserstate } from "tmi.js";
@@ -8,19 +8,19 @@ import { AxiosInstance } from "axios";
 
 export class TwitchFetch {
   private api: AxiosInstance = twitchAPI;
-  constructor(public messageData: MessageData) {}
 
-  async getChannels(): Promise<ITwitchChannel[]> {
-    const { channel } = this.messageData;
+  constructor() {}
+
+  async getChannels(channel: string): Promise<ITwitchChannel[]> {
     const query = `/search/channels?query=${channel}`;
     const { data: twitchChannelList } = await this.api.get<ITwitchChannel[]>(query);
     return twitchChannelList
   };
 
-  async fetchFollowage(): Promise<IFollowage[]> {
-    const twitchChannels: ITwitchChannel[] = await this.getChannels();
+  async fetchFollowage(channel: string = "CHANGE ME", chatter: ChatUserstate): Promise<IFollowage[]> {
+    const twitchChannels: ITwitchChannel[] = await this.getChannels(channel);
     const targetChannel = this.filteredChannel(twitchChannels);
-    const follower: ChatUserstate = this.messageData.chatter
+    const follower: ChatUserstate = chatter
     const followerId = follower["user-id"];
     if (!followerId) throw new Error(`${follower.username} not found`);
     const { id } = targetChannel;
@@ -43,7 +43,7 @@ export class TwitchUptime implements ICommand {
   private twitchFetch: TwitchFetch
 
   constructor(public messageData: MessageData, twitchFetch?: TwitchFetch) {
-    this.twitchFetch = new TwitchFetch(this.messageData) || twitchFetch;
+    this.twitchFetch = twitchFetch || new TwitchFetch()
   }
 
   run = async () => {
@@ -61,12 +61,12 @@ export class TwitchUptime implements ICommand {
     const start: number = new Date(started_at).getTime();
     const today: number = new Date().getTime();
     const time_diff_milliseconds: number = today - start;
-    const dateDataObject = extractMillisecondsToObject(time_diff_milliseconds);
+    const dateDataObject = millisecondsToDistance(time_diff_milliseconds);
     return dateToLetters(dateDataObject);
   }
 
   private async getStartedAt() {
-    const twitchChannels = await this.twitchFetch.getChannels();
+    const twitchChannels = await this.twitchFetch.getChannels("CHANGE ME");
     const { started_at } = this.twitchFetch.filteredChannel(twitchChannels);
 
     return started_at;
@@ -74,12 +74,14 @@ export class TwitchUptime implements ICommand {
 }
 
 export class TwitchTitle implements ICommand {
-  private twitchFetch = new TwitchFetch(this.messageData)
+  private twitchFetch: TwitchFetch
 
-  constructor(public messageData: MessageData) {}
+  constructor(public messageData: MessageData, twitchFetch?: TwitchFetch) {
+    this.twitchFetch = twitchFetch || new TwitchFetch()
+  }
 
   run = async () => {
-    const twitchChannels = await this.twitchFetch.getChannels();
+    const twitchChannels = await this.twitchFetch.getChannels("CHANGE ME");
     const { title } = this.twitchFetch.filteredChannel(twitchChannels);
     this.messageData.response = title;
 
@@ -89,7 +91,7 @@ export class TwitchTitle implements ICommand {
 
 
 export class Followage implements ICommand {
-  private twitchFetch = new TwitchFetch(this.messageData)
+  private twitchFetch = new TwitchFetch()
 
   constructor(public messageData: MessageData) {}
 
