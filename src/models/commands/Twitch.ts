@@ -1,5 +1,5 @@
 import { twitchAPI } from "../../config/twitchConfig";
-import { IFollowage, IFollowageResponse, ITwitchChannl } from "../../interfaces/twitch";
+import { IFollowage, IFollowageResponse, ITwitchChannel } from "../../interfaces/twitch";
 import { datesDaysDifference, dateToLetters, millisecondsToDistance, } from "../../utility/dateFormat";
 import { ICommand } from "../../interfaces/Command";
 import { MessageData } from "../MessageData";
@@ -8,8 +8,6 @@ import { AxiosInstance } from "axios";
 
 export class TwitchFetch {
   private api: AxiosInstance = twitchAPI;
-
-  constructor() {}
 
   async getChannels(channel: string): Promise<ITwitchChannel[]> {
     const query = `/search/channels?query=${channel}`;
