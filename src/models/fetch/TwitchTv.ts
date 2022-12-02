@@ -1,24 +1,35 @@
-import { IStreamerResponse, ITwitchChannel } from "../../interfaces/twitch";
-import { IAPI, IAxiosOptions } from "../../interfaces/Axios";
+import { IFollowage, IFollowageResponse,  ITwitchChannel } from "../../interfaces/twitch";
+import { AxiosInstance } from "axios";
+import { twitchAPI } from "../../config/twitchConfig";
+import { ChatUserstate } from "tmi.js";
 
-export class TwitchChannelApi {
-  private options: IAxiosOptions = {
-    name: this.name,
-    type: "channel",
-    url: `/search/channels?query=${this.name}`,
-  };
+export class TwitchFetch {
+    private api: AxiosInstance = twitchAPI;
 
-  constructor(private api: IAPI<IStreamerResponse>, private name: string) {}
+    async getChannels(channel: string): Promise<ITwitchChannel[]> {
+        const query = `/search/channels?query=${channel}`;
+        const { data: twitchChannelList } = await this.api.get<ITwitchChannel[]>(query);
+        return twitchChannelList
+    };
 
-  fetch = async (): Promise<IStreamerResponse> => {
-    const { data } = await this.api.fetch(this.options);
-    return data;
-  };
+    async fetchFollowage(channel: string = "CHANGE ME", chatter: ChatUserstate): Promise<IFollowage[]> {
+        const twitchChannels: ITwitchChannel[] = await this.getChannels(channel);
+        const targetChannel = this.filteredChannel(twitchChannels);
+        const follower: ChatUserstate = chatter
+        const followerId = follower["user-id"];
+        if (!followerId) throw new Error(`${follower.username} not found`);
+        const { id } = targetChannel;
+        const query = `/users/follows?to_id=${id}&from_id=${followerId}`;
+        const { data: { data: followage }, } = await this.api.get<IFollowageResponse>(query);
 
-  get = async (): Promise<ITwitchChannel | undefined> => {
-    const channels = await this.fetch();
-    return channels.data.find((channel: ITwitchChannel) => {
-      return channel.broadcaster_login.toLowerCase() === this.name.toLowerCase();
-    });
-  };
+        return followage
+    }
+
+    filteredChannel(twitchChannel: ITwitchChannel[]): ITwitchChannel {
+        const targetChannel = twitchChannel.find((channel: ITwitchChannel) => {
+            return channel.display_name.toLowerCase() === this.messageData.channel
+        })
+        if (targetChannel === undefined) throw new Error("Error using command")
+        return targetChannel;
+    }
 }

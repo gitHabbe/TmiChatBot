@@ -1,8 +1,8 @@
 import { MessageData } from "./MessageData";
-import { TwitchFetch } from "./commands/Twitch";
 import { twitchAPI } from "../config/twitchConfig";
 import { ITwitchChannel } from "../interfaces/twitch";
 import { speedrunAPI } from "../config/speedrunConfig";
+import { TwitchFetch } from "./fetch/TwitchTv";
 
 export class StringExtract {
   private twitchFetch = new TwitchFetch();
