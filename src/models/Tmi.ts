@@ -14,11 +14,11 @@ export class Tmi {
     this.addMessageEvent()
   }
 
-  connect = () => {
-    this.client.connect().then();
+  connect(): void {
+    this.client.connect().then()
   }
 
-  private addMessageEvent = (): void => {
+  private addMessageEvent(): void {
     this.client.on("message", this.onMessage)
   }
 
