@@ -1,8 +1,9 @@
-import { TwitchTitle, TwitchUptime } from "../src/models/commands/Twitch";
+import { TwitchUptime } from "../src/models/commands/Twitch";
 import { ITwitchChannel } from "../src/interfaces/twitch";
 import { messageDataMock, offlineTwitchChannelMock, onlineTwitchChannelMock } from "./mockData";
 import { MessageData } from "../src/models/MessageData";
 import { TwitchFetch } from "../src/models/fetch/TwitchTv";
+import { TwitchTitle } from "../src/models/commands/twitch/TwitchTitle";
 
 describe("Standard commands", () => {
 
