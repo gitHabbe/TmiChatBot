@@ -12,7 +12,7 @@ export class StringExtract {
     const { message } = this.messageData;
     const messageArray = message.split(" ").slice(1);
     if (!messageArray || !messageArray[0]) {
-      const twitchChannels = await this.twitchFetch.getChannels("CHANGE ME")
+      const twitchChannels = await this.twitchFetch.channelList("CHANGE ME")
       const { game_name } = this.twitchFetch.filteredChannel(twitchChannels, this.messageData.channel);
       return game_name;
     }
@@ -23,7 +23,7 @@ export class StringExtract {
     const { message } = this.messageData;
     const messageArray = message.split(" ").slice(2);
     if (!messageArray || !messageArray[0]) {
-      const twitchChannels = await this.twitchFetch.getChannels("CHANGE ME");
+      const twitchChannels = await this.twitchFetch.channelList("CHANGE ME");
       const { title } = this.twitchFetch.filteredChannel(twitchChannels, this.messageData.channel);
       return title;
     }

@@ -1,8 +1,9 @@
-import { IFollowage } from "../../interfaces/twitch";
+import { IFollowage, ITwitchChannel } from "../../interfaces/twitch";
 import { datesDaysDifference, dateToLetters, millisecondsToDistance, } from "../../utility/dateFormat";
 import { ICommand } from "../../interfaces/Command";
 import { MessageData } from "../MessageData";
 import { TwitchFetch } from "../fetch/TwitchTv";
+import { ChatUserstate } from "tmi.js";
 
 export class TwitchUptime implements ICommand {
   private twitchFetch: TwitchFetch
@@ -31,7 +32,7 @@ export class TwitchUptime implements ICommand {
   }
 
   private async getStartedAt() {
-    const twitchChannels = await this.twitchFetch.getChannels("CHANGE ME");
+    const twitchChannels = await this.twitchFetch.channelList("CHANGE ME");
     const { started_at } = this.twitchFetch.filteredChannel(twitchChannels, this.messageData.channel);
 
     return started_at;
@@ -46,7 +47,7 @@ export class TwitchTitle implements ICommand {
   }
 
   run = async () => {
-    const twitchChannels = await this.twitchFetch.getChannels("CHANGE ME");
+    const twitchChannels = await this.twitchFetch.channelList("CHANGE ME");
     const { title } = this.twitchFetch.filteredChannel(twitchChannels, this.messageData.channel);
     this.messageData.response = title;
 
@@ -60,19 +61,30 @@ export class Followage implements ICommand {
 
   constructor(public messageData: MessageData) {}
 
-  run = async () => {
-    const user = this.messageData.chatter
-    if (!user["user-id"]) throw new Error(`${user.username} not found`);
-    const followage: IFollowage[] = await this.twitchFetch.fetchFollowage();
+  async run(): Promise<MessageData> {
+    const follower: ChatUserstate = this.messageData.chatter
+    if (!follower["user-id"]) throw new Error(`${follower.username} not found`);
+    const channelList: ITwitchChannel[] = await this.twitchFetch.channelList(this.messageData.channel)
+    const targetChannel = this.getChannel(channelList);
+    const streamerId: string = targetChannel.display_name;
+    const followerId: string = follower["user-id"];
+    const followage: IFollowage[] = await this.twitchFetch.followage(streamerId, followerId);
     if (followage.length === 0) {
-      this.messageData.response = `${user.username} is not following ${this.messageData.channel}`;
+      this.messageData.response = `${follower.username} is not following ${this.messageData.channel}`;
       return this.messageData
     }
     const days_ago: number = datesDaysDifference(followage[0].followed_at);
-    console.log("day_difference:", days_ago);
-    this.messageData.response = `${user.username} followage: ${days_ago} days`;
+    this.messageData.response = `${follower.username} followage: ${days_ago} days`;
 
     return this.messageData
 
+  }
+
+  private getChannel(channelList: ITwitchChannel[]) {
+    const targetChannel = channelList.find((channel: ITwitchChannel) => {
+      return channel.display_name.toLowerCase() === this.messageData.channel.toLowerCase()
+    })
+    if (targetChannel === undefined) throw new Error("Error using command")
+    return targetChannel;
   }
 }
