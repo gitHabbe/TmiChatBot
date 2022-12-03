@@ -32,7 +32,7 @@ export class TwitchUptime implements ICommand {
 
   private async getStartedAt() {
     const twitchChannels = await this.twitchFetch.getChannels("CHANGE ME");
-    const { started_at } = this.twitchFetch.filteredChannel(twitchChannels);
+    const { started_at } = this.twitchFetch.filteredChannel(twitchChannels, this.messageData.channel);
 
     return started_at;
   }
@@ -47,7 +47,7 @@ export class TwitchTitle implements ICommand {
 
   run = async () => {
     const twitchChannels = await this.twitchFetch.getChannels("CHANGE ME");
-    const { title } = this.twitchFetch.filteredChannel(twitchChannels);
+    const { title } = this.twitchFetch.filteredChannel(twitchChannels, this.messageData.channel);
     this.messageData.response = title;
 
     return this.messageData;
