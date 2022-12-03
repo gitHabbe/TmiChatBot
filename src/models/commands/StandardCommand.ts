@@ -1,6 +1,5 @@
 import { CommandName } from "../../interfaces/tmi";
 import { Client } from "tmi.js";
-import { TwitchUptime } from "./Twitch";
 import { ICommand } from "../../interfaces/Command";
 import { MessageData } from "../MessageData";
 import { IndividualWorldRecord, WorldRecord } from "./Speedrun";
@@ -9,6 +8,7 @@ import { JoinedUser } from "../../interfaces/prisma";
 import { Component } from "@prisma/client";
 import { Followage } from "./twitch/Followage";
 import { TwitchTitle } from "./twitch/TwitchTitle";
+import { TwitchUptime } from "./twitch/TwitchUptime";
 
 export class StandardCommand implements ICommand {
   private commandMap = new Map<string, ICommand>();
