@@ -14,11 +14,11 @@ export class TwitchFetch {
 
     async fetchFollowage(channel: string = "CHANGE ME", chatter: ChatUserstate): Promise<IFollowage[]> {
         const twitchChannels: ITwitchChannel[] = await this.getChannels(channel);
-        const targetChannel = this.filteredChannel(twitchChannels, channel);
+        const targetChannel: ITwitchChannel = this.filteredChannel(twitchChannels, channel);
         const follower: ChatUserstate = chatter
-        const followerId = follower["user-id"];
+        const followerId: string | undefined = follower["user-id"];
         if (!followerId) throw new Error(`${follower.username} not found`);
-        const { id } = targetChannel;
+        const { id }: ITwitchChannel = targetChannel;
         const query = `/users/follows?to_id=${id}&from_id=${followerId}`;
         const { data: { data: followage }, } = await this.api.get<IFollowageResponse>(query);
         return followage
