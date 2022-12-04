@@ -9,7 +9,7 @@ export class TwitchTitle implements ICommand {
         this.twitchFetch = twitchFetch || new TwitchFetch()
     }
 
-    run = async () => {
+    async run(): Promise<MessageData> {
         const twitchChannels = await this.twitchFetch.channelList("CHANGE ME");
         const { title } = this.twitchFetch.filteredChannel(twitchChannels, this.messageData.channel);
         this.messageData.response = title;

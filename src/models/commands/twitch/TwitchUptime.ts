@@ -10,7 +10,7 @@ export class TwitchUptime implements ICommand {
         this.twitchFetch = twitchFetch || new TwitchFetch()
     }
 
-    run = async () => {
+    async run(): Promise<MessageData> {
         const { channel } = this.messageData;
         const started_at = await this.getStartedAt();
         if (!started_at) {
