@@ -2,6 +2,17 @@ import { ICommand } from "../../../interfaces/Command";
 import { TwitchFetch } from "../../fetch/TwitchTv";
 import { MessageData } from "../../MessageData";
 import { dateToLetters, millisecondsToDistance } from "../../../utility/dateFormat";
+import { ITwitchChannel } from "../../../interfaces/twitch";
+
+export class FilterTwitchChannel {
+    channel(twitchChannels: ITwitchChannel[], targetChannel: string) {
+        const filteredChannel = twitchChannels.find((twitchChannel: ITwitchChannel) => {
+            return twitchChannel.display_name.toLowerCase() === targetChannel.toLowerCase()
+        })
+        if (filteredChannel === undefined) throw new Error("Error using command")
+        return filteredChannel;
+    }
+}
 
 export class TwitchUptime implements ICommand {
     private twitchFetch: TwitchFetch
@@ -30,9 +41,10 @@ export class TwitchUptime implements ICommand {
     }
 
     private async getStartedAt() {
-        const twitchChannels = await this.twitchFetch.channelList("CHANGE ME");
-        const { started_at } = this.twitchFetch.filteredChannel(twitchChannels, this.messageData.channel);
-
-        return started_at;
+        const { channel } = this.messageData;
+        const twitchChannelList: ITwitchChannel[] = await this.twitchFetch.channelList(channel);
+        const filterTwitchChannel = new FilterTwitchChannel();
+        const singleChannel = filterTwitchChannel.channel(twitchChannelList, channel);
+        return singleChannel.started_at;
     }
 }
