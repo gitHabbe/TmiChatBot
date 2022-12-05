@@ -3,16 +3,7 @@ import { TwitchFetch } from "../../fetch/TwitchTv";
 import { MessageData } from "../../MessageData";
 import { dateToLetters, millisecondsToDistance } from "../../../utility/dateFormat";
 import { ITwitchChannel } from "../../../interfaces/twitch";
-
-export class FilterTwitchChannel {
-    channel(twitchChannels: ITwitchChannel[], targetChannel: string) {
-        const filteredChannel = twitchChannels.find((twitchChannel: ITwitchChannel) => {
-            return twitchChannel.display_name.toLowerCase() === targetChannel.toLowerCase()
-        })
-        if (filteredChannel === undefined) throw new Error("Error using command")
-        return filteredChannel;
-    }
-}
+import { FilterTwitchChannel } from "./FilterTwitchChannel";
 
 export class TwitchUptime implements ICommand {
     private twitchFetch: TwitchFetch

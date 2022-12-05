@@ -2,7 +2,7 @@ import { ICommand } from "../../../interfaces/Command";
 import { TwitchFetch } from "../../fetch/TwitchTv";
 import { MessageData } from "../../MessageData";
 import { ITwitchChannel } from "../../../interfaces/twitch";
-import { FilterTwitchChannel } from "./TwitchUptime";
+import { FilterTwitchChannel } from "./FilterTwitchChannel";
 
 export class TwitchTitle implements ICommand {
     private twitchFetch: TwitchFetch

@@ -4,7 +4,7 @@ import { MessageData } from "../../MessageData";
 import { ChatUserstate } from "tmi.js";
 import { IFollowage, ITwitchChannel } from "../../../interfaces/twitch";
 import { datesDaysDifference } from "../../../utility/dateFormat";
-import { FilterTwitchChannel } from "./TwitchUptime";
+import { FilterTwitchChannel } from "./FilterTwitchChannel";
 
 export class Followage implements ICommand {
     private twitchFetch = new TwitchFetch()
