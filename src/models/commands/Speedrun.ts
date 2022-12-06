@@ -27,7 +27,7 @@ import { ParseMessage } from "../../utility/ParseMessage";
 export class WorldRecord implements ICommand {
     constructor(public messageData: MessageData) {}
 
-    run = async () => {
+    async run(): Promise<MessageData> {
         const stringExtract = new StringExtract(this.messageData);
         const gameName: string = await stringExtract.game();
         const game = await this.getGame(gameName);
@@ -54,7 +54,7 @@ export class WorldRecord implements ICommand {
 export class IndividualWorldRecord implements ICommand {
     constructor(public messageData: MessageData) {}
 
-    run = async () => {
+    async run(): Promise<MessageData> {
         const stringExtract = new StringExtract(this.messageData);
         const game: string = await stringExtract.game();
         switch (game.toUpperCase()) {
@@ -70,7 +70,7 @@ export class IndividualWorldRecordDiddyKongRacing extends ParseMessage implement
 
     constructor(public messageData: MessageData) {super(messageData);}
 
-    run = async () => {
+    async run(): Promise<MessageData> {
         const { query, dkrLevels } = this.parseMessage();
         const [ { item } ] = fuseSearch<ITrack>(dkrLevels, query.join(" "));
         const apiLeaderboard = new Api<ILeaderboardResponse>(speedrunAPI);
