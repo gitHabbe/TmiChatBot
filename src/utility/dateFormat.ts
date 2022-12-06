@@ -1,4 +1,4 @@
-interface ILetterFormattedDate {
+export interface ILetterFormattedDate {
   dayDistance: number;
   hourDistance: number;
   minuteDistance: number;

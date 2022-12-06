@@ -1,7 +1,7 @@
 import { ICommand } from "../../../interfaces/Command";
 import { TwitchFetch } from "../../fetch/TwitchTv";
 import { MessageData } from "../../MessageData";
-import { dateToLetters, millisecondsToDistance } from "../../../utility/dateFormat";
+import { dateToLetters, ILetterFormattedDate, millisecondsToDistance } from "../../../utility/dateFormat";
 import { ITwitchChannel } from "../../../interfaces/twitch";
 import { FilterTwitchChannel } from "./FilterTwitchChannel";
 
@@ -19,19 +19,19 @@ export class TwitchUptime implements ICommand {
             this.messageData.response = `${channel} not online`;
             return this.messageData
         }
-        this.messageData.response = this.formatResponse(started_at)
+        this.messageData.response = TwitchUptime.formatResponse(started_at)
         return this.messageData;
     };
 
-    private formatResponse(started_at: string) {
+    private static formatResponse(started_at: string): string {
         const start: number = new Date(started_at).getTime();
         const today: number = new Date().getTime();
         const time_diff_milliseconds: number = today - start;
-        const dateDataObject = millisecondsToDistance(time_diff_milliseconds);
+        const dateDataObject: ILetterFormattedDate = millisecondsToDistance(time_diff_milliseconds);
         return dateToLetters(dateDataObject);
     }
 
-    private async getStartedAt() {
+    private async getStartedAt(): Promise<string> {
         const { channel } = this.messageData;
         const twitchChannelList: ITwitchChannel[] = await this.twitchFetch.channelList(channel);
         const filterTwitchChannel = new FilterTwitchChannel();
