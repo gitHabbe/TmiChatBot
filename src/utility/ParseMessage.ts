@@ -5,20 +5,16 @@ import { MessageData } from "../models/MessageData";
 export class ParseMessage {
   private levels: ITrack[] = new JsonLevels().data();
 
+  constructor(public messageData: MessageData) {}
+
   parseMessage = () => {
     const { message } = this.messageData;
-    console.log("message:", message)
-    const vehicles = [ "car", "hover", "plane" ];
-
+    const supportedVehicles = [ "car", "hover", "plane" ];
     let query = message.split(" ").slice(2);
-    const specifiedVehicle = query.find((word: string) => {
-      return vehicles.includes(word);
-    });
+    const specifiedVehicle = query.find((word: string) => supportedVehicles.includes(word));
+
     if (specifiedVehicle) {
-      query = query.filter((word: string) => word !== specifiedVehicle);
-      this.levels = this.levels.filter((track: ITrack) => {
-        return track.vehicle === specifiedVehicle;
-      });
+      query = this.filterVehicle(query, specifiedVehicle);
     } else {
       this.levels = this.levels.filter((track: ITrack) => {
         return track.default;
@@ -35,6 +31,11 @@ export class ParseMessage {
     return { query, dkrLevels: this.levels };
   };
 
-  constructor(public messageData: MessageData) {
+  private filterVehicle(query: string[], specifiedVehicle: string) {
+    query = query.filter((word: string) => word !== specifiedVehicle);
+    this.levels = this.levels.filter((track: ITrack) => {
+      return track.vehicle === specifiedVehicle;
+    });
+    return query;
   }
 }
