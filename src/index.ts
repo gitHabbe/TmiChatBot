@@ -1,4 +1,4 @@
-import { Tmi } from "./models/Tmi";
+import { TmiChatBot } from "./models/TmiChatBot";
 
-const tmi = new Tmi();
-tmi.connect()
+const tmiChatBot = new TmiChatBot();
+tmiChatBot.connect()

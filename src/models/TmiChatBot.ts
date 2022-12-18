@@ -9,7 +9,7 @@ import { UserModel } from "./database/UserPrisma";
 import { JoinedUser } from "../interfaces/prisma";
 import channels from "../private/tmi_channels.json";
 
-export class Tmi {
+export class TmiChatBot {
   constructor(public client: Client = new Client(tmiOptions)) {
     this.addMessageEvent()
   }
