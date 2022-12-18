@@ -9,14 +9,26 @@ import { Component } from "@prisma/client";
 import { TwitchTitle } from "./twitch/TwitchTitle";
 import { TwitchUptime } from "./twitch/TwitchUptime";
 
-export class StandardCommandList {
+export interface CommandList {
+  get(commandName: string): ICommand;
+}
+
+export class StandardCommandList implements CommandList {
   private commandMap = new Map<string, ICommand>();
 
-  constructor(public messageData: MessageData, private tmiClient: Client) {
-    this.buildCommands()
+  constructor(public messageData: MessageData) {
+    this.buildCommandMap()
   }
 
-  private buildCommands(): void {
+  get(commandName: string): ICommand {
+    if (!this.commandMap.has(commandName)) {
+      console.log("Command not found")
+    }
+    // @ts-ignore, weird behaviour
+    return this.commandMap.get(commandName).run();
+  }
+
+  private buildCommandMap(): void {
     this.commandMap.set(CommandName.UPTIME, new TwitchUptime(this.messageData))
     this.commandMap.set(CommandName.TITLE, new TwitchTitle(this.messageData))
     this.commandMap.set(CommandName.WR, new WorldRecord(this.messageData))
@@ -39,19 +51,5 @@ export class StandardCommandList {
     // this.commandMap.set(CommandName.TTPB, new TimeTrialPersonalBest(this.messageData))
     // this.commandMap.set(ComponentsSupport.POKEMON, new Pokemon(this.messageData))
     // this.commandMap.set(ComponentsSupport.SLOTS, new Slots(this.messageData))
-  }
-
-  run(commandName: string): ICommand {
-    if (!this.commandMap.has(commandName)) {
-      console.log("Command not found")
-    }
-    // @ts-ignore, weird behaviour
-    return this.commandMap.get(commandName).run();
-  }
-
-  private async isComponentEnabled(channel: string, commandName: string): Promise<Component | undefined> {
-    const userModel = new UserModel(channel);
-    const joinedUser: JoinedUser = await userModel.get();
-    return userModel.isComponentEnabled(commandName, joinedUser.components);
   }
 }
