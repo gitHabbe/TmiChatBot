@@ -41,4 +41,3 @@ describe("Social media module", () => {
         .mockImplementation(async () => tweetMockData);
   }
 })
-
