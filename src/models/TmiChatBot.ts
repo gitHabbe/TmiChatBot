@@ -23,8 +23,8 @@ class ClientSingleton {
     private static instance: ClientSingleton;
     public client = new Client(tmiOptions)
 
-    getInstance(): ClientSingleton {
-        if (ClientSingleton.instance) {
+    static getInstance(): ClientSingleton {
+        if (!ClientSingleton.instance) {
             ClientSingleton.instance = new ClientSingleton();
         }
         return ClientSingleton.instance
