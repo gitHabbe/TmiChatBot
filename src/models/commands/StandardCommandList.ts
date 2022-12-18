@@ -41,15 +41,7 @@ export class StandardCommandList {
     // this.commandMap.set(ComponentsSupport.SLOTS, new Slots(this.messageData))
   }
 
-  private getCommandName = (): string => {
-    const { message } = this.messageData;
-    const chatterCommand: string = message.split(" ")[0];
-
-    return chatterCommand.slice(1).toUpperCase();
-  };
-
-  run(): ICommand {
-    const commandName = this.getCommandName();
+  run(commandName: string): ICommand {
     if (!this.commandMap.has(commandName)) {
       console.log("Command not found")
     }
