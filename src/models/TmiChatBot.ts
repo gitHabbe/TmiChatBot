@@ -19,8 +19,27 @@ class MessageParser {
         return chatterCommand.slice(1).toUpperCase();
     };
 }
+class ClientSingleton {
+    private static instance: ClientSingleton;
+    public client = new Client(tmiOptions)
+
+    getInstance(): ClientSingleton {
+        if (ClientSingleton.instance) {
+            ClientSingleton.instance = new ClientSingleton();
+        }
+        return ClientSingleton.instance
+    }
+
+    get(): Client {
+        return this.client
+    }
+}
+
 export class TmiChatBot {
-  constructor(public client: Client = new Client(tmiOptions)) {
+  private chatEvent = new ChatEvent();
+  private client = new ClientSingleton().getInstance().get();
+
+  constructor() {
     this.addMessageEvent()
   }
 
