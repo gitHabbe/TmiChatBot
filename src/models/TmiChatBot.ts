@@ -2,7 +2,7 @@ import { ChatUserstate, Client } from "tmi.js";
 import { tmiOptions } from "../config/tmiConfig";
 import { OnMessage } from "../interfaces/tmi";
 import { MessageData } from "./MessageData";
-import { StandardCommand } from "./commands/StandardCommand";
+import { StandardCommandList } from "./commands/StandardCommandList";
 import { CustomCommand } from "./commands/CustomCommand";
 import { LinkCommand } from "./commands/LinkCommand";
 import { UserModel } from "./database/UserPrisma";

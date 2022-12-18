@@ -9,7 +9,7 @@ import { Component } from "@prisma/client";
 import { TwitchTitle } from "./twitch/TwitchTitle";
 import { TwitchUptime } from "./twitch/TwitchUptime";
 
-export class StandardCommand {
+export class StandardCommandList {
   private commandMap = new Map<string, ICommand>();
 
   constructor(public messageData: MessageData, private tmiClient: Client) {
