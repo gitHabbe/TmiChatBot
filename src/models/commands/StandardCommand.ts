@@ -6,11 +6,10 @@ import { IndividualWorldRecord, WorldRecord } from "./Speedrun";
 import { UserModel } from "../database/UserPrisma";
 import { JoinedUser } from "../../interfaces/prisma";
 import { Component } from "@prisma/client";
-import { Followage } from "./twitch/Followage";
 import { TwitchTitle } from "./twitch/TwitchTitle";
 import { TwitchUptime } from "./twitch/TwitchUptime";
 
-export class StandardCommand implements ICommand {
+export class StandardCommand {
   private commandMap = new Map<string, ICommand>();
 
   constructor(public messageData: MessageData, private tmiClient: Client) {
@@ -21,7 +20,7 @@ export class StandardCommand implements ICommand {
     this.commandMap.set(CommandName.UPTIME, new TwitchUptime(this.messageData))
     this.commandMap.set(CommandName.TITLE, new TwitchTitle(this.messageData))
     this.commandMap.set(CommandName.WR, new WorldRecord(this.messageData))
-    // this.commandMap.set(CommandName.ILWR, new IndividualWorldRecord(this.messageData))
+    this.commandMap.set(CommandName.ILWR, new IndividualWorldRecord(this.messageData))
     // this.commandMap.set(CommandName.PB, new PersonalBest(this.messageData))
     // this.commandMap.set(CommandName.ILPB, new IndividualPersonalBest(this.messageData))
     // this.commandMap.set(CommandName.FOLLOWAGE, new Followage(this.messageData))
@@ -49,25 +48,18 @@ export class StandardCommand implements ICommand {
     return chatterCommand.slice(1).toUpperCase();
   };
 
-  run: () => Promise<MessageData> = async () => {
+  run(): ICommand {
     const commandName = this.getCommandName();
-    if (this.commandMap.has(commandName)) {
-      let { channel } = this.messageData;
-      const userModel = new UserModel(channel);
-      const joinedUser: JoinedUser = await userModel.get();
-      const isComponentEnabled = userModel.isComponentEnabled(commandName, joinedUser.components);
-      const components: Component[] = joinedUser.components;
-      const isEnabledComponent = components.find((component) => {
-        const componentName = component.name.toLowerCase();
-        const targetCommand = commandName.toLowerCase();
-        return componentName === targetCommand;
-      });
-      if (isEnabledComponent) {
-        // @ts-ignore
-        this.messageData = this.commandMap.get(commandName).run();
-        return this.messageData
-      }
+    if (!this.commandMap.has(commandName)) {
+      console.log("Command not found")
     }
-    return this.messageData
+    // @ts-ignore, weird behaviour
+    return this.commandMap.get(commandName).run();
+  }
+
+  private async isComponentEnabled(channel: string, commandName: string): Promise<Component | undefined> {
+    const userModel = new UserModel(channel);
+    const joinedUser: JoinedUser = await userModel.get();
+    return userModel.isComponentEnabled(commandName, joinedUser.components);
   }
 }
