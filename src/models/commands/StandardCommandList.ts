@@ -16,7 +16,7 @@ export class StandardCommandList {
     this.buildCommands()
   }
 
-  private buildCommands = () => {
+  private buildCommands(): void {
     this.commandMap.set(CommandName.UPTIME, new TwitchUptime(this.messageData))
     this.commandMap.set(CommandName.TITLE, new TwitchTitle(this.messageData))
     this.commandMap.set(CommandName.WR, new WorldRecord(this.messageData))
