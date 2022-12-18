@@ -9,9 +9,4 @@ export class MessageData {
         this.channel = channel.slice(1);
         this.targetChannel = channel;
     }
-
-    getCommandName(): string {
-        const chatterCommand: string = this.message.split(" ")[0];
-        return chatterCommand.slice(1).toUpperCase();
-    };
 }

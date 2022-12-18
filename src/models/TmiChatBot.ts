@@ -8,7 +8,17 @@ import { LinkCommand } from "./commands/LinkCommand";
 import { UserModel } from "./database/UserPrisma";
 import { JoinedUser } from "../interfaces/prisma";
 import channels from "../private/tmi_channels.json";
+import { CommandName } from "../interfaces/tmi";
 
+
+class MessageParser {
+    constructor(private message: string) {}
+
+    getCommandName(): string {
+        const chatterCommand: string = this.message.split(" ")[0];
+        return chatterCommand.slice(1).toUpperCase();
+    };
+}
 export class TmiChatBot {
   constructor(public client: Client = new Client(tmiOptions)) {
     this.addMessageEvent()
