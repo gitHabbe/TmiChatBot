@@ -1,70 +1,15 @@
 import { Runner } from ".prisma/client";
 import { dkr64API, speedrunAPI } from "../../config/speedrunConfig";
-import { FullGame } from "../../interfaces/prisma";
 import { ITimeTrialJson, ITimeTrialResponse, ITrack } from "../../interfaces/specificGames";
-import { ILeaderboardResponse, InduvidualLevelSupport, IRun, TimeTrialSupport, } from "../../interfaces/speedrun";
+import { ILeaderboardResponse, } from "../../interfaces/speedrun";
 import { datesDaysDifference, floatToHHMMSS } from "../../utility/dateFormat";
 import { fuseSearch } from "../../utility/fusejs";
-import { GameModel } from "../database/GamePrisma";
 import { RunnerPrisma } from "../database/RunnerPrisma";
-import { Leaderboard } from "../fetch/Leaderboard";
-import {
-    Api,
-    LeaderboardApi,
-    TimeTrialPersonalBestApi,
-    TimeTrialWorldRecordApi,
-    WorldRecordApi
-} from "../fetch/SpeedrunCom";
+import { Api, TimeTrialPersonalBestApi, TimeTrialWorldRecordApi, WorldRecordApi } from "../fetch/SpeedrunCom";
 import { JsonTimeTrials } from "../JsonArrayFile";
-import { StringExtract } from "../StringExtract";
 import { ICommand } from "../../interfaces/Command";
-import { UserModel } from "../database/UserPrisma";
-import { SettingPrisma } from "../database/SettingPrisma";
-import { formatWorldRecord } from "../../utility/math";
 import { MessageData } from "../MessageData";
 import { ParseMessage } from "../../utility/ParseMessage";
-
-export class WorldRecord implements ICommand {
-    constructor(public messageData: MessageData) {}
-
-    async run(): Promise<MessageData> {
-        const stringExtract = new StringExtract(this.messageData);
-        const gameName: string = await stringExtract.game();
-        const game = await this.getGame(gameName);
-        const query: string = await stringExtract.category();
-        if (!game) {
-            this.messageData.response = `Game ${gameName} not found on SpeedrunDotCom`;
-            return this.messageData;
-        }
-        const leaderboard = new Leaderboard(game);
-        const fuzzyCategory = leaderboard.fuzzyCategory(query);
-        const [ { item: category } ] = fuzzyCategory;
-        const worldRecord: IRun = await leaderboard.fetchWorldRecord(category);
-        this.messageData.response = await formatWorldRecord(worldRecord, category.name);
-
-        return this.messageData;
-    };
-
-    private async getGame(gameName: string): Promise<FullGame | null> {
-        const gameModel = new GameModel(gameName);
-        return await gameModel.pull();
-    }
-}
-
-export class IndividualWorldRecord implements ICommand {
-    constructor(public messageData: MessageData) {}
-
-    async run(): Promise<MessageData> {
-        const stringExtract = new StringExtract(this.messageData);
-        const game: string = await stringExtract.game();
-        switch (game.toUpperCase()) {
-            case InduvidualLevelSupport.DKR:
-                return new IndividualWorldRecordDiddyKongRacing(this.messageData).run();
-            default:
-                throw Error(`${game} doesn't support !ilwr`);
-        }
-    };
-}
 
 export class IndividualWorldRecordDiddyKongRacing extends ParseMessage implements ICommand {
 
@@ -88,153 +33,6 @@ export class IndividualWorldRecordDiddyKongRacing extends ParseMessage implement
 
         return this.messageData;
     };
-}
-
-export class PersonalBest implements ICommand {
-    constructor(public messageData: MessageData) {}
-
-    run = async () => {
-        const messageArray = this.messageData.message.split(" ");
-        const runnerName = messageArray.splice(1, 1).join();
-        this.messageData.message = messageArray.join(" ");
-        const stringExtract = new StringExtract(this.messageData);
-        const gameName: string = await stringExtract.game();
-        const gameModel = new GameModel(gameName);
-        const game: FullGame | null = await gameModel.pull();
-        const query: string = await stringExtract.category();
-        if (!game) {
-            this.messageData.response = `Game ${gameName} not found`;
-            return this.messageData
-        }
-        const runnerModel = new RunnerPrisma();
-        const runner = await runnerModel.get(runnerName);
-        if (!runner) {
-            this.messageData.response = `Runner ${runnerName} not found`;
-            return this.messageData
-        }
-        const leaderboard = new Leaderboard(game);
-        const fuzzyCategory = leaderboard.fuzzyCategory(query);
-        const [ { item: category } ] = fuzzyCategory;
-        const personalBest: IRun = await leaderboard.fetchPersonalBest(
-            category,
-            runner.id
-        );
-        const worldRecordDate: string = personalBest.run.date;
-        const worldRecordNumber: number = personalBest.run.times.primary_t;
-        const personalBestTime: string = floatToHHMMSS(worldRecordNumber);
-        const daysAgo: number = datesDaysDifference(worldRecordDate);
-        this.messageData.response = `${runner.name} ${category.name} PB: ${personalBestTime} - #${personalBest.place} - ${daysAgo} days ago`;
-
-        return this.messageData;
-    };
-}
-
-export class IndividualPersonalBest implements ICommand {
-    constructor(public messageData: MessageData) {}
-
-    run = async () => {
-        const stringExtract = new StringExtract(this.messageData);
-        const game: string = await stringExtract.game();
-        switch (game.toUpperCase()) {
-            case InduvidualLevelSupport.DKR:
-                return new IndividualPersonalBestDiddyKongRacing(this.messageData).run();
-            default:
-                throw Error(`${game} doesn't support !ilpb`);
-        }
-    };
-}
-
-export class IndividualPersonalBestDiddyKongRacing extends ParseMessage implements ICommand {
-
-    constructor(messageData: MessageData) { super(messageData); }
-
-    run = async () => {
-        const { query, dkrLevels } = this.parseMessage();
-        // console.log(query, dkrLevels)
-        const [ { item } ] = fuseSearch<ITrack>(dkrLevels, query.join(" "));
-        const apiLeaderboard = new Api<ILeaderboardResponse>(speedrunAPI);
-        const leaderboardApi = new LeaderboardApi(apiLeaderboard, item);
-        const { data: leaderboard } = await leaderboardApi.fetch();
-        const { name, vehicle } = item;
-        const messageArray = this.messageData.message.split(" ");
-        const runnerName = messageArray.splice(1, 1).join();
-        const runnerModel = new RunnerPrisma();
-        const runner = await runnerModel.get(runnerName);
-        console.log(runner)
-        if (!runner) {
-            this.messageData.response = `Runner ${runnerName} not found`;
-            return this.messageData;
-        }
-        const run = leaderboard.runs.find(run => {
-            return run.run.players[0].id === runner.id
-        });
-        if (!run) {
-            this.messageData.response = `Runner ${runner.name} has no pb for that track`;
-            return this.messageData;
-        }
-        console.log(run);
-        const personalBest: number = run.run.times.primary_t;
-        const personalBestTime: string = floatToHHMMSS(personalBest);
-        const personalBestDate: string = run.run.date;
-        const daysAgo: number = datesDaysDifference(personalBestDate);
-        this.messageData.response = `${runner.name} ${name} ${vehicle} PB: ${personalBestTime} - ${daysAgo} days ago`;
-
-        return this.messageData;
-    }
-}
-
-export class SetSpeedrunner implements ICommand {
-    constructor(public messageData: MessageData) { }
-
-    private getUser = async (channel: string) => {
-        const userPrisma = new UserModel(channel);
-        const user = await userPrisma.get();
-        if (!user) throw new Error(`User not found`);
-        return user;
-    }
-
-    run = async () => {
-        const { channel, message } = this.messageData;
-        const newUsername: string | undefined = message.split(" ")[1];
-        const user = await this.getUser(channel);
-        const setting = new SettingPrisma(user);
-        const settingType = "SpeedrunName";
-        const isSetting = await setting.find(settingType);
-        let newSetting;
-        if (isSetting) {
-            if (newUsername === undefined) {
-                newSetting = await setting.delete(isSetting.id);
-                this.messageData.response = `SpeedrunDotCom username restored to: ${channel}`;
-                return this.messageData;
-            }
-            newSetting = await setting.update(isSetting.id, settingType, newUsername);
-        } else {
-            if (newUsername === undefined) {
-                this.messageData.response = `No name specified.`;
-                return this.messageData;
-            }
-            newSetting = await setting.add(settingType, newUsername)
-        }
-        this.messageData.response = `SpeedrunDotCom username set to: ${newSetting.value}`;
-
-        return this.messageData;
-    }
-}
-
-export class TimeTrialWorldRecord implements ICommand {
-    constructor(public messageData: MessageData) {
-    }
-
-    run = async () => {
-        const stringExtract = new StringExtract(this.messageData);
-        const gameName: string = await stringExtract.game();
-        switch (gameName.toUpperCase()) {
-            case TimeTrialSupport.DKR:
-                return new TimeTrialWorldRecordDiddyKongRacing(this.messageData).run();
-            default:
-                throw Error(`${gameName} doesn't support !ttwr`);
-        }
-    }
 }
 
 
@@ -307,26 +105,6 @@ export class TimeTrialWorldRecordDiddyKongRacing implements ICommand {
         this.messageData.response = `${track} [${formalVehicle}][${laps}-lap]${shortcutPrint} WR: ${time} by ${runner} - ${daysAgo} days ago`;
 
         return this.messageData;
-    }
-}
-
-export class TimeTrialPersonalBest implements ICommand {
-    constructor(public messageData: MessageData) {}
-
-    run = async () => {
-        console.log("messageData:", this.messageData)
-        const targetUser = this.messageData.message.split(" ")[1]
-        let message = this.messageData.message.split(" ")
-        message.splice(1, 1)
-        this.messageData.message = message.join(" ")
-        const stringExtract = new StringExtract(this.messageData);
-        const gameName: string = await stringExtract.game();
-        switch (gameName.toUpperCase()) {
-            case TimeTrialSupport.DKR:
-                return new TimeTrialPersonalBestDiddyKongRacing(this.messageData, targetUser).run();
-            default:
-                throw Error(`${gameName} doesn't support !ttpb`);
-        }
     }
 }
 
