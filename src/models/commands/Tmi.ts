@@ -436,7 +436,8 @@ export class UserJoin implements ICommand {
         if (newPrismaUser) {
             const jsonUser = new JsonStringArray();
             jsonUser.add(newPrismaUser.name);
-            await this.tmiClient.join(newPrismaUser.name)
+            const client = ClientSingleton.getInstance().get();
+            await client.join(newPrismaUser.name)
         }
         this.messageData.response = `I have joined channel: ${newPrismaUser.name}`;
 
