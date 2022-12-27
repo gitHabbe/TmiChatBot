@@ -18,8 +18,8 @@ export class Trust implements ICommand {
     }
 
     private addTrust = async (user: any, newTrust: string, chatter: ChatUserstate) => {
-        const trust = new TrustModel(user);
-        const addTrust = await trust.add(newTrust, chatter);
+        const trust = new TrustModel(user, chatter);
+        const addTrust = await trust.save(newTrust);
         return addTrust;
     }
 
@@ -37,7 +37,8 @@ export class Trust implements ICommand {
         if (!newTrust) throw new Error("No user specified");
         const user = await this.getUser(channel);
         const addTrust = await this.addTrust(user, newTrust, chatter);
-        return `${addTrust.name} added to trust-list`;
+        this.messageData.response = `${addTrust.name} added to trust-list`;
+        return this.messageData;
     }
 }
 
@@ -58,8 +59,8 @@ export class NewTrust implements ICommand {
         const newTrust = message.split(" ")[1];
         if (!newTrust) throw new Error("No user specified");
         const user = await this.getUser(channel);
-        const trust = new TrustPrisma(user);
-        const addTrust = await trust.addTrust(user, newTrust, chatter);
+        const trust = new TrustModel(user, chatter);
+        const addTrust = await trust.save(chatter.username);
         this.messageData.response = `${addTrust.name} added to trust-list`;
 
         return this.messageData;
@@ -83,9 +84,9 @@ export class UnTrust implements ICommand {
         const deleteTrust = message.split(" ")[1];
         if (!deleteTrust) throw new Error("No user specified");
         const user = await this.getUser(channel);
-        const trust = new TrustPrisma(user);
-        const removeTrust = await trust.remove(deleteTrust, chatter);
-        this.messageData.response = `${removeTrust.name} removed from trust-list`;
+        const trust = new TrustModel(user, chatter);
+        const removeTrust = await trust.delete(chatter.username);
+        this.messageData.response = `${removeTrust} removed from trust-list`;
 
         return this.messageData;
     }
