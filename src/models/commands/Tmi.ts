@@ -12,6 +12,8 @@ import { randomInt } from "../../utility/math";
 import { JsonStringArray } from "../JsonArrayFile";
 import { twitchAPI } from "../../config/twitchConfig";
 import { MessageData } from "../MessageData";
+import { DatabaseSingleton } from "../database/Prisma";
+import { ClientSingleton } from "../TmiChatBot";
 
 export class Trust implements ICommand {
     constructor(public messageData: MessageData) {
@@ -415,17 +417,18 @@ export class Slots implements ICommand {
 }
 
 export class UserJoin implements ICommand {
-    constructor(public messageData: MessageData, private tmiClient: Client) {
-    }
+    constructor(public messageData: MessageData) {}
 
-    run = async () => {
+    async run() {
         const { channel,  chatter } = this.messageData;
         const botName = process.env.TWITCH_USERNAME;
         if (channel !== botName) {
-            throw new Error(`!join only works in ${botName}'s channel`);
+            this.messageData.response = `!join only works in ${botName}'s channel`
+            return this.messageData
         }
         if (!chatter.username) {
-            throw new Error("User not found");
+            this.messageData.response = "User not found";
+            return this.messageData
         }
         const user = new UserModel(chatter.username);
         const newPrismaUser = await user.save();
