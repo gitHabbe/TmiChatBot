@@ -1,6 +1,5 @@
 import { ParseMessage } from "../../../utility/ParseMessage";
 import { ICommand } from "../../../interfaces/Command";
-import { MessageData } from "../../MessageData";
 import { fuseSearch } from "../../../utility/fusejs";
 import { ITrack } from "../../../interfaces/specificGames";
 import { Api, LeaderboardApi } from "../../fetch/SpeedrunCom";
@@ -8,6 +7,7 @@ import { ILeaderboardResponse } from "../../../interfaces/speedrun";
 import { speedrunAPI } from "../../../config/speedrunConfig";
 import { RunnerPrisma } from "../../database/RunnerPrisma";
 import { datesDaysDifference, floatToHHMMSS } from "../../../utility/dateFormat";
+import { MessageData } from "../../tmi/MessageData";
 
 export class IndividualPersonalBestDiddyKongRacing extends ParseMessage implements ICommand {
 

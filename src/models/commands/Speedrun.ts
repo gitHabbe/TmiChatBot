@@ -8,8 +8,8 @@ import { RunnerPrisma } from "../database/RunnerPrisma";
 import { Api, TimeTrialPersonalBestApi, TimeTrialWorldRecordApi, WorldRecordApi } from "../fetch/SpeedrunCom";
 import { JsonTimeTrials } from "../JsonArrayFile";
 import { ICommand } from "../../interfaces/Command";
-import { MessageData } from "../MessageData";
 import { ParseMessage } from "../../utility/ParseMessage";
+import { MessageData } from "../tmi/MessageData";
 
 export class IndividualWorldRecordDiddyKongRacing extends ParseMessage implements ICommand {
 

@@ -1,5 +1,5 @@
 import { ChatUserstate, Userstate } from "tmi.js";
-import { MessageData } from "../models/MessageData";
+import { MessageData } from "../models/tmi/MessageData";
 
 export interface TmiMessageProps {
   channel: string;

@@ -1,7 +1,7 @@
 import { ITwitterTweetResponse, IYoutubePagination } from "../src/interfaces/socialMedia";
 import { ITwitchChannel } from "../src/interfaces/twitch";
-import { MessageData } from "../src/models/MessageData";
 import { JoinedUser } from "../src/interfaces/prisma";
+import { MessageData } from "../src/models/tmi/MessageData";
 
 export const tweetMockData: ITwitterTweetResponse = {
     data: {

@@ -1,7 +1,7 @@
 import { ICommand } from "../../../interfaces/Command";
-import { MessageData } from "../../MessageData";
 import { UserModel } from "../../database/UserPrisma";
 import { SettingPrisma } from "../../database/SettingPrisma";
+import { MessageData } from "../../tmi/MessageData";
 
 export class SetSpeedrunner implements ICommand {
     constructor(public messageData: MessageData) {

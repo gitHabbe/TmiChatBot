@@ -1,8 +1,8 @@
 import { ICommand } from "../../../interfaces/Command";
-import { MessageData } from "../../MessageData";
 import { StringExtract } from "../../StringExtract";
 import { InduvidualLevelSupport } from "../../../interfaces/speedrun";
 import { IndividualPersonalBestDiddyKongRacing } from "./IndividualPersonalBestDiddyKongRacing";
+import { MessageData } from "../../tmi/MessageData";
 
 export class IndividualPersonalBest implements ICommand {
     constructor(public messageData: MessageData) {

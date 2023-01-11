@@ -2,8 +2,8 @@ import { twitterAPI, twitterRegex } from "../../config/twitterConfig";
 import { youtubeAPI, youtubeRegex } from "../../config/youtubeConfig";
 import { ITwitterTweet, ITwitterTweetResponse, ITwitterUser, IYoutubePagination } from "../../interfaces/socialMedia";
 import { numberToRoundedWithLetter, youtubeDurationToHHMMSS } from "../../utility/dateFormat";
-import { MessageData } from "../MessageData";
 import { ICommand } from "../../interfaces/Command";
+import { MessageData } from "../tmi/MessageData";
 
 export class RegexPattern {
   constructor(public pattern: RegExp, public text: string) {}

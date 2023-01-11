@@ -1,4 +1,4 @@
-import { MessageData } from "../models/MessageData";
+import { MessageData } from "../models/tmi/MessageData";
 
 export interface ICommand {
     messageData: MessageData;

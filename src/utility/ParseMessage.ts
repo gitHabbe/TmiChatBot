@@ -1,6 +1,6 @@
 import { ITrack } from "../interfaces/specificGames";
 import { JsonLevels } from "../models/JsonArrayFile";
-import { MessageData } from "../models/MessageData";
+import { MessageData } from "../models/tmi/MessageData";
 
 export class ParseMessage {
   private levels: ITrack[] = new JsonLevels().data();

@@ -1,8 +1,8 @@
 import { ICommand } from "../../../interfaces/Command";
-import { MessageData } from "../../MessageData";
 import { StringExtract } from "../../StringExtract";
 import { TimeTrialSupport } from "../../../interfaces/speedrun";
 import { TimeTrialWorldRecordDiddyKongRacing } from "../Speedrun";
+import { MessageData } from "../../tmi/MessageData";
 
 export class TimeTrialWorldRecord implements ICommand {
     constructor(public messageData: MessageData) {

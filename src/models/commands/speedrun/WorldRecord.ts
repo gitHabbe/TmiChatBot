@@ -1,11 +1,11 @@
 import { ICommand } from "../../../interfaces/Command";
-import { MessageData } from "../../MessageData";
 import { StringExtract } from "../../StringExtract";
 import { Leaderboard } from "../../fetch/Leaderboard";
 import { IRun } from "../../../interfaces/speedrun";
 import { formatWorldRecord } from "../../../utility/math";
 import { FullGame } from "../../../interfaces/prisma";
 import { GameModel } from "../../database/GamePrisma";
+import { MessageData } from "../../tmi/MessageData";
 
 export class WorldRecord implements ICommand {
     constructor(public messageData: MessageData) {

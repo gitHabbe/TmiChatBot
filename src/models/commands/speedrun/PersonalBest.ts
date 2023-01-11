@@ -1,5 +1,4 @@
 import { ICommand } from "../../../interfaces/Command";
-import { MessageData } from "../../MessageData";
 import { StringExtract } from "../../StringExtract";
 import { GameModel } from "../../database/GamePrisma";
 import { FullGame } from "../../../interfaces/prisma";
@@ -7,6 +6,7 @@ import { RunnerPrisma } from "../../database/RunnerPrisma";
 import { Leaderboard } from "../../fetch/Leaderboard";
 import { IRun } from "../../../interfaces/speedrun";
 import { datesDaysDifference, floatToHHMMSS } from "../../../utility/dateFormat";
+import { MessageData } from "../../tmi/MessageData";
 
 export class PersonalBest implements ICommand {
     constructor(public messageData: MessageData) {

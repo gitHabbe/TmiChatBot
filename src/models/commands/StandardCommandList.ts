@@ -1,13 +1,13 @@
 import { CommandName } from "../../interfaces/tmi";
 import { Client } from "tmi.js";
 import { ICommand } from "../../interfaces/Command";
-import { MessageData } from "../MessageData";
 import { IndividualWorldRecord, WorldRecord } from "./Speedrun";
 import { UserModel } from "../database/UserPrisma";
 import { JoinedUser } from "../../interfaces/prisma";
 import { Component } from "@prisma/client";
 import { TwitchTitle } from "./twitch/TwitchTitle";
 import { TwitchUptime } from "./twitch/TwitchUptime";
+import { MessageData } from "../tmi/MessageData";
 
 export interface CommandList {
   get(commandName: string): ICommand;

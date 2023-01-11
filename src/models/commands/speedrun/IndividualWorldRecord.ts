@@ -1,8 +1,8 @@
 import { ICommand } from "../../../interfaces/Command";
-import { MessageData } from "../../MessageData";
 import { StringExtract } from "../../StringExtract";
 import { InduvidualLevelSupport } from "../../../interfaces/speedrun";
 import { IndividualWorldRecordDiddyKongRacing } from "../Speedrun";
+import { MessageData } from "../../tmi/MessageData";
 
 export class IndividualWorldRecord implements ICommand {
     constructor(public messageData: MessageData) {

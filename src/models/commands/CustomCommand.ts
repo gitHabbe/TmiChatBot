@@ -1,8 +1,8 @@
 import { Command } from "@prisma/client";
 import { UserModel } from "../database/UserPrisma";
 import { CommandPrisma } from "../database/CommandPrisma";
-import { MessageData } from "../MessageData";
 import { ICommand } from "../../interfaces/Command";
+import { MessageData } from "../tmi/MessageData";
 
 export class CustomCommand implements ICommand {
 
