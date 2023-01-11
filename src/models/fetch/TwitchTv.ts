@@ -1,4 +1,4 @@
-import { IFollowage, IFollowageResponse,  ITwitchChannel } from "../../interfaces/twitch";
+import { IFollowage, IFollowageResponse, IStreamerResponse, ITwitchChannel } from "../../interfaces/twitch";
 import { AxiosInstance } from "axios";
 import { twitchAPI } from "../../config/twitchConfig";
 
@@ -7,7 +7,7 @@ export class TwitchFetch {
 
     async channelList(channel: string): Promise<ITwitchChannel[]> {
         const query = `/search/channels?query=${channel}`;
-        const { data: twitchChannelList } = await this.api.get<ITwitchChannel[]>(query);
+        const { data: { data: twitchChannelList } } = await this.api.get<IStreamerResponse>(query);
         return twitchChannelList
     };
 
