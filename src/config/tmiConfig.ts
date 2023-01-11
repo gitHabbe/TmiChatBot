@@ -6,7 +6,7 @@ dotenv.config();
 
 export const tmiOptions: Options = {
   options: {
-    clientId: process.env.TWITCH_CLIENT_ID2,
+    clientId: process.env.TWITCH_CLIENT_ID,
     debug: true,
   },
   connection: {
@@ -15,7 +15,7 @@ export const tmiOptions: Options = {
   },
   identity: {
     username: process.env.TWITCH_USERNAME,
-    password: "oauth:" + process.env.TWITCH_OAUTH_PASSWORD2,
+    password: "oauth:" + process.env.TWITCH_GENERATED_ACCESS_TOKEN,
   },
   channels,
 };
