@@ -7,7 +7,7 @@ import {
 } from "../interfaces/specificGames";
 
 export class JsonFile<T> {
-  jsonFile: string = `./src/private/${this.filename}.json`;
+  jsonFile: string = `./src/utility/${this.filename}.json`;
   private data = JSON.parse(readFileSync(this.jsonFile, "utf8"));
   constructor(private filename: string) {}
 
