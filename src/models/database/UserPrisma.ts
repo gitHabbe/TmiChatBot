@@ -1,6 +1,7 @@
 import { JoinedUser, Model, ModelName } from "../../interfaces/prisma";
 import { DatabaseSingleton } from "./Prisma";
 import { Component, User } from "@prisma/client";
+import { CommandModule } from "../../interfaces/tmi";
 
 export class UserModel implements Model {
   private db = DatabaseSingleton.getInstance().get();
@@ -46,5 +47,17 @@ export class UserModel implements Model {
     return this.client.delete({ where: { name: this.name } });
   };
 
+  create(channel: string) {
+    this.client.create({
+      data: {
+        name: channel,
+        components: {
+          create: [
+            { name: CommandModule.TITLE, enabled: true },
+            { name: CommandModule.UPTIME, enabled: true },
+          ]
+        }
+      }
+    })
   }
 }
