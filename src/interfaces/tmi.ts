@@ -31,6 +31,12 @@ export enum CommandName {
   SETSPEEDRUNNER = "SETSPEEDRUNNER",
 }
 
+export enum CommandModule {
+  SPEEDRUN = "SPEEDRUN",
+  TITLE = "TITLE",
+  UPTIME = "UPTIME",
+}
+
 export enum ComponentsSupport {
   SLOTS = "SLOTS",
   POKEMON = "POKEMON",
