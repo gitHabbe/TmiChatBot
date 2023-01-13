@@ -2,17 +2,38 @@ import { ChatUserstate } from "tmi.js";
 import { CommandName } from "../../interfaces/tmi";
 import { CommandList, StandardCommandList } from "../commands/StandardCommandList";
 import { ICommand } from "../../interfaces/Command";
-import { ClientSingleton } from "../database/ClientSingleton";
 import { MessageParser } from "./MessageParse";
 import { MessageData } from "./MessageData";
+import { UserModel } from "../database/UserPrisma";
+import { ClientSingleton } from "./ClientSingleton";
+import { CustomCommand } from "../commands/CustomCommand";
 
 export class ChatEvent {
-    async onMessage(streamer: string, chatter: ChatUserstate, message: string, self: boolean): Promise<MessageData | void> {
+    async onMessage(streamer: string, chatter: ChatUserstate, message: string, self: boolean): Promise<void> {
         if (self) return; // Bot self message;
         let messageData: MessageData = new MessageData(streamer, chatter, message);
         const messageParser: MessageParser = new MessageParser(message);
         const commandName: string = messageParser.getCommandName();
         const isStandardCommand: boolean = commandName in CommandName
+
+        await ChatEvent.standardCommandAction(isStandardCommand, messageData, commandName);
+        // messageData = await standardCommand.run(commandName);
+        const customCommand = new CustomCommand(messageData);
+        messageData = await customCommand.run();
+        if (messageData.response.length > 0) {
+            const client = ClientSingleton.getInstance().get();
+            await client.say(messageData.channel, messageData.response)
+        }
+          //
+          // const linkCommand = new LinkCommand(messageData);
+          // messageData = await linkCommand.run()
+          // if (messageData.response.length > 0) {
+          //   return await this.client.say(messageData.targetChannel, messageData.response)
+          // }
+          //
+    }
+
+    private static async standardCommandAction(isStandardCommand: boolean, messageData: MessageData, commandName: string) {
         let commandList: CommandList;
         if (isStandardCommand) {
             commandList = new StandardCommandList(messageData);
@@ -23,24 +44,12 @@ export class ChatEvent {
                 await client.say(messageData.channel, messageData.response)
             }
         }
-        // messageData = await standardCommand.run(commandName);
-        //   // console.log(messageData)
-        //   // if (messageData.response.length > 0) {
-        //   //   return await this.client.say(messageData.targetChannel, messageData.response)
-        //   // }
-        //   //
-        //   // const customCommand = new CustomCommand(messageData);
-        //   // messageData = await customCommand.run();
-        //   // if (messageData.response.length > 0) {
-        //   //   return await this.client.say(messageData.targetChannel, messageData.response)
-        //   // }
-        //   //
-        //   // const linkCommand = new LinkCommand(messageData);
-        //   // messageData = await linkCommand.run()
-        //   // if (messageData.response.length > 0) {
-        //   //   return await this.client.say(messageData.targetChannel, messageData.response)
-        //   // }
-        //   //
-        return messageData
+    }
+
+    async onJoin(channel: string, username: string, self: boolean) {
+        const userModel = new UserModel(channel);
+        userModel.create()
+        const joinedUser = await userModel.get();
+
     }
 }
