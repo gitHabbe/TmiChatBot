@@ -11,28 +11,27 @@ import { CustomCommand } from "../commands/CustomCommand";
 export class ChatEvent {
     async onMessage(ircChannel: string, chatter: ChatUserstate, message: string, self: boolean): Promise<void> {
         if (self) return; // Bot self message;
-        const channel = ircChannel.slice(1);
+        const channel: string = ircChannel.slice(1);
         let messageData: MessageData = new MessageData(channel, chatter, message);
         const commandName: string = MessageParser.getCommandName(message);
-        const isStandardCommand: boolean = commandName in CommandName
 
-        const isCommand = await ChatEvent.standardCommandAction(isStandardCommand, messageData, commandName);
+        const isCommand: boolean = await ChatEvent.standardCommandAction(messageData, commandName);
         if (isCommand) return
     }
 
-    private static async standardCommandAction(isStandardCommand: boolean, messageData: MessageData, commandName: string): Promise<boolean> {
+    private static async standardCommandAction(messageData: MessageData, commandName: string): Promise<boolean> {
+        const isStandardCommand: boolean = commandName in CommandName
         let commandList: CommandList;
-        if (isStandardCommand) {
-            commandList = new StandardCommandList(messageData);
-            const isCommand: ICommand | undefined = commandList.get(commandName);
-            if (isCommand) {
-                messageData = await isCommand.run();
-                const client = ClientSingleton.getInstance().get();
-                await client.say(messageData.channel, messageData.response)
-                return true
-            }
-        }
-        return false;
+        if (!isStandardCommand) return false
+
+        commandList = new StandardCommandList(messageData);
+        const isCommand: ICommand | undefined = commandList.get(commandName);
+        if (!isCommand) return false;
+        
+        messageData = await isCommand.run();
+        const client = ClientSingleton.getInstance().get();
+        await client.say(messageData.channel, messageData.response)
+        return true
     }
 
     async onJoin(channel: string, username: string, self: boolean) {
