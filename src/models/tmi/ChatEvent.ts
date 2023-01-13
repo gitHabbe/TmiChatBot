@@ -18,21 +18,6 @@ export class ChatEvent {
 
         const isCommand = await ChatEvent.standardCommandAction(isStandardCommand, messageData, commandName);
         if (isCommand) return
-        // messageData = await standardCommand.run(commandName);
-        const customCommand = new CustomCommand(messageData);
-        messageData = await customCommand.run();
-        if (messageData.response.length > 0) {
-            const client = ClientSingleton.getInstance().get();
-            await client.say(messageData.channel, messageData.response)
-            return
-        }
-          //
-          // const linkCommand = new LinkCommand(messageData);
-          // messageData = await linkCommand.run()
-          // if (messageData.response.length > 0) {
-          //   return await this.client.say(messageData.targetChannel, messageData.response)
-          // }
-          //
     }
 
     private static async standardCommandAction(isStandardCommand: boolean, messageData: MessageData, commandName: string): Promise<boolean> {
@@ -52,7 +37,7 @@ export class ChatEvent {
 
     async onJoin(channel: string, username: string, self: boolean) {
         const userModel = new UserModel(channel);
-        userModel.create()
+        // userModel.create()
         const joinedUser = await userModel.get();
 
     }
