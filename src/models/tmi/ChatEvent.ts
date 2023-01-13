@@ -13,8 +13,7 @@ export class ChatEvent {
         if (self) return; // Bot self message;
         const channel = ircChannel.slice(1);
         let messageData: MessageData = new MessageData(channel, chatter, message);
-        const messageParser: MessageParser = new MessageParser(message);
-        const commandName: string = messageParser.getCommandName();
+        const commandName: string = MessageParser.getCommandName(message);
         const isStandardCommand: boolean = commandName in CommandName
 
         await ChatEvent.standardCommandAction(isStandardCommand, messageData, commandName);
