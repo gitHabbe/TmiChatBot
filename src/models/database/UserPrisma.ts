@@ -46,11 +46,5 @@ export class UserModel implements Model {
     return this.client.delete({ where: { name: this.name } });
   };
 
-  isComponentEnabled(commandName: string, components: Component[]): Component | undefined {
-    return components.find((component: Component) => {
-      const componentName = component.name.toLowerCase();
-      const targetCommand = commandName.toLowerCase();
-      return componentName === targetCommand;
-    });
   }
 }
