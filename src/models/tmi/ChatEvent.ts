@@ -9,9 +9,10 @@ import { ClientSingleton } from "./ClientSingleton";
 import { CustomCommand } from "../commands/CustomCommand";
 
 export class ChatEvent {
-    async onMessage(streamer: string, chatter: ChatUserstate, message: string, self: boolean): Promise<void> {
+    async onMessage(ircChannel: string, chatter: ChatUserstate, message: string, self: boolean): Promise<void> {
         if (self) return; // Bot self message;
-        let messageData: MessageData = new MessageData(streamer, chatter, message);
+        const channel = ircChannel.slice(1);
+        let messageData: MessageData = new MessageData(channel, chatter, message);
         const messageParser: MessageParser = new MessageParser(message);
         const commandName: string = messageParser.getCommandName();
         const isStandardCommand: boolean = commandName in CommandName
