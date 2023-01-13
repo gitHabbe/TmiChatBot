@@ -12,8 +12,8 @@ import { randomInt } from "../../utility/math";
 import { JsonStringArray } from "../JsonArrayFile";
 import { twitchAPI } from "../../config/twitchConfig";
 import { DatabaseSingleton } from "../database/Prisma";
-import { ClientSingleton } from "../database/ClientSingleton";
 import { MessageData } from "../tmi/MessageData";
+import { ClientSingleton } from "../tmi/ClientSingleton";
 
 export class Trust implements ICommand {
     constructor(public messageData: MessageData) {
