@@ -1,5 +1,5 @@
 import { User } from "@prisma/client";
-import { ComponentsSupport } from "../../interfaces/tmi";
+import { CommandModule, ComponentsSupport } from "../../interfaces/tmi";
 import { Prisma } from "./Prisma";
 
 export class ComponentPrisma extends Prisma {
@@ -32,7 +32,7 @@ export class ComponentPrisma extends Prisma {
   };
 
   createComponent = () => {
-    const isSupported = this.name in ComponentsSupport;
+    const isSupported = this.name in CommandModule;
     if (!isSupported) throw new Error(`Component !${this.name} doesn't exist`);
     return this.db.create({
       data: {
