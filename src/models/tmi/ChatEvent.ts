@@ -6,6 +6,8 @@ import { MessageParser } from "./MessageParse";
 import { MessageData } from "./MessageData";
 import { UserModel } from "../database/UserPrisma";
 import { ClientSingleton } from "./ClientSingleton";
+import { JoinedUser } from "../../interfaces/prisma";
+import { Command, Component } from "@prisma/client";
 
 export class ChatEvent {
     async onMessage(ircChannel: string, chatter: ChatUserstate, message: string, self: boolean): Promise<void> {
@@ -13,8 +15,25 @@ export class ChatEvent {
         const channel: string = ircChannel.slice(1);
         const messageData: MessageData = new MessageData(channel, chatter, message);
 
+        const isCustomCommand: boolean = await ChatEvent.customCommandAction(channel, message);
+        if (isCustomCommand) return
+
         const isCommand: boolean = await ChatEvent.standardCommandAction(messageData);
         if (isCommand) return
+    }
+
+    private static async customCommandAction(channel: string, message: string): Promise<boolean> {
+        const userModel: UserModel = new UserModel(channel);
+        const joinedUser: JoinedUser = await userModel.get();
+        const isCustomCommand: Command[] = joinedUser.commands.filter((command: Command) => {
+            return command.name === message
+        })
+        if (isCustomCommand.length > 0) {
+            const client = ClientSingleton.getInstance().client;
+            await client.say(channel, isCustomCommand[0].name)
+            return true
+        }
+        return false;
     }
 
     async onJoin(ircChannel: string, username: string, self: boolean) {
