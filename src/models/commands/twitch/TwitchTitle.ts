@@ -3,9 +3,11 @@ import { TwitchFetch } from "../../fetch/TwitchTv";
 import { ITwitchChannel } from "../../../interfaces/twitch";
 import { FilterTwitchChannel } from "./FilterTwitchChannel";
 import { MessageData } from "../../tmi/MessageData";
+import { CommandModule } from "../../../interfaces/tmi";
 
 export class TwitchTitle implements ICommand {
     private twitchFetch: TwitchFetch
+    public commandModule: CommandModule = CommandModule.TITLE;
 
     constructor(public messageData: MessageData, twitchFetch?: TwitchFetch) {
         this.twitchFetch = twitchFetch || new TwitchFetch()
