@@ -21,13 +21,12 @@ export class ChatEvent {
 
     private static async standardCommandAction(messageData: MessageData, commandName: string): Promise<boolean> {
         const isStandardCommand: boolean = commandName in CommandName
-        let commandList: CommandList;
         if (!isStandardCommand) return false
 
-        commandList = new StandardCommandList(messageData);
+        const commandList: CommandList = new StandardCommandList(messageData);
         const isCommand: ICommand | undefined = commandList.get(commandName);
         if (!isCommand) return false;
-        
+
         messageData = await isCommand.run();
         const client = ClientSingleton.getInstance().get();
         await client.say(messageData.channel, messageData.response)
