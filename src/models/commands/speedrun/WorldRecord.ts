@@ -6,8 +6,11 @@ import { formatWorldRecord } from "../../../utility/math";
 import { FullGame } from "../../../interfaces/prisma";
 import { GameModel } from "../../database/GamePrisma";
 import { MessageData } from "../../tmi/MessageData";
+import { CommandModule } from "../../../interfaces/tmi";
 
 export class WorldRecord implements ICommand {
+    public commandModule: CommandModule = CommandModule.SPEEDRUN;
+
     constructor(public messageData: MessageData) {
     }
 

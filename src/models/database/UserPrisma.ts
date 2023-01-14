@@ -55,6 +55,7 @@ export class UserModel implements Model {
           create: [
             { name: CommandModule.TITLE, enabled: true },
             { name: CommandModule.UPTIME, enabled: true },
+            { name: CommandModule.SPEEDRUN, enabled: false },
           ]
         }
       }
