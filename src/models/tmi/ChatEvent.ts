@@ -6,20 +6,21 @@ import { MessageParser } from "./MessageParse";
 import { MessageData } from "./MessageData";
 import { UserModel } from "../database/UserPrisma";
 import { ClientSingleton } from "./ClientSingleton";
-import { CustomCommand } from "../commands/CustomCommand";
 
 export class ChatEvent {
     async onMessage(ircChannel: string, chatter: ChatUserstate, message: string, self: boolean): Promise<void> {
         if (self) return; // Bot self message;
         const channel: string = ircChannel.slice(1);
-        let messageData: MessageData = new MessageData(channel, chatter, message);
-        const commandName: string = MessageParser.getCommandName(message);
+        const messageData: MessageData = new MessageData(channel, chatter, message);
 
-        const isCommand: boolean = await ChatEvent.standardCommandAction(messageData, commandName);
+        const isCommand: boolean = await ChatEvent.standardCommandAction(messageData);
         if (isCommand) return
     }
 
-    private static async standardCommandAction(messageData: MessageData, commandName: string): Promise<boolean> {
+    async onJoin(channel: string, username: string, self: boolean) {}
+
+    private static async standardCommandAction(messageData: MessageData): Promise<boolean> {
+        const commandName: string = MessageParser.getCommandName(messageData.message);
         const isStandardCommand: boolean = commandName in CommandName
         if (!isStandardCommand) return false
 
@@ -31,12 +32,5 @@ export class ChatEvent {
         const client = ClientSingleton.getInstance().get();
         await client.say(messageData.channel, messageData.response)
         return true
-    }
-
-    async onJoin(channel: string, username: string, self: boolean) {
-        const userModel = new UserModel(channel);
-        // userModel.create()
-        const joinedUser = await userModel.get();
-
     }
 }
