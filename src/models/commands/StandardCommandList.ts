@@ -25,7 +25,9 @@ export class StandardCommandList implements CommandList {
   }
 
   get(commandName: string): ICommand | undefined  {
-    return this.commandMap.get(commandName);
+    const commandNameUpperCase = commandName.toUpperCase();
+    console.log(commandNameUpperCase);
+    return this.commandMap.get(commandNameUpperCase);
   }
 
   private buildCommandMap(): void {
