@@ -32,9 +32,9 @@ export enum CommandName {
 }
 
 export enum CommandModule {
-  SPEEDRUN = "SPEEDRUN",
   TITLE = "TITLE",
   UPTIME = "UPTIME",
+  SPEEDRUN = "SPEEDRUN",
 }
 
 export enum ComponentsSupport {
