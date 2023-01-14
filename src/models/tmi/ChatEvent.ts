@@ -17,7 +17,12 @@ export class ChatEvent {
         if (isCommand) return
     }
 
-    async onJoin(channel: string, username: string, self: boolean) {}
+    async onJoin(ircChannel: string, username: string, self: boolean) {
+        console.log(`I HAVE JOINED ${ircChannel}`);
+        const channel: string = ircChannel.slice(1);
+        const userModel = new UserModel(channel);
+        await userModel.get();
+    }
 
     private static async standardCommandAction(messageData: MessageData): Promise<boolean> {
         const commandName: string = MessageParser.getCommandName(messageData.message);
@@ -27,9 +32,25 @@ export class ChatEvent {
         const commandList: CommandList = new StandardCommandList(messageData);
         const isCommand: ICommand | undefined = commandList.get(commandName);
         if (!isCommand) return false;
+        const userModel = new UserModel(messageData.channel);
+        const joinedUser = await userModel.get();
+        const isCommandEnabled = joinedUser.components.find(command => {
+            const isEnabled = command.name.toUpperCase() === isCommand.commandModule.toUpperCase();
+            return isEnabled ? 1 : 0
+        })
+        const chatter = messageData.chatter.username?.toUpperCase();
+        const streamer = messageData.channel.toUpperCase();
+        const client = ClientSingleton.getInstance().get();
+        if (!isCommandEnabled) {
+            if (streamer === chatter) {
+                await client.say(messageData.channel, `Command: ${commandName} is not enabled. Use "!enable ${commandName.toLowerCase()}"`)
+                return true
+            } else {
+                return false
+            }
+        }
 
         messageData = await isCommand.run();
-        const client = ClientSingleton.getInstance().get();
         await client.say(messageData.channel, messageData.response)
         return true
     }
