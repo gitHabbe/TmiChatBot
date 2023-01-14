@@ -11,7 +11,7 @@ export class UserModel implements Model {
   get = async (): Promise<JoinedUser> => {
     let findFirst: JoinedUser | null = await this.getFirst();
     if (findFirst === null) {
-      await this.client.create({ data: { name: this.name } });
+      await this.create();
       findFirst = await this.getFirst();
     }
     if (findFirst === null) {
@@ -40,17 +40,17 @@ export class UserModel implements Model {
   save = async (): Promise<User> => {
     const oldUser = await this.get()
     if (oldUser) throw new Error("User already exists")
-    return await this.client.create({ data: { name: this.name } });
+    return await this.create();
   };
 
   delete = (): Promise<User> => {
     return this.client.delete({ where: { name: this.name } });
   };
 
-  create(channel: string) {
-    this.client.create({
+  async create() {
+    return await this.client.create({
       data: {
-        name: channel,
+        name: this.name,
         components: {
           create: [
             { name: CommandModule.TITLE, enabled: true },
