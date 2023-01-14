@@ -7,6 +7,7 @@ import { Component } from "@prisma/client";
 import { TwitchTitle } from "./twitch/TwitchTitle";
 import { TwitchUptime } from "./twitch/TwitchUptime";
 import { UserJoin } from "./Tmi";
+import { ToggleComponent, UserJoin } from "./Tmi";
 import { WorldRecord } from "./speedrun/WorldRecord";
 import { IndividualWorldRecord } from "./speedrun/IndividualWorldRecord";
 import { PersonalBest } from "./speedrun/PersonalBest";
@@ -46,8 +47,8 @@ export class StandardCommandList implements CommandList {
     // this.commandMap.set(CommandName.NEWCMD, new NewCommand(this.messageData))
     // this.commandMap.set(CommandName.DELCMD, new DeleteCommand(this.messageData))
     // this.commandMap.set(CommandName.SETSPEEDRUNNER, new SetSpeedrunner(this.messageData))
-    // this.commandMap.set(CommandName.TOGGLE, new ToggleComponent(this.messageData))
     this.commandMap.set(CommandName.JOIN, new UserJoin(this.messageData))
+    this.commandMap.set(CommandName.TOGGLE, new ToggleComponent(this.messageData))
     // this.commandMap.set(CommandName.PART, new UserLeave(this.messageData, this.tmiClient))
     // this.commandMap.set(CommandName.TTWR, new TimeTrialWorldRecord(this.messageData))
     // this.commandMap.set(CommandName.TTPB, new TimeTrialPersonalBest(this.messageData))
