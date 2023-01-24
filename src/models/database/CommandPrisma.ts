@@ -1,11 +1,12 @@
-import { User } from "@prisma/client";
 import { Prisma } from "./Prisma";
 import { Command } from ".prisma/client";
 import { ModuleFamily } from "../../interfaces/tmi";
+import { JoinedUser } from "../../interfaces/prisma";
 
 export class CommandPrisma extends Prisma {
   private db = this.prisma.command;
-  constructor(private user: User) {
+
+  constructor(private user: JoinedUser) {
     super();
   }
 
