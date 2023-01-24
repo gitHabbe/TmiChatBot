@@ -1,10 +1,12 @@
-import { User } from "@prisma/client";
-import { ModuleFamily, ComponentsSupport } from "../../interfaces/tmi";
+import { Component } from "@prisma/client";
+import { ModuleFamily } from "../../interfaces/tmi";
 import { Prisma } from "./Prisma";
+import { JoinedUser } from "../../interfaces/prisma";
 
 export class ComponentPrisma extends Prisma {
   private db = this.prisma.component;
-  constructor(private user: User, private name: string) {
+
+  constructor(private user: JoinedUser, private name: string) {
     super();
     if (name[0] === "!") this.name = name.slice(1);
     this.name = this.name.toUpperCase();
