@@ -10,8 +10,10 @@ import { JsonTimeTrials } from "../JsonArrayFile";
 import { ICommand } from "../../interfaces/Command";
 import { ParseMessage } from "../../utility/ParseMessage";
 import { MessageData } from "../tmi/MessageData";
+import { ModuleFamily } from "../../interfaces/tmi";
 
 export class IndividualWorldRecordDiddyKongRacing extends ParseMessage implements ICommand {
+    moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN
 
     constructor(public messageData: MessageData) {super(messageData);}
 
@@ -37,6 +39,7 @@ export class IndividualWorldRecordDiddyKongRacing extends ParseMessage implement
 
 
 export class TimeTrialWorldRecordDiddyKongRacing implements ICommand {
+    moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN
     private jsonTimeTrials = new JsonTimeTrials();
 
     constructor(public messageData: MessageData) {
@@ -109,6 +112,7 @@ export class TimeTrialWorldRecordDiddyKongRacing implements ICommand {
 }
 
 export class TimeTrialPersonalBestDiddyKongRacing implements ICommand {
+    moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN
     private jsonTimeTrials = new JsonTimeTrials();
 
     constructor(public messageData: MessageData, private targetUser: string) {

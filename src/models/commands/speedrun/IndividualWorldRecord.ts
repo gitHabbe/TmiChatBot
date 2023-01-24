@@ -3,8 +3,10 @@ import { StringExtract } from "../../StringExtract";
 import { InduvidualLevelSupport } from "../../../interfaces/speedrun";
 import { IndividualWorldRecordDiddyKongRacing } from "../Speedrun";
 import { MessageData } from "../../tmi/MessageData";
+import { ModuleFamily } from "../../../interfaces/tmi";
 
 export class IndividualWorldRecord implements ICommand {
+    moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN;
     constructor(public messageData: MessageData) {
     }
 

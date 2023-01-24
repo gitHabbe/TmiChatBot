@@ -7,8 +7,11 @@ import { Leaderboard } from "../../fetch/Leaderboard";
 import { IRun } from "../../../interfaces/speedrun";
 import { datesDaysDifference, floatToHHMMSS } from "../../../utility/dateFormat";
 import { MessageData } from "../../tmi/MessageData";
+import { ModuleFamily } from "../../../interfaces/tmi";
 
 export class PersonalBest implements ICommand {
+    moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN
+
     constructor(public messageData: MessageData) {
     }
 

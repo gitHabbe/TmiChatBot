@@ -3,8 +3,11 @@ import { StringExtract } from "../../StringExtract";
 import { TimeTrialSupport } from "../../../interfaces/speedrun";
 import { TimeTrialWorldRecordDiddyKongRacing } from "../Speedrun";
 import { MessageData } from "../../tmi/MessageData";
+import { ModuleFamily } from "../../../interfaces/tmi";
 
 export class TimeTrialWorldRecord implements ICommand {
+    moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN
+
     constructor(public messageData: MessageData) {
     }
 
