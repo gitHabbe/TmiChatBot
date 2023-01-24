@@ -1,6 +1,5 @@
 import { Prisma } from "./Prisma";
 import { Command } from ".prisma/client";
-import { ModuleFamily } from "../../interfaces/tmi";
 import { JoinedUser } from "../../interfaces/prisma";
 
 export class CommandPrisma extends Prisma {
@@ -27,7 +26,7 @@ export class CommandPrisma extends Prisma {
     });
   };
 
-  remove = async (name: string): Promise<Command> => {
+  remove =  async (name: string): Promise<Command> => {
     const command = await this.find(name);
     if (!command) throw new Error("Command not found");
     return await this.db.delete({
@@ -55,4 +54,5 @@ export class CommandPrisma extends Prisma {
       },
     });
   };
+
 }
