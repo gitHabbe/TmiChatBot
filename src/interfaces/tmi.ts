@@ -35,6 +35,7 @@ export enum CommandModule {
   TITLE = "TITLE",
   UPTIME = "UPTIME",
   SPEEDRUN = "SPEEDRUN",
+  PROTECTED = "PROTECTED",
 }
 
 export enum ComponentsSupport {
