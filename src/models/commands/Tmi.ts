@@ -93,6 +93,7 @@ export class UnTrust implements ICommand {
         return this.messageData;
     }
 }
+import { ModuleFamily } from "../../interfaces/tmi";
 
 export const isTrustedUser = async (
     streamer: string,

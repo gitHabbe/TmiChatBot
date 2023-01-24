@@ -4,11 +4,11 @@ import { dateToLetters, ILetterFormattedDate, millisecondsToDistance } from "../
 import { ITwitchChannel } from "../../../interfaces/twitch";
 import { FilterTwitchChannel } from "./FilterTwitchChannel";
 import { MessageData } from "../../tmi/MessageData";
-import { CommandModule } from "../../../interfaces/tmi";
+import { ModuleFamily } from "../../../interfaces/tmi";
 
 export class TwitchUptime implements ICommand {
     private twitchFetch: TwitchFetch
-    public commandModule: CommandModule = CommandModule.UPTIME
+    public moduleFamily: ModuleFamily = ModuleFamily.UPTIME
 
     constructor(public messageData: MessageData, twitchFetch?: TwitchFetch) {
         this.twitchFetch = twitchFetch || new TwitchFetch()

@@ -1,9 +1,9 @@
 import { MessageData } from "../models/tmi/MessageData";
-import { CommandModule } from "./tmi";
+import { ModuleFamily } from "./tmi";
 
 export interface ICommand {
     messageData: MessageData;
-    commandModule: CommandModule;
+    moduleFamily: ModuleFamily;
 
     run(): Promise<MessageData>;
 }

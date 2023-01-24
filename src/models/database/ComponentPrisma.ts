@@ -1,5 +1,5 @@
 import { User } from "@prisma/client";
-import { CommandModule, ComponentsSupport } from "../../interfaces/tmi";
+import { ModuleFamily, ComponentsSupport } from "../../interfaces/tmi";
 import { Prisma } from "./Prisma";
 
 export class ComponentPrisma extends Prisma {
@@ -32,7 +32,7 @@ export class ComponentPrisma extends Prisma {
   };
 
   createComponent = () => {
-    const isSupported = this.name in CommandModule;
+    const isSupported = this.name in ModuleFamily;
     if (!isSupported) throw new Error(`Component !${this.name} doesn't exist`);
     return this.db.create({
       data: {
@@ -51,4 +51,14 @@ export class ComponentPrisma extends Prisma {
       },
     });
   };
+
+  isFamilyEnabled(commandModule: ModuleFamily): Component | undefined {
+    return this.user.components.find((userComponent: Component) => {
+      const isCommand = userComponent.name.toUpperCase() === commandModule.toUpperCase();
+      if (isCommand) {
+        return userComponent.enabled
+      }
+      return false
+    })
+  }
 }

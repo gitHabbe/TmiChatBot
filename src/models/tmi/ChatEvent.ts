@@ -1,5 +1,5 @@
 import { ChatUserstate } from "tmi.js";
-import { CommandName } from "../../interfaces/tmi";
+import { ModuleFamily } from "../../interfaces/tmi";
 import { CommandList, StandardCommandList } from "../commands/StandardCommandList";
 import { ICommand } from "../../interfaces/Command";
 import { MessageParser } from "./MessageParse";

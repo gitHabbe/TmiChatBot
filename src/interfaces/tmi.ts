@@ -31,7 +31,7 @@ export enum CommandName {
   SETSPEEDRUNNER = "SETSPEEDRUNNER",
 }
 
-export enum CommandModule {
+export enum ModuleFamily {
   TITLE = "TITLE",
   UPTIME = "UPTIME",
   SPEEDRUN = "SPEEDRUN",

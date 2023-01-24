@@ -1,6 +1,7 @@
 import { User } from "@prisma/client";
 import { Prisma } from "./Prisma";
 import { Command } from ".prisma/client";
+import { ModuleFamily } from "../../interfaces/tmi";
 
 export class CommandPrisma extends Prisma {
   private db = this.prisma.command;
