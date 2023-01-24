@@ -14,7 +14,7 @@ export class ComponentPrisma extends Prisma {
 
   toggle = async () => {
     let component = await this.getComponent();
-    if (component === null) component = await this.createComponent();
+    if (component === null) return
 
     return this.db.update({
       where: {
@@ -28,22 +28,12 @@ export class ComponentPrisma extends Prisma {
 
   isEnabled = async () => {
     let component = await this.getComponent();
-    if (component === null) component = await this.createComponent();
+    if (component === null) return
 
     return component.enabled;
   };
 
-  createComponent = () => {
-    const isSupported = this.name in ModuleFamily;
-    if (!isSupported) throw new Error(`Component !${this.name} doesn't exist`);
-    return this.db.create({
-      data: {
-        userId: this.user.id,
-        name: this.name,
-        enabled: false,
-      },
-    });
-  };
+
 
   getComponent = () => {
     return this.db.findFirst({
