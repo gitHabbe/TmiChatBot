@@ -8,6 +8,8 @@ import { UserModel } from "../database/UserPrisma";
 import { ClientSingleton } from "./ClientSingleton";
 import { JoinedUser } from "../../interfaces/prisma";
 import { Command, Component } from "@prisma/client";
+import { ComponentPrisma } from "../database/ComponentPrisma";
+import { CommandPrisma } from "../database/CommandPrisma";
 
 export class ChatEvent {
     async onMessage(ircChannel: string, chatter: ChatUserstate, message: string, self: boolean): Promise<void> {
@@ -45,31 +47,34 @@ export class ChatEvent {
 
     private static async standardCommandAction(messageData: MessageData): Promise<boolean> {
         const commandName: string = MessageParser.getCommandName(messageData.message);
-        const isStandardCommand: boolean = commandName in CommandName
-        if (!isStandardCommand) return false
-
         const commandList: CommandList = new StandardCommandList(messageData);
-        const isCommand: ICommand | undefined = commandList.get(commandName);
-        if (!isCommand) return false;
+        const command: ICommand | undefined = commandList.get(commandName);
+        if (!command) return false;
+
         const userModel = new UserModel(messageData.channel);
-        const joinedUser = await userModel.get();
-        const isCommandEnabled = joinedUser.components.find(command => {
-            const isEnabled = command.name.toUpperCase() === isCommand.commandModule.toUpperCase();
-            return isEnabled ? 1 : 0
-        })
+        const joinedUser: JoinedUser = await userModel.get();
+        const componentPrisma = new ComponentPrisma(joinedUser, messageData.channel);
+        const isComponentEnabled = componentPrisma.isFamilyEnabled(command.moduleFamily);
+        const isProtected = command.moduleFamily === ModuleFamily.PROTECTED;
+        
         const chatter = messageData.chatter.username?.toUpperCase();
         const streamer = messageData.channel.toUpperCase();
         const client = ClientSingleton.getInstance().get();
-        if (!isCommandEnabled) {
+        if (isProtected) {
+            const commandResponse = await command.run();
+            await client.say(messageData.channel, commandResponse.response)
+            return true
+        }
+        if (!isComponentEnabled) {
             if (streamer === chatter) {
-                await client.say(messageData.channel, `Command: ${commandName} is not enabled. Use "!enable ${commandName.toLowerCase()}"`)
+                await client.say(messageData.channel, `Command: ${commandName} is not enabled. Use "!toggle ${command.moduleFamily}"`)
                 return true
             } else {
                 return false
             }
         }
 
-        messageData = await isCommand.run();
+        messageData = await command.run();
         await client.say(messageData.channel, messageData.response)
         return true
     }
