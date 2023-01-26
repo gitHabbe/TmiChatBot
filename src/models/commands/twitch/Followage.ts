@@ -23,7 +23,7 @@ export class Followage implements ICommand {
         const twitchChannelList: ITwitchChannel[] = await this.twitchFetch.channelList(channel);
         const filterTwitchChannel = new FilterTwitchChannel();
         const singleChannel = filterTwitchChannel.channel(twitchChannelList, channel);
-        const streamerId: string = singleChannel.display_name;
+        const streamerId: string = singleChannel.id;
         const followerId: string = follower["user-id"];
         const followage: IFollowage[] = await this.twitchFetch.followage(streamerId, followerId);
         if (followage.length === 0) {
