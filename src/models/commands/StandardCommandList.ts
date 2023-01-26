@@ -12,6 +12,7 @@ import { IndividualWorldRecord } from "./speedrun/IndividualWorldRecord";
 import { PersonalBest } from "./speedrun/PersonalBest";
 import { IndividualPersonalBest } from "./speedrun/IndividualPersonalBest";
 import { MessageData } from "../tmi/MessageData";
+import { Followage } from "./twitch/Followage";
 
 export interface CommandList {
   get(commandName: string): ICommand | undefined;
@@ -37,7 +38,7 @@ export class StandardCommandList implements CommandList {
     this.commandMap.set(CommandName.ILWR, new IndividualWorldRecord(this.messageData))
     this.commandMap.set(CommandName.PB, new PersonalBest(this.messageData))
     this.commandMap.set(CommandName.ILPB, new IndividualPersonalBest(this.messageData))
-    // this.commandMap.set(CommandName.FOLLOWAGE, new Followage(this.messageData))
+    this.commandMap.set(CommandName.FOLLOWAGE, new Followage(this.messageData))
     // this.commandMap.set(CommandName.TRUST, new NewTrust(this.messageData))
     // this.commandMap.set(CommandName.UNTRUST, new UnTrust(this.messageData))
     // this.commandMap.set(CommandName.TS, new Timestamp(this.messageData))
