@@ -8,8 +8,10 @@ import { speedrunAPI } from "../../../config/speedrunConfig";
 import { RunnerPrisma } from "../../database/RunnerPrisma";
 import { datesDaysDifference, floatToHHMMSS } from "../../../utility/dateFormat";
 import { MessageData } from "../../tmi/MessageData";
+import { ModuleFamily } from "../../../interfaces/tmi";
 
 export class IndividualPersonalBestDiddyKongRacing extends ParseMessage implements ICommand {
+    moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN;
 
     constructor(messageData: MessageData) {
         super(messageData);

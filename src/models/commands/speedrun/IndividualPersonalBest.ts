@@ -3,8 +3,10 @@ import { StringExtract } from "../../StringExtract";
 import { InduvidualLevelSupport } from "../../../interfaces/speedrun";
 import { IndividualPersonalBestDiddyKongRacing } from "./IndividualPersonalBestDiddyKongRacing";
 import { MessageData } from "../../tmi/MessageData";
+import { ModuleFamily } from "../../../interfaces/tmi";
 
 export class IndividualPersonalBest implements ICommand {
+    moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN;
     constructor(public messageData: MessageData) {
     }
 
