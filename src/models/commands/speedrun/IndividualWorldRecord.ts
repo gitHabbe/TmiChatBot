@@ -19,7 +19,8 @@ export class IndividualWorldRecord implements ICommand {
             case InduvidualLevelSupport.DKR:
                 return new IndividualWorldRecordDiddyKongRacing(this.messageData).run();
             default:
-                throw Error(`${game} doesn't support !ilwr`);
+                this.messageData.response = `${gameName} doesn't support !ilwr`;
+                return this.messageData
         }
     };
 }

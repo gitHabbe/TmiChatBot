@@ -20,7 +20,8 @@ export class IndividualPersonalBest implements ICommand {
             case InduvidualLevelSupport.DKR:
                 return new IndividualPersonalBestDiddyKongRacing(this.messageData).run();
             default:
-                throw Error(`${game} doesn't support !ilpb`);
+                this.messageData.response = `${gameName} doesn't support !ilpb`
+                return this.messageData
         }
     };
 }
