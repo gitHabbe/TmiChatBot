@@ -5,8 +5,11 @@ import { IFollowage, ITwitchChannel } from "../../../interfaces/twitch";
 import { datesDaysDifference } from "../../../utility/dateFormat";
 import { FilterTwitchChannel } from "./FilterTwitchChannel";
 import { MessageData } from "../../tmi/MessageData";
+import { ModuleFamily } from "../../../interfaces/tmi";
 
 export class Followage implements ICommand {
+    moduleFamily: ModuleFamily = ModuleFamily.FOLLOWAGE
+
     private twitchFetch = new TwitchFetch()
 
     constructor(public messageData: MessageData, twitchFetch?: TwitchFetch) {

@@ -36,6 +36,7 @@ export enum ModuleFamily {
   UPTIME = "UPTIME",
   SPEEDRUN = "SPEEDRUN",
   PROTECTED = "PROTECTED",
+  FOLLOWAGE = "FOLLOWAGE",
 }
 
 export enum ComponentsSupport {

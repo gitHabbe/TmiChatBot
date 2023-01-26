@@ -55,6 +55,7 @@ export class UserModel implements Model {
           create: [
             { name: ModuleFamily.TITLE, enabled: true },
             { name: ModuleFamily.UPTIME, enabled: true },
+            { name: ModuleFamily.FOLLOWAGE, enabled: false },
             { name: ModuleFamily.SPEEDRUN, enabled: false },
           ]
         }
