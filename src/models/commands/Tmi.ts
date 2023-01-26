@@ -14,6 +14,9 @@ import { twitchAPI } from "../../config/twitchConfig";
 import { DatabaseSingleton } from "../database/Prisma";
 import { MessageData } from "../tmi/MessageData";
 import { ClientSingleton } from "../tmi/ClientSingleton";
+import { ModuleFamily } from "../../interfaces/tmi";
+export class AddTrust implements ICommand {
+    moduleFamily: ModuleFamily = ModuleFamily.PROTECTED
 
 export class Trust implements ICommand {
     constructor(public messageData: MessageData) {
