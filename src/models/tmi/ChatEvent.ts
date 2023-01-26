@@ -47,6 +47,8 @@ export class ChatEvent {
 
     private static async standardCommandAction(messageData: MessageData): Promise<boolean> {
         const commandName: string = MessageParser.getCommandName(messageData.message);
+        const messageParser: MessageParser = new MessageParser();
+        const commandName: string = messageParser.getCommandName(messageData.message);
         const commandList: CommandList = new StandardCommandList(messageData);
         const command: ICommand | undefined = commandList.get(commandName);
         if (!command) return false;

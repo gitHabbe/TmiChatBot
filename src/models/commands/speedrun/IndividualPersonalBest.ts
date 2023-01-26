@@ -4,16 +4,19 @@ import { InduvidualLevelSupport } from "../../../interfaces/speedrun";
 import { IndividualPersonalBestDiddyKongRacing } from "./IndividualPersonalBestDiddyKongRacing";
 import { MessageData } from "../../tmi/MessageData";
 import { ModuleFamily } from "../../../interfaces/tmi";
+import { MessageParser } from "../../tmi/MessageParse";
 
 export class IndividualPersonalBest implements ICommand {
     moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN;
+
     constructor(public messageData: MessageData) {
     }
 
     run = async () => {
-        const stringExtract = new StringExtract(this.messageData);
-        const game: string = await stringExtract.game();
-        switch (game.toUpperCase()) {
+        const messageParser = new MessageParser();
+        const gameName: string = await messageParser.getGame(this.messageData, 2);
+
+        switch (gameName.toUpperCase()) {
             case InduvidualLevelSupport.DKR:
                 return new IndividualPersonalBestDiddyKongRacing(this.messageData).run();
             default:

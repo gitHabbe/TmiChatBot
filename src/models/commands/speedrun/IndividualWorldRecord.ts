@@ -4,6 +4,7 @@ import { InduvidualLevelSupport } from "../../../interfaces/speedrun";
 import { IndividualWorldRecordDiddyKongRacing } from "../Speedrun";
 import { MessageData } from "../../tmi/MessageData";
 import { ModuleFamily } from "../../../interfaces/tmi";
+import { MessageParser } from "../../tmi/MessageParse";
 
 export class IndividualWorldRecord implements ICommand {
     moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN;
@@ -11,9 +12,10 @@ export class IndividualWorldRecord implements ICommand {
     }
 
     async run(): Promise<MessageData> {
-        const stringExtract = new StringExtract(this.messageData);
-        const game: string = await stringExtract.game();
-        switch (game.toUpperCase()) {
+        const messageParser = new MessageParser();
+        const gameName: string = await messageParser.getGame(this.messageData, 1);
+
+        switch (gameName.toUpperCase()) {
             case InduvidualLevelSupport.DKR:
                 return new IndividualWorldRecordDiddyKongRacing(this.messageData).run();
             default:
