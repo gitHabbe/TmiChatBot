@@ -9,7 +9,6 @@ import { ClientSingleton } from "./ClientSingleton";
 import { JoinedUser } from "../../interfaces/prisma";
 import { Command, Component } from "@prisma/client";
 import { ComponentPrisma } from "../database/ComponentPrisma";
-import { CommandPrisma } from "../database/CommandPrisma";
 
 export class ChatEvent {
     async onMessage(ircChannel: string, chatter: ChatUserstate, message: string, self: boolean): Promise<void> {
@@ -46,7 +45,6 @@ export class ChatEvent {
     }
 
     private static async standardCommandAction(messageData: MessageData): Promise<boolean> {
-        const commandName: string = MessageParser.getCommandName(messageData.message);
         const messageParser: MessageParser = new MessageParser();
         const commandName: string = messageParser.getCommandName(messageData.message);
         const commandList: CommandList = new StandardCommandList(messageData);
@@ -59,11 +57,11 @@ export class ChatEvent {
         const isComponentEnabled = componentPrisma.isFamilyEnabled(command.moduleFamily);
         const isProtected = command.moduleFamily === ModuleFamily.PROTECTED;
         
-        const chatter = messageData.chatter.username?.toUpperCase();
-        const streamer = messageData.channel.toUpperCase();
+        const chatter: string | undefined = messageData.chatter.username?.toUpperCase();
+        const streamer: string = messageData.channel.toUpperCase();
         const client = ClientSingleton.getInstance().get();
         if (isProtected) {
-            const commandResponse = await command.run();
+            const commandResponse: MessageData = await command.run();
             await client.say(messageData.channel, commandResponse.response)
             return true
         }
