@@ -24,4 +24,14 @@ export class TwitchFetch {
         if (targetChannel === undefined) throw new Error("Error using command")
         return targetChannel;
     }
+
+    async getTitle(channel: string) {
+        const { title } = await this.singleChannel(channel);
+        return title;
+    }
+
+    async singleChannel(channel: string): Promise<ITwitchChannel> {
+        const twitchChannels = await this.channelList(channel);
+        return this.filteredChannel(twitchChannels, channel);
+    }
 }
