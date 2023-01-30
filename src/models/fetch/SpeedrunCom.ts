@@ -8,7 +8,9 @@ import {
   IGameSearchResponse,
   IGameType,
   ILeaderboard,
-  ILeaderboardResponse
+  ILeaderboardResponse,
+  IRunner,
+  IRunnerResponse
 } from "../../interfaces/speedrun";
 import { FullGame } from "../../interfaces/prisma";
 
@@ -68,6 +70,22 @@ export class SpeedrunLeaderboard {
 
   async fetch(): Promise<ILeaderboard> {
     const axiosResponse = await this.axiosInstance.get<ILeaderboardResponse>(this.options.url);
+    return axiosResponse.data.data
+  }
+}
+
+export class SpeedrunRunner {
+  private options: IAxiosOptions = {
+    type: "Runner",
+    name: this.name,
+    url: `/users/${this.name}`,
+  };
+
+  constructor(private name: string, private axiosInstance: AxiosInstance = speedrunAPI) {
+  }
+
+  async fetch(): Promise<IRunner> {
+    const axiosResponse = await this.axiosInstance.get<IRunnerResponse>(this.options.url);
     return axiosResponse.data.data
   }
 }
