@@ -1,12 +1,22 @@
 import { ICommand } from "../../../interfaces/Command";
 import { StringExtract } from "../../StringExtract";
 import { Leaderboard } from "../../fetch/Leaderboard";
-import { IRun } from "../../../interfaces/speedrun";
+import {
+    ICategoryResponse,
+    ICategoryType,
+    IGameResponse,
+    IGameSearchResponse,
+    IGameType,
+    IRun
+} from "../../../interfaces/speedrun";
 import { formatWorldRecord } from "../../../utility/math";
 import { FullGame } from "../../../interfaces/prisma";
-import { GameModel } from "../../database/GamePrisma";
+import { GameModel, SpeedrunCategory, SpeedrunGame } from "../../database/GamePrisma";
 import { MessageData } from "../../tmi/MessageData";
 import { ModuleFamily } from "../../../interfaces/tmi";
+import { MessageParser } from "../../tmi/MessageParse";
+import { TwitchFetch } from "../../fetch/TwitchTv";
+import { SpeedrunCategories } from "../../fetch/SpeedGame";
 
 export class WorldRecord implements ICommand {
     public moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN;
@@ -15,25 +25,46 @@ export class WorldRecord implements ICommand {
     }
 
     async run(): Promise<MessageData> {
-        const stringExtract = new StringExtract(this.messageData);
-        const gameName: string = await stringExtract.game();
-        const game = await this.getGame(gameName);
-        const query: string = await stringExtract.category();
-        if (!game) {
+        const messageParser = new MessageParser();
+        const gameName: string = await messageParser.gameName(this.messageData, 1);
+        const gameModel = new GameModel(gameName);
+        let databaseGame = await gameModel.get();
+        const categoryName: string = await messageParser.categoryName(this.messageData, 2);
+        if (!databaseGame) {
+            const speedrunGame = new SpeedrunGame(gameName);
+            const gameList: IGameType[] = await speedrunGame.fetch();
+            console.log(gameList);
+            const foundGame: IGameType | undefined = gameList.find(iGameType => {
+                const isNameCorrect = iGameType.names.international.toUpperCase() === gameName.toUpperCase();
+                const isAbbreviationCorrect = iGameType.abbreviation.toUpperCase() === gameName.toUpperCase();
+                return isNameCorrect || isAbbreviationCorrect;
+            })
+            if (gameList.length === 0 || !foundGame) {
+                this.messageData.response = `Game ${gameName} not found on SpeedrunDotCom`;
+                return this.messageData;
+            }
+            const speedrunCategory = new SpeedrunCategory(foundGame);
+            const categoryList: ICategoryResponse = await speedrunCategory.fetch()
+            const validCategoryList = categoryList.data.filter(iCategoryType => {
+                return iCategoryType.links.find(link => link.rel === "leaderboard")
+            })
+            console.log(validCategoryList);
+            const gameModel = new GameModel(foundGame.names.international);
+            const savedGame = await gameModel.save(foundGame, validCategoryList);
+        }
+        databaseGame = await gameModel.get();
+        if (!databaseGame) {
             this.messageData.response = `Game ${gameName} not found on SpeedrunDotCom`;
             return this.messageData;
         }
-        const leaderboard = new Leaderboard(game);
-        const fuzzyCategory = leaderboard.fuzzyCategory(query);
+        const leaderboard = new Leaderboard(databaseGame);
+        const fuzzyCategory = leaderboard.fuzzyCategory(categoryName);
         const [ { item: category } ] = fuzzyCategory;
         const worldRecord: IRun = await leaderboard.fetchWorldRecord(category);
+        console.log(worldRecord);
         this.messageData.response = await formatWorldRecord(worldRecord, category.name);
+        // this.messageData.response = `${gameName} ${categoryName}`
 
         return this.messageData;
     };
-
-    private async getGame(gameName: string): Promise<FullGame | null> {
-        const gameModel = new GameModel(gameName);
-        return await gameModel.pull();
-    }
 }
