@@ -1,6 +1,6 @@
 import { ICommand } from "../../interfaces/Command";
 import { ChatUserstate } from "tmi.js";
-import { TrustModel } from "../database/TrustPrisma";
+import { TrustPrisma } from "../database/TrustPrisma";
 import { UserModel } from "../database/UserPrisma";
 import { ComponentPrisma } from "../database/ComponentPrisma";
 import { MessageData } from "../tmi/MessageData";
@@ -15,7 +15,7 @@ export class AddTrust implements ICommand {
     }
 
     private async addTrust(user: JoinedUser, chatter: ChatUserstate, newTrust: string) {
-        const trust = new TrustModel(user, chatter);
+        const trust = new TrustPrisma(user, chatter);
         return await trust.save(newTrust, newTrust);
     }
 
@@ -63,7 +63,7 @@ export class NewTrust {
         const newTrust = message.split(" ")[1];
         if (!newTrust) throw new Error("No user specified");
         const user = await this.getUser(channel);
-        const trust = new TrustModel(user, chatter);
+        const trust = new TrustPrisma(user, chatter);
         const addTrust = await trust.save(chatter.username);
         this.messageData.response = `${addTrust.name} added to trust-list`;
 

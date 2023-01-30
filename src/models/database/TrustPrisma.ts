@@ -3,7 +3,7 @@ import { JoinedUser, Model, ModelName } from "../../interfaces/prisma";
 import { DatabaseSingleton } from "./Prisma";
 import { Userstate } from "tmi.js";
 
-export class TrustModel {
+export class TrustPrisma {
   private db = DatabaseSingleton.getInstance().get();
   private client = this.db[ModelName.trust];
 
