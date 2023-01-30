@@ -8,7 +8,7 @@ export class StringExtract {
   private twitchFetch = new TwitchFetch();
   constructor(private messageData: MessageData) {}
 
-  game = async (): Promise<string> => {
+  async game(): Promise<string> {
     const { message } = this.messageData;
     const messageArray = message.split(" ").slice(1);
     if (!messageArray || !messageArray[0]) {
@@ -19,7 +19,7 @@ export class StringExtract {
     return messageArray[0];
   };
 
-  category = async (): Promise<string> => {
+  async category(): Promise<string> {
     const { message } = this.messageData;
     const messageArray = message.split(" ").slice(2);
     if (!messageArray || !messageArray[0]) {
