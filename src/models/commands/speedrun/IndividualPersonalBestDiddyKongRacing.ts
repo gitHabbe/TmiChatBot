@@ -2,7 +2,7 @@ import { ParseMessage } from "../../../utility/ParseMessage";
 import { ICommand } from "../../../interfaces/Command";
 import { fuseSearch } from "../../../utility/fusejs";
 import { ITrack } from "../../../interfaces/specificGames";
-import { Api, LeaderboardApi } from "../../fetch/SpeedrunCom";
+import { Api, LeaderboardApi } from "../../fetch/DepricatedSpeedrunCom";
 import { ILeaderboardResponse } from "../../../interfaces/speedrun";
 import { speedrunAPI } from "../../../config/speedrunConfig";
 import { RunnerPrisma } from "../../database/RunnerPrisma";

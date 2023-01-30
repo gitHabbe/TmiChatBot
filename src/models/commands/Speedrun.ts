@@ -5,7 +5,7 @@ import { ILeaderboardResponse, } from "../../interfaces/speedrun";
 import { datesDaysDifference, floatToHHMMSS } from "../../utility/dateFormat";
 import { fuseSearch } from "../../utility/fusejs";
 import { RunnerPrisma } from "../database/RunnerPrisma";
-import { Api, TimeTrialPersonalBestApi, TimeTrialWorldRecordApi, WorldRecordApi } from "../fetch/SpeedrunCom";
+import { Api, TimeTrialPersonalBestApi, TimeTrialWorldRecordApi, WorldRecordApi } from "../fetch/DepricatedSpeedrunCom";
 import { JsonTimeTrials } from "../JsonArrayFile";
 import { ICommand } from "../../interfaces/Command";
 import { ParseMessage } from "../../utility/ParseMessage";
