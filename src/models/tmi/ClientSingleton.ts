@@ -1,9 +1,10 @@
 import { Client } from "tmi.js";
 import { tmiOptions } from "../../config/tmiConfig";
+import { TmiClient } from "../../../test/ChatEvent.spec";
 
 export class ClientSingleton {
     private static instance: ClientSingleton;
-    public client = new Client(tmiOptions)
+    public client: TmiClient = new Client(tmiOptions)
 
     static getInstance(): ClientSingleton {
         if (!ClientSingleton.instance) {
@@ -12,7 +13,7 @@ export class ClientSingleton {
         return ClientSingleton.instance
     }
 
-    get(): Client {
+    get(): TmiClient {
         return this.client
     }
 }

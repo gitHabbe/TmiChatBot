@@ -51,20 +51,20 @@ export class ChatEvent {
         const command: ICommand | undefined = commandList.get(commandName);
         if (!command) return false;
 
-        const userModel = new UserModel(messageData.channel);
-        const joinedUser: JoinedUser = await userModel.get();
-        const componentPrisma = new ComponentPrisma(joinedUser, messageData.channel);
-        const isComponentEnabled = componentPrisma.isFamilyEnabled(command.moduleFamily);
-        const isProtected = command.moduleFamily === ModuleFamily.PROTECTED;
-        
-        const chatter: string | undefined = messageData.chatter.username?.toUpperCase();
-        const streamer: string = messageData.channel.toUpperCase();
         const client = ClientSingleton.getInstance().get();
+        const isProtected = command.moduleFamily === ModuleFamily.PROTECTED;
         if (isProtected) {
             const commandResponse: MessageData = await command.run();
             await client.say(messageData.channel, commandResponse.response)
             return true
         }
+
+        const chatter: string | undefined = messageData.chatter.username?.toUpperCase();
+        const streamer: string = messageData.channel.toUpperCase();
+        const userModel = new UserModel(messageData.channel);
+        const joinedUser: JoinedUser = await userModel.get();
+        const componentPrisma = new ComponentPrisma(joinedUser, messageData.channel);
+        const isComponentEnabled: Component | undefined = componentPrisma.isFamilyEnabled(command.moduleFamily);
         if (!isComponentEnabled) {
             if (streamer === chatter) {
                 await client.say(messageData.channel, `Command: ${commandName} is not enabled. Use "!toggle ${command.moduleFamily}"`)
