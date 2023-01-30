@@ -11,7 +11,7 @@ import {
 } from "../../../interfaces/speedrun";
 import { formatWorldRecord } from "../../../utility/math";
 import { FullGame } from "../../../interfaces/prisma";
-import { GameModel, SpeedrunCategory, SpeedrunGame } from "../../database/GamePrisma";
+import { GamePrisma, SpeedrunCategory, SpeedrunGame } from "../../database/GamePrisma";
 import { MessageData } from "../../tmi/MessageData";
 import { ModuleFamily } from "../../../interfaces/tmi";
 import { MessageParser } from "../../tmi/MessageParse";
@@ -27,7 +27,7 @@ export class WorldRecord implements ICommand {
     async run(): Promise<MessageData> {
         const messageParser = new MessageParser();
         const gameName: string = await messageParser.gameName(this.messageData, 1);
-        const gameModel = new GameModel(gameName);
+        const gameModel = new GamePrisma(gameName);
         let databaseGame = await gameModel.get();
         const categoryName: string = await messageParser.categoryName(this.messageData, 2);
         if (!databaseGame) {
@@ -49,7 +49,7 @@ export class WorldRecord implements ICommand {
                 return iCategoryType.links.find(link => link.rel === "leaderboard")
             })
             console.log(validCategoryList);
-            const gameModel = new GameModel(foundGame.names.international);
+            const gameModel = new GamePrisma(foundGame.names.international);
             const savedGame = await gameModel.save(foundGame, validCategoryList);
         }
         databaseGame = await gameModel.get();

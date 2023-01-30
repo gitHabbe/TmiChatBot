@@ -82,7 +82,7 @@ export class SpeedrunCategory {
 //   }
 // }
 
-export class GameModel {
+export class GamePrisma {
   private db = DatabaseSingleton.getInstance().get();
   private client = this.db[ModelName.game];
 

@@ -1,6 +1,6 @@
 import { ICommand } from "../../../interfaces/Command";
 import { StringExtract } from "../../StringExtract";
-import { GameModel } from "../../database/GamePrisma";
+import { GamePrisma } from "../../database/GamePrisma";
 import { FullGame } from "../../../interfaces/prisma";
 import { RunnerPrisma } from "../../database/RunnerPrisma";
 import { Leaderboard } from "../../fetch/Leaderboard";
@@ -21,7 +21,7 @@ export class PersonalBest implements ICommand {
         this.messageData.message = messageArray.join(" ");
         const stringExtract = new StringExtract(this.messageData);
         const gameName: string = await stringExtract.game();
-        const gameModel = new GameModel(gameName);
+        const gameModel = new GamePrisma(gameName);
         const game = await gameModel.get();
         const query: string = await stringExtract.category();
         if (!game) {
