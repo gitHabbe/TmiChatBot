@@ -273,6 +273,7 @@ export class LeaderboardApi<T> {
 //     return data.data;
 //   }
 // }
+
 export class SpeedrunCategories {
   private options: IAxiosOptions = {
     type: "Categories",
