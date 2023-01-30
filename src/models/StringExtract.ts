@@ -30,13 +30,3 @@ export class StringExtract {
     return messageArray.join(" ");
   };
 }
-
-class MessageParser {
-  constructor(private messageData: MessageData) {}
-
-  getWordNum(num: number): string {
-    const { message } = this.messageData;
-    const messageArray = message.split(" ").slice(num);
-    return messageArray[0];
-  }
-}
