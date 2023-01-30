@@ -1,5 +1,4 @@
-import { ChatUserstate, Userstate } from "tmi.js";
-import { MessageData } from "../models/tmi/MessageData";
+import { ChatUserstate, Client } from "tmi.js";
 
 export interface TmiMessageProps {
   channel: string;
@@ -51,3 +50,9 @@ export type OnMessage = (
   message: string,
   self: boolean
 ) => void;
+
+export interface TmiClient {
+    on(event: any, listener: any): Client;
+    connect(): Promise<[ string, number ]>;
+    say(channel: string, message: string): void;
+}

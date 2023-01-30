@@ -1,12 +1,7 @@
 import { ChatEvent } from "../src/models/tmi/ChatEvent";
-import { ChatUserstate, Client } from "tmi.js";
+import { ChatUserstate } from "tmi.js";
 import { ClientSingleton } from "../src/models/tmi/ClientSingleton";
-
-export interface TmiClient {
-    on(event: any, listener: any): Client;
-    connect(): Promise<[string, number]>;
-    say: (channel: string, message: string) => void;
-}
+import { TmiClient } from "../src/interfaces/tmi";
 
 export interface TmiClientTest extends TmiClient {
     testResults: TestResponse

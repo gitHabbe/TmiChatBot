@@ -1,6 +1,6 @@
 import { Client } from "tmi.js";
 import { tmiOptions } from "../../config/tmiConfig";
-import { TmiClient } from "../../../test/ChatEvent.spec";
+import { TmiClient } from "../../interfaces/tmi";
 
 export class ClientSingleton {
     private static instance: ClientSingleton;
