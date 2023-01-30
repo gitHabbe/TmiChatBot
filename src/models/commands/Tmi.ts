@@ -11,8 +11,7 @@ import { Trust } from "@prisma/client";
 export class AddTrust implements ICommand {
     moduleFamily: ModuleFamily = ModuleFamily.PROTECTED
 
-    constructor(public messageData: MessageData) {
-    }
+    constructor(public messageData: MessageData) {}
 
     private async addTrust(user: JoinedUser, chatter: ChatUserstate, newTrust: string) {
         const trust = new TrustPrisma(user, chatter);
@@ -24,7 +23,7 @@ export class AddTrust implements ICommand {
         return await userPrisma.get();
     }
 
-    run = async () => {
+    async run() {
         const { channel, message, chatter } = this.messageData;
         if (!chatter.username) throw new Error("Creator not specified");
         if (!chatter.id) {
@@ -46,18 +45,17 @@ export class AddTrust implements ICommand {
     }
 }
 
-export class NewTrust {
-    constructor(public messageData: MessageData) {
-    }
+export class NewTrust implements ICommand {
+    moduleFamily: ModuleFamily = ModuleFamily.PROTECTED
 
-    private getUser = async (channel: string) => {
+    constructor(public messageData: MessageData) {}
+
+    private async getUser(channel: string): Promise<JoinedUser> {
         const userPrisma = new UserPrisma(channel);
-        const user = await userPrisma.get();
-        if (!user) throw new Error(`User not found`);
-        return user;
+        return await userPrisma.get();
     }
 
-    run = async () => {
+    async run(): Promise<MessageData> {
         const { channel, message, chatter } = this.messageData;
         if (!chatter.username) throw new Error("Creator not specified");
         const newTrust = message.split(" ")[1];
