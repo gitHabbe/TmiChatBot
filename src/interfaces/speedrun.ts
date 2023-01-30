@@ -97,7 +97,7 @@ export enum TwitchTvErrorMessage {
   Generic = "Problem getting data from",
 }
 
-export enum InduvidualLevelSupport {
+export enum IndividualLevelSupport {
   DKR = "DKR",
 }
 

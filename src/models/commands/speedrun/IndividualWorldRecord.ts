@@ -1,6 +1,6 @@
 import { ICommand } from "../../../interfaces/Command";
 import { StringExtract } from "../../StringExtract";
-import { InduvidualLevelSupport } from "../../../interfaces/speedrun";
+import { IndividualLevelSupport } from "../../../interfaces/speedrun";
 import { IndividualWorldRecordDiddyKongRacing } from "../Speedrun";
 import { MessageData } from "../../tmi/MessageData";
 import { ModuleFamily } from "../../../interfaces/tmi";
@@ -16,7 +16,7 @@ export class IndividualWorldRecord implements ICommand {
         const gameName: string = await messageParser.gameName(this.messageData, 1);
 
         switch (gameName.toUpperCase()) {
-            case InduvidualLevelSupport.DKR:
+            case IndividualLevelSupport.DKR:
                 return new IndividualWorldRecordDiddyKongRacing(this.messageData).run();
             default:
                 this.messageData.response = `${gameName} doesn't support !ilwr`;

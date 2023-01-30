@@ -65,8 +65,7 @@ export class SpeedrunLeaderboard {
     url: `/leaderboards/${this.game.id}/category/${this.category.id}?top=1`,
   };
 
-  constructor(private game: FullGame, private category: ICategoryType, private axiosInstance: AxiosInstance = speedrunAPI) {
-  }
+  constructor(private game: FullGame, private category: ICategoryType, private axiosInstance: AxiosInstance = speedrunAPI) {}
 
   async fetch(): Promise<ILeaderboard> {
     const axiosResponse = await this.axiosInstance.get<ILeaderboardResponse>(this.options.url);
@@ -81,8 +80,7 @@ export class SpeedrunRunner {
     url: `/users/${this.name}`,
   };
 
-  constructor(private name: string, private axiosInstance: AxiosInstance = speedrunAPI) {
-  }
+  constructor(private name: string, private axiosInstance: AxiosInstance = speedrunAPI) {}
 
   async fetch(): Promise<IRunner> {
     const axiosResponse = await this.axiosInstance.get<IRunnerResponse>(this.options.url);

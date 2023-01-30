@@ -1,6 +1,6 @@
 import { ICommand } from "../../../interfaces/Command";
 import { StringExtract } from "../../StringExtract";
-import { InduvidualLevelSupport } from "../../../interfaces/speedrun";
+import { IndividualLevelSupport } from "../../../interfaces/speedrun";
 import { IndividualPersonalBestDiddyKongRacing } from "./IndividualPersonalBestDiddyKongRacing";
 import { MessageData } from "../../tmi/MessageData";
 import { ModuleFamily } from "../../../interfaces/tmi";
@@ -17,7 +17,7 @@ export class IndividualPersonalBest implements ICommand {
         const gameName: string = await messageParser.gameName(this.messageData, 2);
 
         switch (gameName.toUpperCase()) {
-            case InduvidualLevelSupport.DKR:
+            case IndividualLevelSupport.DKR:
                 return new IndividualPersonalBestDiddyKongRacing(this.messageData).run();
             default:
                 this.messageData.response = `${gameName} doesn't support !ilpb`
