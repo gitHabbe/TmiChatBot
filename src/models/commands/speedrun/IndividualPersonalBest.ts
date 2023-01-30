@@ -14,7 +14,7 @@ export class IndividualPersonalBest implements ICommand {
 
     run = async () => {
         const messageParser = new MessageParser();
-        const gameName: string = await messageParser.getGame(this.messageData, 2);
+        const gameName: string = await messageParser.gameName(this.messageData, 2);
 
         switch (gameName.toUpperCase()) {
             case InduvidualLevelSupport.DKR:

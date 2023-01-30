@@ -13,7 +13,7 @@ export class IndividualWorldRecord implements ICommand {
 
     async run(): Promise<MessageData> {
         const messageParser = new MessageParser();
-        const gameName: string = await messageParser.getGame(this.messageData, 1);
+        const gameName: string = await messageParser.gameName(this.messageData, 1);
 
         switch (gameName.toUpperCase()) {
             case InduvidualLevelSupport.DKR:
