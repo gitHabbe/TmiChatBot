@@ -18,10 +18,10 @@ export class Api<T> implements IAPI<T> {
   throw = (options: IAxiosOptions, error: Error | AxiosError) => {
     if (!axios.isAxiosError(error))
       throw new Error(SpeedrunComErrorMessage.Generic);
-    if (!error.response) throw new Error(SpeedrunComErrorMessage.GenericAxios);
+    if (!error.message) throw new Error(SpeedrunComErrorMessage.GenericAxios);
     const { type, name } = options;
     const { NotFound, ServerError } = StatusCode;
-    switch (error.response.status) {
+    switch (error.message.status) {
       case NotFound:
         throw new Error(`${type} ${name} ${SpeedrunComErrorMessage.NotFound}`);
       case ServerError:
@@ -46,6 +46,8 @@ export class GameApi<T> {
     return data;
   };
 }
+
+
 
 export class CategoriesApi<T> {
   private options: IAxiosOptions = {
@@ -172,31 +174,31 @@ export class LeaderboardApi<T> {
 //   console.log("data:", data);
 // });
 
-export class SpeedrunDotCom<T> implements IAPI<T> {
-  fetch = async (options: IAxiosOptions) => {
-    try {
-      return await speedrunAPI.get<T>(options.url);
-    } catch (error: any) {
-      return this.throw(options, error);
-    }
-  };
-
-  throw = (options: IAxiosOptions, error: Error | AxiosError) => {
-    if (!axios.isAxiosError(error))
-      throw new Error(SpeedrunComErrorMessage.Generic);
-    if (!error.response) throw new Error(SpeedrunComErrorMessage.GenericAxios);
-    const { type, name } = options;
-    const { NotFound, ServerError } = StatusCode;
-    switch (error.response.status) {
-      case NotFound:
-        throw new Error(`${type} ${name} ${SpeedrunComErrorMessage.NotFound}`);
-      case ServerError:
-        throw new Error(`${SpeedrunComErrorMessage.ServerError}`);
-      default:
-        throw new Error(`${SpeedrunComErrorMessage.Generic} ${type} ${name}`);
-    }
-  };
-}
+// export class SpeedrunDotCom<T> implements IAPI<T> {
+//   fetch = async (options: IAxiosOptions) => {
+//     try {
+//       return await speedrunAPI.get<T>(options.url);
+//     } catch (error: any) {
+//       return this.throw(options, error);
+//     }
+//   };
+//
+//   throw = (options: IAxiosOptions, error: Error | AxiosError) => {
+//     if (!axios.isAxiosError(error))
+//       throw new Error(SpeedrunComErrorMessage.Generic);
+//     if (!error.message) throw new Error(SpeedrunComErrorMessage.GenericAxios);
+//     const { type, name } = options;
+//     const { NotFound, ServerError } = StatusCode;
+//     switch (error.message.status) {
+//       case NotFound:
+//         throw new Error(`${type} ${name} ${SpeedrunComErrorMessage.NotFound}`);
+//       case ServerError:
+//         throw new Error(`${SpeedrunComErrorMessage.ServerError}`);
+//       default:
+//         throw new Error(`${SpeedrunComErrorMessage.Generic} ${type} ${name}`);
+//     }
+//   };
+// }
 
 // export class TwitchDotTv<T> implements IAPI<T> {
 //   fetch = async (options: IAxiosOptions) => {
@@ -223,30 +225,31 @@ export class SpeedrunDotCom<T> implements IAPI<T> {
 //     }
 //   };
 // }
-export class SpeedrunCom<T> {
-  constructor(private options: IAxiosOptions) {}
+// export class SpeedrunCom<T> {
+//   constructor(private options: IAxiosOptions) {}
+//
+//   fetchAPI = async () => {
+//     try {
+//       return await speedrunAPI.get<T>(this.options.url);
+//     } catch (error: any) {
+//       return this.throwError(error);
+//     }
+//   };
+//
+//   throwError = (error: Error | AxiosError) => {
+//     if (!axios.isAxiosError(error))
+//       throw new Error(SpeedrunComErrorMessage.Generic);
+//     if (!error.message) throw new Error(SpeedrunComErrorMessage.GenericAxios);
+//     const { type, name } = this.options;
+//     const { NotFound, ServerError } = StatusCode;
+//     switch (error.message.status) {
+//       case NotFound:
+//         throw new Error(`${type} ${name} ${SpeedrunComErrorMessage.NotFound}`);
+//       case ServerError:
+//         throw new Error(`${SpeedrunComErrorMessage.ServerError}`);
+//       default:
+//         throw new Error(`${SpeedrunComErrorMessage.Generic} ${type} ${name}`);
+//     }
+//   };
+// }
 
-  fetchAPI = async () => {
-    try {
-      return await speedrunAPI.get<T>(this.options.url);
-    } catch (error: any) {
-      return this.throwError(error);
-    }
-  };
-
-  throwError = (error: Error | AxiosError) => {
-    if (!axios.isAxiosError(error))
-      throw new Error(SpeedrunComErrorMessage.Generic);
-    if (!error.response) throw new Error(SpeedrunComErrorMessage.GenericAxios);
-    const { type, name } = this.options;
-    const { NotFound, ServerError } = StatusCode;
-    switch (error.response.status) {
-      case NotFound:
-        throw new Error(`${type} ${name} ${SpeedrunComErrorMessage.NotFound}`);
-      case ServerError:
-        throw new Error(`${SpeedrunComErrorMessage.ServerError}`);
-      default:
-        throw new Error(`${SpeedrunComErrorMessage.Generic} ${type} ${name}`);
-    }
-  };
-}

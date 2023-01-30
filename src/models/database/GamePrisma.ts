@@ -1,31 +1,106 @@
 import { DatabaseSingleton } from "./Prisma";
 import { FullGame, ModelName } from "../../interfaces/prisma";
 import {
-  IGameType,
+  ICategoryResponse,
   ICategoryType,
   IGameResponse,
-  ICategoryResponse,
+  IGameSearchResponse,
+  IGameType,
   Link,
 } from "../../interfaces/speedrun";
 import { speedrunAPI } from "../../config/speedrunConfig";
-import { Api, CategoriesApi, GameApi } from "../fetch/SpeedrunCom";
+import { IAxiosOptions } from "../../interfaces/Axios";
+import { AxiosInstance } from "axios";
+
+export class SpeedrunGame {
+  private options: IAxiosOptions = {
+    name: this.name,
+    type: "game",
+    url: `/games`,
+  };
+
+  constructor(private name: string, private axiosInstance: AxiosInstance = speedrunAPI) {}
+
+  async fetch(): Promise<IGameType[]> {
+    const baseURL = this.options.url;
+    this.options.url = `${baseURL}/${this.name}`;
+    // try {
+    const axiosResponse = await this.axiosInstance.get<IGameResponse>(this.options.url);
+    return [ axiosResponse.data.data ]
+    // } catch (e) {
+    // console.log(e);
+      // this.options.url = `${baseURL}?name=${this.name}`;
+      // const fetchAttempt1 = await this.axiosInstance.get<IGameSearchResponse>(this.options.url);
+      // if (fetchAttempt1.data.data.length > 0) {
+      //   return fetchAttempt1.data.data
+      // }
+      // this.options.url = `${baseURL}?abbreviation=${this.name}`;
+      // const fetchAttempt2 = await this.axiosInstance.get<IGameSearchResponse>(this.options.url);
+      // return fetchAttempt2.data.data
+    }
+  // }
+}
+
+export class SpeedrunCategory {
+  private options: IAxiosOptions = {
+    name: this.game.names.international,
+    type: "category",
+    url: `/games/${this.game.id}/categories`,
+  };
+
+  constructor(private game: IGameType, private axiosInstance: AxiosInstance = speedrunAPI) {}
+
+  async fetch() {
+    // try {
+    const { data } = await this.axiosInstance.get<ICategoryResponse>(this.options.url);
+    return data
+    // } catch (e) {
+    //   console.log(e);
+    //   return []
+    // }
+  }
+
+}
+
+// export class SpeedrunFetch {
+//
+//   async getLeaderboard(gameName: string) {
+//     const game: IGameResponse | IGameSearchResponse = await this.fetchGame(gameName);
+//     const categories: ICategoryType[] = await this.fetchCategories(game);
+//
+//     return { game, categories }
+//   }
+//
+//   private async fetchCategories(game: IGameResponse | IGameSearchResponse): Promise<ICategoryType[]> {
+//     const speedrunCategory = new SpeedrunCategory(game);
+//     return await speedrunCategory.fetch()
+//   }
+//
+//   async fetchGame(gameName: string): Promise<IGameResponse | IGameSearchResponse> {
+//     const gameFetch = new SpeedrunGame(gameName);
+//     return await gameFetch.fetch()
+//   }
+// }
 
 export class GameModel {
   private db = DatabaseSingleton.getInstance().get();
   private client = this.db[ModelName.game];
+
   constructor(private name: string) {}
 
-  pull = async (): Promise<FullGame | null> => {
-    const game: FullGame | null = await this.get();
-    if (game === null) {
-      const savedGame = await this.save();
-      this.name = savedGame.abbreviation;
-      return await this.get();
-    }
-    return game;
-  };
+  // pull = async (): Promise<FullGame | null> => {
+  //   const fullGame: FullGame | null = await this.get();
+  //   const speedrunFetch = new SpeedrunFetch();
+  //   const { game, categories } = await speedrunFetch.getLeaderboard(this.name);
+  //   if (fullGame === null) {
+  //     const savedGame = await this.save(game, categories);
+  //     this.name = savedGame.abbreviation;
+  //     return await this.get();
+  //   }
+  //   return fullGame;
+  // };
 
-  get = async () => {
+  get = async (): Promise<FullGame | null> => {
     return this.client.findFirst({
       where: {
         OR: [
@@ -55,14 +130,9 @@ export class GameModel {
     throw new Error(`Uncallable`);
   };
 
-  save = async () => {
-    const apiGame = new Api<IGameResponse>(speedrunAPI);
-    const gameApi = new GameApi(apiGame, this.name);
-    const { data: game }: IGameResponse = await gameApi.fetch();
-
-    const apiCategories = new Api<ICategoryResponse>(speedrunAPI);
-    const categoriesApi = new CategoriesApi(apiCategories, game);
-    const { data: categories }: ICategoryResponse = await categoriesApi.fetch();
+  async save(game: IGameType, categories: ICategoryType[]) {
+    // const speedrunFetch = new SpeedrunFetch();
+    // const { game, categories } = await speedrunFetch.getLeaderboard(this.name);
 
     return await this.client.create({
       data: {
