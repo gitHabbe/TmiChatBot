@@ -4,7 +4,7 @@ import { CommandList, StandardCommandList } from "../commands/StandardCommandLis
 import { ICommand } from "../../interfaces/Command";
 import { MessageParser } from "./MessageParse";
 import { MessageData } from "./MessageData";
-import { UserModel } from "../database/UserPrisma";
+import { UserPrisma } from "../database/UserPrisma";
 import { ClientSingleton } from "./ClientSingleton";
 import { JoinedUser } from "../../interfaces/prisma";
 import { Command, Component } from "@prisma/client";
@@ -24,7 +24,7 @@ export class ChatEvent {
     }
 
     private static async customCommandAction(channel: string, message: string): Promise<boolean> {
-        const userModel: UserModel = new UserModel(channel);
+        const userModel: UserPrisma = new UserPrisma(channel);
         const joinedUser: JoinedUser = await userModel.get();
         const isCustomCommand: Command[] = joinedUser.commands.filter((command: Command) => {
             return command.name === message
@@ -40,7 +40,7 @@ export class ChatEvent {
     async onJoin(ircChannel: string, username: string, self: boolean) {
         console.log(`I HAVE JOINED ${ircChannel}`);
         const channel: string = ircChannel.slice(1);
-        const userModel = new UserModel(channel);
+        const userModel = new UserPrisma(channel);
         await userModel.get();
     }
 
@@ -61,7 +61,7 @@ export class ChatEvent {
 
         const chatter: string | undefined = messageData.chatter.username?.toUpperCase();
         const streamer: string = messageData.channel.toUpperCase();
-        const userModel = new UserModel(messageData.channel);
+        const userModel = new UserPrisma(messageData.channel);
         const joinedUser: JoinedUser = await userModel.get();
         const componentPrisma = new ComponentPrisma(joinedUser, messageData.channel);
         const isComponentEnabled: Component | undefined = componentPrisma.isFamilyEnabled(command.moduleFamily);

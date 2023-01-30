@@ -1,5 +1,5 @@
 import { Command } from "@prisma/client";
-import { UserModel } from "../database/UserPrisma";
+import { UserPrisma } from "../database/UserPrisma";
 import { CommandPrisma } from "../database/CommandPrisma";
 import { ICommand } from "../../interfaces/Command";
 import { MessageData } from "../tmi/MessageData";
@@ -17,7 +17,7 @@ export class CustomCommand implements ICommand {
       streamer: string,
       targetCommand: string
   ): Promise<Command | undefined> => {
-    const userPrisma = new UserModel(streamer);
+    const userPrisma = new UserPrisma(streamer);
     const user = await userPrisma.get();
     if (!user) throw new Error(`User not found`);
     const commands = await this.allCommands(user);

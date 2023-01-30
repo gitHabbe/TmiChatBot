@@ -1,5 +1,5 @@
 import { ICommand } from "../../../interfaces/Command";
-import { UserModel } from "../../database/UserPrisma";
+import { UserPrisma } from "../../database/UserPrisma";
 import { SettingPrisma } from "../../database/SettingPrisma";
 import { MessageData } from "../../tmi/MessageData";
 
@@ -8,7 +8,7 @@ export class SetSpeedrunner implements ICommand {
     }
 
     private getUser = async (channel: string) => {
-        const userPrisma = new UserModel(channel);
+        const userPrisma = new UserPrisma(channel);
         const user = await userPrisma.get();
         if (!user) throw new Error(`User not found`);
         return user;

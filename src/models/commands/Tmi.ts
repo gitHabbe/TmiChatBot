@@ -1,7 +1,7 @@
 import { ICommand } from "../../interfaces/Command";
 import { ChatUserstate } from "tmi.js";
 import { TrustPrisma } from "../database/TrustPrisma";
-import { UserModel } from "../database/UserPrisma";
+import { UserPrisma } from "../database/UserPrisma";
 import { ComponentPrisma } from "../database/ComponentPrisma";
 import { MessageData } from "../tmi/MessageData";
 import { ModuleFamily } from "../../interfaces/tmi";
@@ -20,7 +20,7 @@ export class AddTrust implements ICommand {
     }
 
     private async getUser(channel: string): Promise<JoinedUser> {
-        const userPrisma = new UserModel(channel);
+        const userPrisma = new UserPrisma(channel);
         return await userPrisma.get();
     }
 
@@ -51,7 +51,7 @@ export class NewTrust {
     }
 
     private getUser = async (channel: string) => {
-        const userPrisma = new UserModel(channel);
+        const userPrisma = new UserPrisma(channel);
         const user = await userPrisma.get();
         if (!user) throw new Error(`User not found`);
         return user;
@@ -100,7 +100,7 @@ export const isTrustedUser = async (
     streamer: string,
     madeBy: ChatUserstate
 ): Promise<boolean> => {
-    const userModel = new UserModel(streamer);
+    const userModel = new UserPrisma(streamer);
     const joinedUser: JoinedUser = await userModel.get();
     const trustList = joinedUser.trusts.find((trustee: Trust) => {
         return trustee.name.toUpperCase() === madeBy.username?.toUpperCase();
@@ -255,7 +255,7 @@ export class ToggleComponent implements ICommand {
     }
 
     private getUser = async (channel: string) => {
-        const userPrisma = new UserModel(channel);
+        const userPrisma = new UserPrisma(channel);
         const user = await userPrisma.get();
         if (!user) throw new Error(`msg`);
         return user;

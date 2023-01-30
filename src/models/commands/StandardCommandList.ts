@@ -1,7 +1,7 @@
 import { CommandName } from "../../interfaces/tmi";
 import { Client } from "tmi.js";
 import { ICommand } from "../../interfaces/Command";
-import { UserModel } from "../database/UserPrisma";
+import { UserPrisma } from "../database/UserPrisma";
 import { JoinedUser } from "../../interfaces/prisma";
 import { Component } from "@prisma/client";
 import { TwitchTitle } from "./twitch/TwitchTitle";

@@ -3,7 +3,7 @@ import { DatabaseSingleton } from "./Prisma";
 import { Component, User } from "@prisma/client";
 import { ModuleFamily } from "../../interfaces/tmi";
 
-export class UserModel implements Model {
+export class UserPrisma implements Model {
   private db = DatabaseSingleton.getInstance().get();
   private client = this.db[ModelName.user];
   constructor(private name: string) {}
