@@ -35,9 +35,7 @@ export class TwitchUptime implements ICommand {
 
     private async getStartedAt(): Promise<string> {
         const { channel } = this.messageData;
-        const twitchChannelList: ITwitchChannel[] = await this.twitchFetch.channelList(channel);
-        const filterTwitchChannel = new FilterTwitchChannel();
-        const singleChannel = filterTwitchChannel.channel(twitchChannelList, channel);
-        return singleChannel.started_at;
+        const iTwitchChannel = await this.twitchFetch.singleChannel(channel);
+        return iTwitchChannel.started_at;
     }
 }
