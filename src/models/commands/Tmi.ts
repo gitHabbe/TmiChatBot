@@ -64,7 +64,7 @@ export class NewTrust {
         if (!newTrust) throw new Error("No user specified");
         const user = await this.getUser(channel);
         const trust = new TrustPrisma(user, chatter);
-        const addTrust = await trust.save(chatter.username);
+        const addTrust = await trust.save(chatter.username, newTrust);
         this.messageData.response = `${addTrust.name} added to trust-list`;
 
         return this.messageData;
