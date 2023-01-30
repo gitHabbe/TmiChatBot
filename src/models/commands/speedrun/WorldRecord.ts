@@ -11,12 +11,13 @@ import {
 } from "../../../interfaces/speedrun";
 import { formatWorldRecord } from "../../../utility/math";
 import { FullGame } from "../../../interfaces/prisma";
-import { GamePrisma, SpeedrunCategory, SpeedrunGame } from "../../database/GamePrisma";
+import { GamePrisma} from "../../database/GamePrisma";
 import { MessageData } from "../../tmi/MessageData";
 import { ModuleFamily } from "../../../interfaces/tmi";
 import { MessageParser } from "../../tmi/MessageParse";
 import { TwitchFetch } from "../../fetch/TwitchTv";
 import { SpeedrunCategories } from "../../fetch/DepricatedSpeedrunCom";
+import { SpeedrunCategory, SpeedrunGame } from "../../fetch/SpeedrunCom";
 
 export class WorldRecord implements ICommand {
     public moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN;
