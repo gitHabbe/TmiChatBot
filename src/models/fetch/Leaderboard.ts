@@ -1,30 +1,9 @@
-import { Category, CategoryLink } from ".prisma/client";
-import { FullGame, JoinedGame } from "../../interfaces/prisma";
-import {
-  ICategoryType, IGameResponse, ILeaderboard,
-  ILeaderboardResponse,
-  IRun,
-} from "../../interfaces/speedrun";
+import { CategoryLink } from ".prisma/client";
+import { FullGame } from "../../interfaces/prisma";
+import { ICategoryType, IRun, } from "../../interfaces/speedrun";
 // import { SpeedrunCom } from "./SpeedrunCom";
 import { fuseSearch } from "../../utility/fusejs";
-import { IAxiosOptions } from "../../interfaces/Axios";
-import { AxiosInstance } from "axios";
-import { speedrunAPI } from "../../config/speedrunConfig";
-
-export class SpeedrunLeaderboard {
-  private options: IAxiosOptions = {
-    name: "World record",
-    type: "Leaderboard",
-    url: `/leaderboards/${this.game.id}/category/${this.category.id}?top=1`,
-  };
-
-  constructor(private game: FullGame, private category: ICategoryType, private axiosInstance: AxiosInstance = speedrunAPI) {}
-
-  async fetch(): Promise<ILeaderboard> {
-    const axiosResponse = await this.axiosInstance.get<ILeaderboardResponse>(this.options.url);
-    return axiosResponse.data.data
-  }
-}
+import { SpeedrunLeaderboard } from "./SpeedrunCom";
 
 export class Leaderboard {
   constructor(private game: FullGame) {}

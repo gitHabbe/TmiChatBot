@@ -5,7 +5,7 @@ import { IGameResponse, IRunner, IRunnerResponse } from "../../interfaces/speedr
 import { IAxiosOptions } from "../../interfaces/Axios";
 import { AxiosInstance } from "axios";
 import { speedrunAPI } from "../../config/speedrunConfig";
-import { SpeedrunLeaderboard } from "../fetch/Leaderboard";
+import { SpeedrunLeaderboard } from "../fetch/SpeedrunCom";
 
 class SpeedrunRunner {
   private options: IAxiosOptions = {

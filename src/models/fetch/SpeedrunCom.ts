@@ -1,7 +1,16 @@
 import { IAxiosOptions } from "../../interfaces/Axios";
 import { AxiosInstance } from "axios";
 import { speedrunAPI } from "../../config/speedrunConfig";
-import { ICategoryResponse, IGameResponse, IGameSearchResponse, IGameType } from "../../interfaces/speedrun";
+import {
+  ICategoryResponse,
+  ICategoryType,
+  IGameResponse,
+  IGameSearchResponse,
+  IGameType,
+  ILeaderboard,
+  ILeaderboardResponse
+} from "../../interfaces/speedrun";
+import { FullGame } from "../../interfaces/prisma";
 
 export class SpeedrunGame {
   private options: IAxiosOptions = {
@@ -44,5 +53,21 @@ export class SpeedrunCategory {
   async fetch() {
     const { data } = await this.axiosInstance.get<ICategoryResponse>(this.options.url);
     return data
+  }
+}
+
+export class SpeedrunLeaderboard {
+  private options: IAxiosOptions = {
+    name: "World record",
+    type: "Leaderboard",
+    url: `/leaderboards/${this.game.id}/category/${this.category.id}?top=1`,
+  };
+
+  constructor(private game: FullGame, private category: ICategoryType, private axiosInstance: AxiosInstance = speedrunAPI) {
+  }
+
+  async fetch(): Promise<ILeaderboard> {
+    const axiosResponse = await this.axiosInstance.get<ILeaderboardResponse>(this.options.url);
+    return axiosResponse.data.data
   }
 }
