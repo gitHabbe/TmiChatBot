@@ -6,6 +6,13 @@ export interface IGameType {
   links: Link[];
 }
 
+export interface IGameResponse {
+  data: IGameType;
+}
+
+export interface IGameSearchResponse {
+  data: IGameType[];
+}
 interface Names {
   international: string;
   twitch: string;
@@ -15,6 +22,7 @@ export interface Link {
   rel: string;
   uri: string;
 }
+
 export interface ILeaderboardResponse {
   data: ILeaderboard;
 }
@@ -55,16 +63,8 @@ export interface IRunner {
     international: string;
   };
 }
-
 export interface IRunnerResponse {
   data: IRunner;
-}
-
-export interface IGameResponse {
-  data: IGameType;
-}
-export interface IGameSearchResponse {
-  data: IGameType[];
 }
 
 export interface ICategoryType {
