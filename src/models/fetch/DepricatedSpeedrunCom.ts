@@ -1,7 +1,6 @@
 import axios, { AxiosError, AxiosInstance } from "axios";
-import { speedrunAPI } from "../../config/speedrunConfig";
 import { ITrack } from "../../interfaces/specificGames";
-import { IGameType, SpeedrunComErrorMessage, StatusCode, } from "../../interfaces/speedrun";
+import { IGameResponse, IGameType, SpeedrunComErrorMessage, StatusCode, } from "../../interfaces/speedrun";
 import { IAPI, IAxiosOptions } from "../../interfaces/Axios";
 
 export class Api<T> implements IAPI<T> {
@@ -253,3 +252,18 @@ export class LeaderboardApi<T> {
 //   };
 // }
 
+export class SpeedrunGame {
+  private options: IAxiosOptions = {
+    type: "Game",
+    name: this.name,
+    url: `/games/${this.name}`,
+  };
+
+  constructor(private instance: IAPI<IGameResponse>, private name: string) {
+  }
+
+  async fetch(): Promise<IGameType> {
+    const { data } = await this.instance.fetch(this.options);
+    return data.data;
+  }
+}

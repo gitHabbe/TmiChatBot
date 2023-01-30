@@ -16,7 +16,7 @@ import { MessageData } from "../../tmi/MessageData";
 import { ModuleFamily } from "../../../interfaces/tmi";
 import { MessageParser } from "../../tmi/MessageParse";
 import { TwitchFetch } from "../../fetch/TwitchTv";
-import { SpeedrunCategories } from "../../fetch/SpeedGame";
+import { SpeedrunCategories } from "../../fetch/SpeedrunCom";
 
 export class WorldRecord implements ICommand {
     public moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN;

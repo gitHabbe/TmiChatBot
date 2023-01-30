@@ -1,19 +1,5 @@
-import { ICategoryResponse, ICategoryType, IGameResponse, IGameType, } from "../../interfaces/speedrun";
+import { ICategoryResponse, ICategoryType, IGameType, } from "../../interfaces/speedrun";
 import { IAPI, IAxiosOptions } from "../../interfaces/Axios";
-
-export class SpeedrunGame {
-  private options: IAxiosOptions = {
-    type: "Game",
-    name: this.name,
-    url: `/games/${this.name}`,
-  };
-  constructor(private instance: IAPI<IGameResponse>, private name: string) {}
-
-  async fetch(): Promise<IGameType> {
-    const { data } = await this.instance.fetch(this.options);
-    return data.data;
-  }
-}
 
 export class SpeedrunCategories {
   private options: IAxiosOptions = {
