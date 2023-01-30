@@ -35,17 +35,16 @@ export interface JoinedUser extends User {
 }
 
 export interface JoinedGame extends Game {
-  id: string;
-  abbreviation: string;
+  // id: string;
+  // abbreviation: string;
   names: GameNames | null;
   links: GameLink[];
   platforms: GamePlatform[];
-  categories: {
-    links: CategoryLink[];
-    name: string;
-    id: string;
-    gameId: string;
-  }[];
+  categories: GameCategory[]
+}
+
+interface GameCategory extends Category {
+  links: CategoryLink[]
 }
 
 export type FullGame = Game & {
