@@ -16,31 +16,6 @@ export class JsonFile<T> {
   }
 }
 
-export class JsonStringArray {
-  private strings = new JsonFile<string[]>("tmi_channels");
-
-  add = (newString: string) => {
-    if (this.isInJson(newString)) {
-      throw new Error("User already in JSON");
-    }
-    writeFileSync(
-      this.strings.jsonFile,
-      JSON.stringify([...this.strings.getData, newString])
-    );
-  };
-
-  remove = (newString: string): void => {
-    const newArray = this.strings.getData.filter(
-      (curString: string) => curString !== newString
-    );
-    writeFileSync(this.strings.jsonFile, JSON.stringify(newArray));
-  };
-
-  isInJson = (newUser: string) => {
-    return this.strings.getData.find((user: string) => user === newUser);
-  };
-}
-
 export class JsonLevels {
   private levels = new JsonFile<ILevels>("dkr_data");
 
