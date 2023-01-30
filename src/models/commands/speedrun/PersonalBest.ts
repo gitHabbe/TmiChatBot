@@ -22,7 +22,7 @@ export class PersonalBest implements ICommand {
         const stringExtract = new StringExtract(this.messageData);
         const gameName: string = await stringExtract.game();
         const gameModel = new GameModel(gameName);
-        const game: FullGame | null = await gameModel.pull();
+        const game = await gameModel.get();
         const query: string = await stringExtract.category();
         if (!game) {
             this.messageData.response = `Game ${gameName} not found`;
