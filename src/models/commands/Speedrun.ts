@@ -1,16 +1,16 @@
 import { Runner } from ".prisma/client";
-import { dkr64API, speedrunAPI } from "../../config/speedrunConfig";
-import { ITimeTrialJson, ITimeTrialResponse, ITrack } from "../../interfaces/specificGames";
+import { ITimeTrialJson, ITrack } from "../../interfaces/specificGames";
 import { ILeaderboardResponse, } from "../../interfaces/speedrun";
 import { datesDaysDifference, floatToHHMMSS } from "../../utility/dateFormat";
 import { fuseSearch } from "../../utility/fusejs";
 import { RunnerPrisma } from "../database/RunnerPrisma";
-import { Api, TimeTrialPersonalBestApi, TimeTrialWorldRecordApi, WorldRecordApi } from "../fetch/DepricatedSpeedrunCom";
 import { JsonTimeTrials } from "../JsonArrayFile";
 import { ICommand } from "../../interfaces/Command";
 import { ParseMessage } from "../../utility/ParseMessage";
 import { MessageData } from "../tmi/MessageData";
 import { ModuleFamily } from "../../interfaces/tmi";
+import { DiddyKongRacingLeaderboard } from "../fetch/SpeedrunCom";
+import { DiddyKongRacingTimeTrialLeaderboard } from "../fetch/DKR64";
 
 export class IndividualWorldRecordDiddyKongRacing extends ParseMessage implements ICommand {
     moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN
@@ -20,9 +20,8 @@ export class IndividualWorldRecordDiddyKongRacing extends ParseMessage implement
     async run(): Promise<MessageData> {
         const { query, dkrLevels } = this.parseMessage();
         const [ { item } ] = fuseSearch<ITrack>(dkrLevels, query.join(" "));
-        const apiLeaderboard = new Api<ILeaderboardResponse>(speedrunAPI);
-        const leaderboardApi = new WorldRecordApi(apiLeaderboard, item);
-        const { data: leaderboard } = await leaderboardApi.fetch();
+        const diddyKingRacingLeaderboard = new DiddyKongRacingLeaderboard(item);
+        const { data: leaderboard }: ILeaderboardResponse = await diddyKingRacingLeaderboard.fetchWorldRecord();
         const { name, vehicle } = item;
         const worldRecordNumber: number = leaderboard.runs[0].run.times.primary_t;
         const worldRecordTime: string = floatToHHMMSS(worldRecordNumber);
@@ -89,9 +88,8 @@ export class TimeTrialWorldRecordDiddyKongRacing implements ICommand {
         let shortcut = "standard"
         if (isShortcut) shortcut = "shortcut"
         const [ { item } ] = fuseSearch<ITimeTrialJson>(dkrLevels, query.join(" "));
-        const apiTimeTrialWorldRecord = new Api<ITimeTrialResponse>(dkr64API);
-        const worldRecordApi = new TimeTrialWorldRecordApi(apiTimeTrialWorldRecord, item, laps, shortcut);
-        const res = await worldRecordApi.fetch()
+        const dkrtt = new DiddyKongRacingTimeTrialLeaderboard(item, 3, shortcut);
+        const res = await dkrtt.fetchWorldRecord();
         const track = item.name
             .split("-")
             .map((word) => {
@@ -173,9 +171,9 @@ export class TimeTrialPersonalBestDiddyKongRacing implements ICommand {
         let shortcut = "standard"
         if (isShortcut) shortcut = "shortcut"
         const [ { item } ] = fuseSearch<ITimeTrialJson>(dkrLevels, query.join(" "));
-        const apiTimeTrialPersonalBest = new Api<ITimeTrialResponse>(dkr64API);
-        const worldRecordApi = new TimeTrialPersonalBestApi(apiTimeTrialPersonalBest, item, laps, shortcut, "habbe");
-        const res = await worldRecordApi.fetch()
+        const dkrtt = new DiddyKongRacingTimeTrialLeaderboard(item, parseInt(laps), shortcut);
+        const res = await dkrtt.fetchPersonalBest("");
+        // const res = await worldRecordApi.fetch()
         const run = res.times.find((run) => {
             return run.username.toUpperCase() === this.targetUser.toUpperCase()
         })

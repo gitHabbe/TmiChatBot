@@ -13,6 +13,7 @@ import {
   IRunnerResponse
 } from "../../interfaces/speedrun";
 import { FullGame } from "../../interfaces/prisma";
+import { ITrack } from "../../interfaces/specificGames";
 
 export class SpeedrunGame {
   private options: IAxiosOptions = {
@@ -30,7 +31,8 @@ export class SpeedrunGame {
       const axiosResponse = await this.axiosInstance.get<IGameResponse>(this.options.url);
       return [ axiosResponse.data.data ]
     } catch (e) {
-      console.log(e);
+      // console.log(e);
+      console.log("USING CATCH")
       this.options.url = `${baseURL}?name=${this.name}`;
       const fetchAttempt1 = await this.axiosInstance.get<IGameSearchResponse>(this.options.url);
       if (fetchAttempt1.data.data.length > 0) {
@@ -85,5 +87,26 @@ export class SpeedrunRunner {
   async fetch(): Promise<IRunner> {
     const axiosResponse = await this.axiosInstance.get<IRunnerResponse>(this.options.url);
     return axiosResponse.data.data
+  }
+}
+
+export class DiddyKongRacingLeaderboard {
+
+  private gameId = "9dow9e1p"
+  private unknown = "ndx0q5dq";
+  private baseURL = `/leaderboards/${this.gameId}/level/${this.track.id}/${this.unknown}`;
+
+  constructor(private track: ITrack, private axiosInstance: AxiosInstance = speedrunAPI) {
+  }
+
+  async fetchWorldRecord(): Promise<ILeaderboardResponse> {
+    const worldRecordURL = this.baseURL + "?top=1";
+    const axiosResponse = await this.axiosInstance.get<ILeaderboardResponse>(worldRecordURL);
+    return axiosResponse.data;
+  }
+
+  async fetchLeaderboard(): Promise<ILeaderboardResponse> {
+    const axiosResponse = await this.axiosInstance.get<ILeaderboardResponse>(this.baseURL);
+    return axiosResponse.data;
   }
 }
