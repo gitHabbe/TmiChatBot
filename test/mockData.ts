@@ -2,6 +2,7 @@ import { ITwitterTweetResponse, IYoutubePagination } from "../src/interfaces/soc
 import { ITwitchChannel } from "../src/interfaces/twitch";
 import { JoinedUser } from "../src/interfaces/prisma";
 import { MessageData } from "../src/models/tmi/MessageData";
+import { ChatUserstate } from "tmi.js";
 
 export const tweetMockData: ITwitterTweetResponse = {
     data: {
@@ -95,7 +96,7 @@ export const messageDataMock = new MessageData("#habbe", {}, "This is a test mes
 
 export const joinedUserMock: JoinedUser = {
     id: 1,
-    name: "habb",
+    name: "habbe",
     createdAt: new Date("28-10-2022"),
     updatedAt: new Date("29-10-2022"),
     components: [],
@@ -104,3 +105,19 @@ export const joinedUserMock: JoinedUser = {
     timestamps: [],
     trusts: []
 }
+export const chatterMock: ChatUserstate = {
+    'badges': { 'broadcaster': '1', 'warcraft': 'horde' },
+    'color': '#FFFFFF',
+    'display-name': 'Schmoopiie',
+    'emotes': { '25': [ '0-4' ] },
+    'mod': true,
+    'room-id': '58355428',
+    'subscriber': false,
+    'turbo': true,
+    'user-id': '58355428',
+    'user-type': 'mod',
+    'emotes-raw': '25:0-4',
+    'badges-raw': 'broadcaster/1,warcraft/horde',
+    'username': 'habbe',
+    'message-type': 'chat'
+};

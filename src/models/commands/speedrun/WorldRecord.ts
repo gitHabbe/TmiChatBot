@@ -34,7 +34,6 @@ export class WorldRecord implements ICommand {
         if (!databaseGame) {
             const speedrunGame = new SpeedrunGame(gameName);
             const gameList: IGameType[] = await speedrunGame.fetch();
-            console.log(gameList);
             const foundGame: IGameType | undefined = gameList.find(iGameType => {
                 const isNameCorrect = iGameType.names.international.toUpperCase() === gameName.toUpperCase();
                 const isAbbreviationCorrect = iGameType.abbreviation.toUpperCase() === gameName.toUpperCase();
