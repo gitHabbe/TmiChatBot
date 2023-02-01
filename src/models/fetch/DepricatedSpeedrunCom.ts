@@ -9,33 +9,33 @@ import {
 } from "../../interfaces/speedrun";
 import { IAPI, IAxiosOptions } from "../../interfaces/Axios";
 
-export class Api<T> implements IAPI<T> {
-  constructor(private instance: AxiosInstance) {}
-
-  fetch = async (options: IAxiosOptions) => {
-    try {
-      return await this.instance.get<T>(options.url);
-    } catch (error: any) {
-      return this.throw(options, error);
-    }
-  };
-
-  throw = (options: IAxiosOptions, error: Error | AxiosError) => {
-    if (!axios.isAxiosError(error))
-      throw new Error(SpeedrunComErrorMessage.Generic);
-    if (!error.message) throw new Error(SpeedrunComErrorMessage.GenericAxios);
-    const { type, name } = options;
-    const { NotFound, ServerError } = StatusCode;
-    switch (error.message.status) {
-      case NotFound:
-        throw new Error(`${type} ${name} ${SpeedrunComErrorMessage.NotFound}`);
-      case ServerError:
-        throw new Error(`${SpeedrunComErrorMessage.ServerError}`);
-      default:
-        throw new Error(`${SpeedrunComErrorMessage.Generic} ${type} ${name}`);
-    }
-  };
-}
+// export class Api<T> implements IAPI<T> {
+//   constructor(private instance: AxiosInstance) {}
+//
+//   fetch = async (options: IAxiosOptions) => {
+//     try {
+//       return await this.instance.get<T>(options.url);
+//     } catch (error: any) {
+//       return this.throw(options, error);
+//     }
+//   };
+//
+//   throw = (options: IAxiosOptions, error: Error | AxiosError) => {
+//     if (!axios.isAxiosError(error))
+//       throw new Error(SpeedrunComErrorMessage.Generic);
+//     if (!error.message) throw new Error(SpeedrunComErrorMessage.GenericAxios);
+//     const { type, name } = options;
+//     const { NotFound, ServerError } = StatusCode;
+//     switch (error.message.status) {
+//       case NotFound:
+//         throw new Error(`${type} ${name} ${SpeedrunComErrorMessage.NotFound}`);
+//       case ServerError:
+//         throw new Error(`${SpeedrunComErrorMessage.ServerError}`);
+//       default:
+//         throw new Error(`${SpeedrunComErrorMessage.Generic} ${type} ${name}`);
+//     }
+//   };
+// }
 
 export class GameApi<T> {
   private options: IAxiosOptions = {
