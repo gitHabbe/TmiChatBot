@@ -8,7 +8,7 @@ export class UserPrisma implements Model {
   private client = this.db[ModelName.user];
   constructor(private name: string) {}
 
-  get = async (): Promise<JoinedUser> => {
+  async get(): Promise<JoinedUser> {
     let findFirst: JoinedUser | null = await this.getFirst();
     if (findFirst === null) {
       await this.create();
@@ -33,17 +33,17 @@ export class UserPrisma implements Model {
     });
   }
 
-  getAll = () => {
+  getAll() {
     throw new Error(`Uncallable`);
   };
 
-  save = async (): Promise<User> => {
+  async save(): Promise<User> {
     const oldUser = await this.get()
     if (oldUser) throw new Error("User already exists")
     return await this.create();
   };
 
-  delete = (): Promise<User> => {
+  delete(): Promise<User> {
     return this.client.delete({ where: { name: this.name } });
   };
 

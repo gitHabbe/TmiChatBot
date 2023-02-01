@@ -17,5 +17,7 @@ export class DatabaseSingleton {
     return DatabaseSingleton.instance;
   };
 
-  get = () => this.client;
+  get() {
+    return this.client;
+  }
 }

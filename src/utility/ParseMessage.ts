@@ -7,7 +7,7 @@ export class ParseMessage {
 
   constructor(public messageData: MessageData) {}
 
-  parseMessage = () => {
+  parseMessage(): { query: string[]; dkrLevels: ITrack[] } {
     const { message } = this.messageData;
     const supportedVehicles = [ "car", "hover", "plane" ];
     let query: string[] = message.split(" ").slice(2);

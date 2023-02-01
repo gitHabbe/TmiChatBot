@@ -19,7 +19,7 @@ export class IndividualPersonalBestDiddyKongRacing extends ParseMessage implemen
         super(messageData);
     }
 
-    run = async () => {
+    async run(): Promise<MessageData> {
         const { query, dkrLevels } = this.parseMessage();
         // console.log(query, dkrLevels)
         const [ { item } ] = fuseSearch<ITrack>(dkrLevels, query.join(" "));

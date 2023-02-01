@@ -15,7 +15,7 @@ interface Link {
 export class LinkParser {
   constructor(private message: string) {}
 
-  matchRegex = async (): Promise<string | null> => {
+  async matchRegex(): Promise<string | null> {
     let regex = youtubeRegex.exec(this.message);
     if (regex) {
       const youtubeLink = new YoutubeLink(regex);
@@ -32,7 +32,7 @@ export class LinkParser {
 
 export class TwitterLink implements Link {
   constructor(public regex: RegExpExecArray) {}
-  getMessage = async (): Promise<string> => {
+  async getMessage(): Promise<string> {
     try {
       const tweet = await this.fetchTweet();
       const { text }: ITwitterTweet = tweet.data;
@@ -47,7 +47,7 @@ export class TwitterLink implements Link {
     }
   };
 
-  fetchTweet = async () => {
+  async fetchTweet() {
     const tweet_id = this.regex[1];
     const tweetFieldsQuery = `expansions=author_id&user.fields=name,username,verified&tweet.fields=public_metrics,created_at`;
     const query = `/tweets/${tweet_id}?${tweetFieldsQuery}`;
@@ -58,7 +58,8 @@ export class TwitterLink implements Link {
 
 export class YoutubeLink implements Link {
   constructor(public regex: RegExpExecArray) {}
-  getMessage = async (): Promise<string> => {
+
+  async getMessage(): Promise<string> {
     try {
       const videos = await this.fetchVideos();
       const video = videos.items[0];
@@ -75,7 +76,7 @@ export class YoutubeLink implements Link {
     }
   };
 
-  async fetchVideos() {
+  async fetchVideos(): Promise<IYoutubePagination> {
     const youtube_id = this.regex[3];
     const query = `/videos?id=${youtube_id}&key=${process.env.YOUTUBE_API_KEY}&part=snippet,contentDetails,statistics,status`;
     const { data } = await youtubeAPI.get<IYoutubePagination>(query);

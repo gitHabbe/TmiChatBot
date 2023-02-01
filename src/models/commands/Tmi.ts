@@ -23,7 +23,7 @@ export class AddTrust implements ICommand {
         return await userPrisma.get();
     }
 
-    async run() {
+    async run(): Promise<MessageData> {
         const { channel, message, chatter } = this.messageData;
         if (!chatter.username) throw new Error("Creator not specified");
         if (!chatter.id) {
@@ -252,14 +252,14 @@ export class ToggleComponent implements ICommand {
     constructor(public messageData: MessageData) {
     }
 
-    private getUser = async (channel: string) => {
+    private async getUser(channel: string) {
         const userPrisma = new UserPrisma(channel);
         const user = await userPrisma.get();
         if (!user) throw new Error(`msg`);
         return user;
     }
 
-    run = async () => {
+    async run(): Promise<MessageData> {
         const { channel, message, chatter } = this.messageData;
         const isTrusted = await isTrustedUser(channel, chatter);
         if (!isTrusted) {

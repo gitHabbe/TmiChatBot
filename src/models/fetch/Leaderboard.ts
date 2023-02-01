@@ -44,15 +44,14 @@ export class Leaderboard {
     return target;
   };
 
-  fuzzyCategory = (target: string) => {
+  fuzzyCategory(target: string) {
     const validCategories = this.sortedCategories();
     let targetCategory = this.checkSubstring(target);
     targetCategory = this.checkAcronym(targetCategory);
     return fuseSearch<ICategoryType>(validCategories, targetCategory);
   };
 
-  fetchWorldRecord = async (category: ICategoryType): Promise<IRun> => {
-
+  async fetchWorldRecord(category: ICategoryType): Promise<IRun> {
     const speedrunLeaderboard = new SpeedrunLeaderboard(this.game, category);
     const leaderboard = await speedrunLeaderboard.fetch();
     const { runs: [ worldRecord ] } = leaderboard;
@@ -60,10 +59,7 @@ export class Leaderboard {
     return worldRecord;
   };
 
-  fetchPersonalBest = async (
-    category: ICategoryType,
-    runnerId: string
-  ): Promise<IRun> => {
+  async fetchPersonalBest(category: ICategoryType, runnerId: string): Promise<IRun> {
     const speedrunLeaderboard = new SpeedrunLeaderboard(this.game, category);
     const leaderboard = await speedrunLeaderboard.fetch();
     const { runs } = leaderboard

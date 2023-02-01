@@ -40,7 +40,7 @@ export class GamePrisma {
   //   return fullGame;
   // };
 
-  get = async (): Promise<FullGame | null> => {
+  async get(): Promise<FullGame | null> {
     return this.client.findFirst({
       where: {
         OR: [
@@ -66,7 +66,7 @@ export class GamePrisma {
     });
   };
 
-  getAll = () => {
+  getAll() {
     throw new Error(`Uncallable`);
   };
 
@@ -94,7 +94,7 @@ export class GamePrisma {
     });
   };
 
-  private categories = (categories: ICategoryType[]) => {
+  private categories(categories: ICategoryType[]) {
     return categories.map((category: ICategoryType) => {
       return {
         id: category.id,
@@ -111,7 +111,7 @@ export class GamePrisma {
     });
   };
 
-  private links = (game: IGameType) => {
+  private links(game: IGameType) {
     return game.links.map((link: Link) => {
       return {
         rel: link.rel,
@@ -120,14 +120,14 @@ export class GamePrisma {
     });
   };
 
-  private names = (game: IGameType) => {
+  private names(game: IGameType) {
     return {
       twitch: game.names.twitch,
       international: game.names.international,
     };
   };
 
-  private platforms = (game: IGameType) => {
+  private platforms(game: IGameType) {
     return game.platforms.map((platform) => {
       return {
         platformId: platform,
@@ -135,7 +135,7 @@ export class GamePrisma {
     });
   };
 
-  delete = () => {
+  delete() {
     throw new Error(`Uncallable`);
   };
 }

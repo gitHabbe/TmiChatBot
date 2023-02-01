@@ -9,11 +9,7 @@ export class CommandPrisma extends Prisma {
     super();
   }
 
-  add = async (
-    name: string,
-    content: string,
-    creator: string
-  ): Promise<Command> => {
+  async add(name: string, content: string, creator: string): Promise<Command> {
     const command = await this.find(name);
     if (command) throw new Error("Command already exists");
     return this.db.create({
@@ -26,7 +22,7 @@ export class CommandPrisma extends Prisma {
     });
   };
 
-  remove =  async (name: string): Promise<Command> => {
+  async remove(name: string): Promise<Command> {
     const command = await this.find(name);
     if (!command) throw new Error("Command not found");
     return await this.db.delete({
@@ -36,7 +32,7 @@ export class CommandPrisma extends Prisma {
     });
   };
 
-  find = async (name: string): Promise<Command | null> => {
+  async find(name: string): Promise<Command | null> {
     const command = await this.db.findFirst({
       where: {
         userId: this.user.id,
@@ -47,7 +43,7 @@ export class CommandPrisma extends Prisma {
     return command;
   };
 
-  findAll = async (): Promise<Command[]> => {
+  async findAll(): Promise<Command[]> {
     return await this.db.findMany({
       where: {
         userId: this.user.id,

@@ -15,7 +15,7 @@ export class PersonalBest implements ICommand {
     constructor(public messageData: MessageData) {
     }
 
-    run = async () => {
+    async run(): Promise<MessageData> {
         const messageArray = this.messageData.message.split(" ");
         const runnerName = messageArray.splice(1, 1).join();
         this.messageData.message = messageArray.join(" ");

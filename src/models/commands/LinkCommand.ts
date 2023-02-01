@@ -16,7 +16,7 @@ class YoutubeLink implements SocialMediaLink {
 
   constructor(public regexPattern: RegexPattern) {}
 
-  print = async (): Promise<string> => {
+  async print(): Promise<string> {
     const regex_exec = this.regexPattern.exec();
     if (regex_exec === null) throw new Error("Not a Youtube link");
     const youtube_id = regex_exec[3];
@@ -43,7 +43,7 @@ class TwitterLink implements SocialMediaLink {
 
   constructor(public regexPattern: RegexPattern) {}
 
-  print = async (): Promise<string> => {
+  async print(): Promise<string> {
     const regex_exec = this.regexPattern.exec();
     if (regex_exec === null) throw new Error("Not a Twitter link");
     const tweet_id = regex_exec[1];
@@ -67,13 +67,13 @@ export class LinkCommand implements ICommand {
     ]
   }
 
-  getLink = () => {
+  getLink(): SocialMediaLink | undefined {
     return this.socialMediaLinks.find((socialMediaLink) => {
       if (socialMediaLink.regexPattern.parse()) return socialMediaLink;
     })
   }
 
-  run = async (): Promise<MessageData> => {
+  async run(): Promise<MessageData> {
     const isLink = this.getLink()
     if (isLink === undefined) throw new Error("Not a link")
     this.messageData.response = await isLink.print()

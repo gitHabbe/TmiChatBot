@@ -12,7 +12,7 @@ export class IndividualPersonalBest implements ICommand {
     constructor(public messageData: MessageData) {
     }
 
-    run = async () => {
+    async run(): Promise<MessageData> {
         const messageParser = new MessageParser();
         const gameName: string = await messageParser.gameName(this.messageData, 2);
 

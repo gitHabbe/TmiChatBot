@@ -9,7 +9,7 @@ export class TrustPrisma {
 
   constructor(private user: JoinedUser, private chatter: Userstate) {}
 
-  get = (): Promise<Trust | null> => {
+  get(): Promise<Trust | null> {
     return this.client.findFirst({
       where: {
         userId: this.user.id,
@@ -18,7 +18,7 @@ export class TrustPrisma {
     });
   };
 
-  getAll = (): Promise<Trust[]> => {
+  getAll(): Promise<Trust[]> {
     return this.client.findMany({
       where: {
         userId: this.user.id,
@@ -26,7 +26,7 @@ export class TrustPrisma {
     });
   };
 
-  delete = async (deleter: string) => {
+  async delete(deleter: string) {
     const isStreamer: boolean = this.user.name.toUpperCase() === deleter.toUpperCase()
     if (isStreamer === false) throw new Error(`Only streamer can remove trust`)
     const hasTrust: Trust | null = await this.get()
@@ -39,7 +39,7 @@ export class TrustPrisma {
     });
   };
 
-  save = async (madeBy: string, newTrust: string): Promise<Trust> => {
+  async save(madeBy: string, newTrust: string): Promise<Trust> {
     const oldTrustee = await this.get()
     if (oldTrustee) throw new Error("Chatter already trusted")
     return this.client.create({

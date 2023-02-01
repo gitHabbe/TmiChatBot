@@ -44,7 +44,7 @@ export class TimeTrialWorldRecordDiddyKongRacing implements ICommand {
     constructor(public messageData: MessageData) {
     }
 
-    parseMessage = () => {
+    parseMessage() {
         const { message } = this.messageData;
         let query = message.split(" ").slice(2);
         let tracks = this.jsonTimeTrials.data()
@@ -83,7 +83,7 @@ export class TimeTrialWorldRecordDiddyKongRacing implements ICommand {
         return { query: filteredMessage, dkrLevels: tracks, isShortcut, laps };
     };
 
-    run = async () => {
+    async run() {
         const { query, dkrLevels, isShortcut, laps } = this.parseMessage();
         let shortcut = "standard"
         if (isShortcut) shortcut = "shortcut"
@@ -117,7 +117,7 @@ export class TimeTrialPersonalBestDiddyKongRacing implements ICommand {
 
     }
 
-    parseMessage = () => {
+    parseMessage() {
         const { message } = this.messageData;
         let query = message.split(" ").slice(2);
         let tracks = this.jsonTimeTrials.data()
@@ -166,7 +166,7 @@ export class TimeTrialPersonalBestDiddyKongRacing implements ICommand {
         return track;
     }
 
-    run = async () => {
+    async run() {
         const { query, dkrLevels, isShortcut, laps } = this.parseMessage();
         let shortcut = "standard"
         if (isShortcut) shortcut = "shortcut"

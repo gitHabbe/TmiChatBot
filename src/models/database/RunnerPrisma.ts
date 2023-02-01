@@ -5,7 +5,7 @@ import { IRunner } from "../../interfaces/speedrun";
 import { SpeedrunRunner } from "../fetch/SpeedrunCom";
 
 export class RunnerPrisma extends Prisma {
-  get = async (query: string): Promise<Runner> => {
+  async get(query: string): Promise<Runner> {
     const runner = await this.prisma.runner.findFirst({
       where: {
         OR: [{ id: query }, { name: query }],
@@ -16,7 +16,7 @@ export class RunnerPrisma extends Prisma {
     return runner;
   };
 
-  private save = async (name: string): Promise<Runner> => {
+  private async save(name: string): Promise<Runner> {
     const runner = await this.fetch(name);
     return await this.prisma.runner.create({
       data: {
@@ -26,7 +26,7 @@ export class RunnerPrisma extends Prisma {
     });
   };
 
-  private fetch = async (query: string): Promise<IRunner> => {
+  private async fetch(query: string): Promise<IRunner> {
     const speedrunRunner = new SpeedrunRunner(query);
     const iRunner = await speedrunRunner.fetch();
     return iRunner;

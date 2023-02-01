@@ -9,7 +9,7 @@ export class TimestampPrisma extends Prisma {
     super();
   }
 
-  add = async (video: IVideo, name: string, madeBy: string) => {
+  async add(video: IVideo, name: string, madeBy: string) {
     const { url, created_at, id, viewable } = video;
     const started_date = new Date(created_at).getTime();
     const now_date = new Date().getTime();
@@ -26,7 +26,7 @@ export class TimestampPrisma extends Prisma {
     });
   };
 
-  remove = async (deleteName: string) => {
+  async remove(deleteName: string) {
     const timestamp = await this.find(deleteName);
     if (!timestamp) throw new Error(`Timestamp ${deleteName} doesn't exist`);
     return await this.db.delete({
@@ -36,7 +36,7 @@ export class TimestampPrisma extends Prisma {
     });
   };
 
-  find = async (name: string) => {
+  async find(name: string) {
     const timestamp = await this.db.findFirst({
       where: {
         userId: this.user.id,
@@ -48,7 +48,7 @@ export class TimestampPrisma extends Prisma {
     return timestamp;
   };
 
-  findAll = async () => {
+  async findAll() {
     const allTimestamps = await this.db.findMany({
       where: {
         userId: this.user.id,

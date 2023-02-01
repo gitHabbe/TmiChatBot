@@ -8,7 +8,7 @@ export class TimeTrialPersonalBest implements ICommand {
     constructor(public messageData: MessageData) {
     }
 
-    run = async () => {
+    async run(): Promise<MessageData> {
         console.log("messageData:", this.messageData)
         const targetUser = this.messageData.message.split(" ")[1]
         let message = this.messageData.message.split(" ")

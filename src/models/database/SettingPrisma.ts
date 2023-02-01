@@ -8,7 +8,7 @@ export class SettingPrisma extends Prisma {
     super();
   }
 
-  add = async (type: string, name: string) => {
+  async add(type: string, name: string) {
     return this.db.create({
       data: {
         userId: this.user.id,
@@ -18,7 +18,7 @@ export class SettingPrisma extends Prisma {
     });
   };
 
-  delete = async (id: number) => {
+  async delete(id: number) {
   // delete = async (setting: SettingPrisma) => {
     return this.db.delete({
       where: {
@@ -27,7 +27,7 @@ export class SettingPrisma extends Prisma {
     });
   };
 
-  update = async (id: number, type: string, value: string | undefined) => {
+  async update(id: number, type: string, value: string | undefined) {
     // let setting = await this.find(type);
     // if (setting === null) {
     //   return this.add(type, value);
@@ -46,7 +46,7 @@ export class SettingPrisma extends Prisma {
     });
   };
 
-  find = async (type: string) => {
+  async find(type: string) {
     const setting = await this.db.findFirst({
       where: {
         userId: this.user.id,

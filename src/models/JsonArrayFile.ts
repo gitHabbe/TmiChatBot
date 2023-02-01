@@ -9,6 +9,7 @@ import {
 export class JsonFile<T> {
   jsonFile: string = `./src/utility/${this.filename}.json`;
   private data = JSON.parse(readFileSync(this.jsonFile, "utf8"));
+
   constructor(private filename: string) {}
 
   get getData(): T {

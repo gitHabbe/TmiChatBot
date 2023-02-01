@@ -12,7 +12,7 @@ export class ComponentPrisma extends Prisma {
     this.name = this.name.toUpperCase();
   }
 
-  toggle = async () => {
+  async toggle() {
     let component = await this.getComponent();
     if (component === null) return
 
@@ -26,7 +26,7 @@ export class ComponentPrisma extends Prisma {
     });
   };
 
-  isEnabled = async () => {
+  async isEnabled() {
     let component = await this.getComponent();
     if (component === null) return
 
@@ -35,7 +35,7 @@ export class ComponentPrisma extends Prisma {
 
 
 
-  getComponent = () => {
+  getComponent() {
     return this.db.findFirst({
       where: {
         userId: this.user.id,

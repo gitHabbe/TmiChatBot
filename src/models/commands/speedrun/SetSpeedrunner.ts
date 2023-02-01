@@ -7,14 +7,14 @@ export class SetSpeedrunner implements ICommand {
     constructor(public messageData: MessageData) {
     }
 
-    private getUser = async (channel: string) => {
+    private async getUser(channel: string) {
         const userPrisma = new UserPrisma(channel);
         const user = await userPrisma.get();
         if (!user) throw new Error(`User not found`);
         return user;
     }
 
-    run = async () => {
+    async run(): Promise<MessageData> {
         const { channel, message } = this.messageData;
         const newUsername: string | undefined = message.split(" ")[1];
         const user = await this.getUser(channel);

@@ -8,15 +8,12 @@ export class CustomCommand implements ICommand {
 
   constructor(public messageData: MessageData) {}
 
-  private allCommands = async (user: any): Promise<Command[]> => {
+  private async allCommands(user: any): Promise<Command[]> {
     const command = new CommandPrisma(user);
     return await command.findAll();
   };
 
-  isCustomCommand = async (
-      streamer: string,
-      targetCommand: string
-  ): Promise<Command | undefined> => {
+  async isCustomCommand(streamer: string, targetCommand: string): Promise<Command | undefined> {
     const userPrisma = new UserPrisma(streamer);
     const user = await userPrisma.get();
     if (!user) throw new Error(`User not found`);
@@ -24,7 +21,7 @@ export class CustomCommand implements ICommand {
     return commands.find((command: Command) => command.name === targetCommand);
   }
 
-  run = async (): Promise<MessageData> => {
+  async run(): Promise<MessageData> {
     const { message, channel } = this.messageData;
     const chatterCommand: string = message.split(" ")[0];
     const isCommand = await this.isCustomCommand(channel, chatterCommand);

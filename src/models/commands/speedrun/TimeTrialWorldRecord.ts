@@ -11,7 +11,7 @@ export class TimeTrialWorldRecord implements ICommand {
     constructor(public messageData: MessageData) {
     }
 
-    run = async () => {
+    async run(): Promise<MessageData> {
         const stringExtract = new StringExtract(this.messageData);
         const gameName: string = await stringExtract.game();
         switch (gameName.toUpperCase()) {
