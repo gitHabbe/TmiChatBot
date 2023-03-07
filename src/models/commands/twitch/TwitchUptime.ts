@@ -7,8 +7,8 @@ import { MessageData } from "../../tmi/MessageData";
 import { ModuleFamily } from "../../../interfaces/tmi";
 
 export class TwitchUptime implements ICommand {
-    private twitchFetch: TwitchFetch
     public moduleFamily: ModuleFamily = ModuleFamily.UPTIME
+    private twitchFetch: TwitchFetch
 
     constructor(public messageData: MessageData, twitchFetch?: TwitchFetch) {
         this.twitchFetch = twitchFetch || new TwitchFetch()

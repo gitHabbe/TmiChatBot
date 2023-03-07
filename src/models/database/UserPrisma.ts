@@ -3,9 +3,10 @@ import { DatabaseSingleton } from "./Prisma";
 import { Component, User } from "@prisma/client";
 import { ModuleFamily } from "../../interfaces/tmi";
 
-export class UserPrisma implements Model {
+export class UserPrisma {
   private db = DatabaseSingleton.getInstance().get();
   private client = this.db[ModelName.user];
+
   constructor(private name: string) {}
 
   async get(): Promise<JoinedUser> {
@@ -32,16 +33,6 @@ export class UserPrisma implements Model {
       },
     });
   }
-
-  getAll() {
-    throw new Error(`Uncallable`);
-  };
-
-  async save(): Promise<User> {
-    const oldUser = await this.get()
-    if (oldUser) throw new Error("User already exists")
-    return await this.create();
-  };
 
   delete(): Promise<User> {
     return this.client.delete({ where: { name: this.name } });

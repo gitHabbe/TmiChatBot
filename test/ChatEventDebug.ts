@@ -20,8 +20,8 @@ interface TestResponse {
             channel: "placeholder channel",
             response: "placeholder response"
         },
-        say: function (channel, message) {
-            this.testResults = { channel, response: message }
+        say: function (channel, response) {
+            this.testResults = { channel, response }
         },
     };
     clientSingleton.client = fakeClient
