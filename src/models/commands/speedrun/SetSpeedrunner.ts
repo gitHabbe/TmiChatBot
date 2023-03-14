@@ -1,11 +1,13 @@
-import { ICommand } from "../../../interfaces/Command";
-import { UserPrisma } from "../../database/UserPrisma";
-import { SettingPrisma } from "../../database/SettingPrisma";
-import { MessageData } from "../../tmi/MessageData";
+import { ICommand } from "../../../interfaces/Command"
+import { UserPrisma } from "../../database/UserPrisma"
+import { SettingPrisma } from "../../database/SettingPrisma"
+import { MessageData } from "../../tmi/MessageData"
+import { ModuleFamily } from "../../../interfaces/tmi"
 
 export class SetSpeedrunner implements ICommand {
-    constructor(public messageData: MessageData) {
-    }
+    moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN;
+
+    constructor(public messageData: MessageData) {}
 
     private async getUser(channel: string) {
         const userPrisma = new UserPrisma(channel);
