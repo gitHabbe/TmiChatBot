@@ -1,5 +1,6 @@
-import { Category, CategoryLink, Game, GameLink, GameNames, GamePlatform, } from ".prisma/client";
+import { Category, CategoryLink, Game, GameLink, GamePlatform, } from ".prisma/client";
 import { Command, Component, Setting, Timestamp, Trust, User } from "@prisma/client";
+import { Names } from "./speedrun"
 
 export enum ModelName {
   game = "game",
@@ -37,7 +38,6 @@ export interface JoinedUser extends User {
 export interface JoinedGame extends Game {
   // id: string;
   // abbreviation: string;
-  names: GameNames | null;
   links: GameLink[];
   platforms: GamePlatform[];
   categories: GameCategory[]
@@ -48,7 +48,6 @@ interface GameCategory extends Category {
 }
 
 export type FullGame = Game & {
-  names: GameNames | null;
   platforms: GamePlatform[];
   categories: (Category & {
     links: CategoryLink[];
