@@ -58,4 +58,6 @@ export interface TmiClient {
     on(event: any, listener: any): Client;
     connect(): Promise<[ string, number ]>;
     say(channel: string, message: string): void;
+    join(channel: string): Promise<[string]>;
+    part(channel: string): Promise<[string]>;
 }
