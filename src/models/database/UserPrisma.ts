@@ -48,6 +48,9 @@ export class UserPrisma {
             { name: ModuleFamily.UPTIME, enabled: true },
             { name: ModuleFamily.FOLLOWAGE, enabled: false },
             { name: ModuleFamily.SPEEDRUN, enabled: false },
+            { name: ModuleFamily.TIMESTAMP, enabled: false },
+            { name: ModuleFamily.POKEMON, enabled: false },
+            { name: ModuleFamily.SLOTS, enabled: false },
           ]
         }
       }

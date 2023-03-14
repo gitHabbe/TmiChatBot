@@ -36,6 +36,9 @@ export enum ModuleFamily {
   SPEEDRUN = "SPEEDRUN",
   PROTECTED = "PROTECTED",
   FOLLOWAGE = "FOLLOWAGE",
+  TIMESTAMP = "TIMESTAMP",
+  POKEMON = "POKEMON",
+  SLOTS = "SLOTS",
 }
 
 export enum ComponentsSupport {
