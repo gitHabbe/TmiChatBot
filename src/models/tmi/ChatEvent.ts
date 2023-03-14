@@ -19,8 +19,9 @@ export class ChatEvent {
         const isCustomCommand: boolean = await ChatEvent.customCommandAction(channel, message);
         if (isCustomCommand) return
 
-        const isCommand: boolean = await ChatEvent.standardCommandAction(messageData);
-        if (isCommand) return
+        const standardCommandResponse: string = await ChatEvent.standardCommandResponse(messageData);
+        const client = ClientSingleton.getInstance().get();
+        if (standardCommandResponse !== "") client.say(channel, standardCommandResponse)
     }
 
     private static async customCommandAction(channel: string, message: string): Promise<boolean> {
@@ -44,19 +45,20 @@ export class ChatEvent {
         await userModel.get();
     }
 
-    private static async standardCommandAction(messageData: MessageData): Promise<boolean> {
+    private static async standardCommandResponse(messageDataParam: MessageData): Promise<string> {
+        let messageData = messageDataParam;
+        const commandList: CommandList = new StandardCommandList(messageData);
         const messageParser: MessageParser = new MessageParser();
         const commandName: string = messageParser.getCommandName(messageData.message);
-        const commandList: CommandList = new StandardCommandList(messageData);
         const command: ICommand | undefined = commandList.get(commandName);
-        if (!command) return false;
+        if (!command) {
+            return "";
+        }
 
-        const client = ClientSingleton.getInstance().get();
         const isProtected = command.moduleFamily === ModuleFamily.PROTECTED;
         if (isProtected) {
-            const commandResponse: MessageData = await command.run();
-            await client.say(messageData.channel, commandResponse.response)
-            return true
+            const commandData = await command.run();
+            return commandData.response
         }
 
         const chatter: string | undefined = messageData.chatter.username?.toUpperCase();
@@ -67,15 +69,13 @@ export class ChatEvent {
         const isComponentEnabled: Component | undefined = componentPrisma.isFamilyEnabled(command.moduleFamily);
         if (!isComponentEnabled) {
             if (streamer === chatter) {
-                await client.say(messageData.channel, `Command: ${commandName} is not enabled. Use "!toggle ${command.moduleFamily}"`)
-                return true
+                return `Command: ${commandName} is not enabled. Use "!toggle ${command.moduleFamily}"`
             } else {
-                return false
+                return "";
             }
         }
 
-        messageData = await command.run();
-        await client.say(messageData.channel, messageData.response)
-        return true
+        const commandData = await command.run();
+        return commandData.response;
     }
 }
