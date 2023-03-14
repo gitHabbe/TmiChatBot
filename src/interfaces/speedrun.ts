@@ -13,7 +13,8 @@ export interface IGameResponse {
 export interface IGameSearchResponse {
   data: IGameType[];
 }
-interface Names {
+
+export interface Names {
   international: string;
   twitch: string;
 }
@@ -63,6 +64,7 @@ export interface IRunner {
     international: string;
   };
 }
+
 export interface IRunnerResponse {
   data: IRunner;
 }
