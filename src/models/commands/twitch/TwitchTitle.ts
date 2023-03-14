@@ -15,9 +15,7 @@ export class TwitchTitle implements ICommand {
 
     async run(): Promise<MessageData> {
         const { channel } = this.messageData;
-        const twitchChannelList: ITwitchChannel[] = await this.twitchFetch.channelList(channel);
-        const filterTwitchChannel = new FilterTwitchChannel();
-        const singleChannel = filterTwitchChannel.channel(twitchChannelList, channel);
+        const singleChannel = await this.twitchFetch.singleChannel(channel)
         this.messageData.response = singleChannel.title;
         return this.messageData;
     };

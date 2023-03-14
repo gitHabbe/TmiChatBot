@@ -20,9 +20,8 @@ export class Followage implements ICommand {
         const { channel } = this.messageData;
         const follower: ChatUserstate = this.messageData.chatter
         if (!follower["user-id"]) throw new Error(`${follower.username} not found`);
-        const twitchChannelList: ITwitchChannel[] = await this.twitchFetch.channelList(channel);
-        const filterTwitchChannel = new FilterTwitchChannel();
-        const singleChannel = filterTwitchChannel.channel(twitchChannelList, channel);
+        const twitchFetch = new TwitchFetch()
+        const singleChannel = await twitchFetch.singleChannel(channel)
         const streamerId: string = singleChannel.id;
         const followerId: string = follower["user-id"];
         const followage: IFollowage[] = await this.twitchFetch.followage(streamerId, followerId);
