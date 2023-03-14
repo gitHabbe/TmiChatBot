@@ -8,6 +8,9 @@ import { IRun } from "../../../interfaces/speedrun";
 import { datesDaysDifference, floatToHHMMSS } from "../../../utility/dateFormat";
 import { MessageData } from "../../tmi/MessageData";
 import { ModuleFamily } from "../../../interfaces/tmi";
+import { MessageParser } from "../../tmi/MessageParse"
+import { SpeedrunCategory, SpeedrunApi } from "../../fetch/SpeedrunCom"
+import { SpeedrunGameCollection } from "./WorldRecord"
 
 export class PersonalBest implements ICommand {
     moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN
@@ -17,25 +20,17 @@ export class PersonalBest implements ICommand {
 
     async run(): Promise<MessageData> {
         const messageArray = this.messageData.message.split(" ");
-        const runnerName = messageArray.splice(1, 1).join();
-        this.messageData.message = messageArray.join(" ");
-        const stringExtract = new StringExtract(this.messageData);
-        const gameName: string = await stringExtract.game();
-        const gameModel = new GamePrisma(gameName);
-        const game = await gameModel.get();
-        const query: string = await stringExtract.category();
-        if (!game) {
-            this.messageData.response = `Game ${gameName} not found`;
-            return this.messageData
-        }
+        const speedrunGameCollection = new SpeedrunGameCollection(this.messageData)
+        const { fullSpeedrunGame, categoryName } = await speedrunGameCollection.getFullSpeedrunGame(2)
         const runnerModel = new RunnerPrisma();
+        const runnerName = messageArray.splice(1, 1).join();
         const runner = await runnerModel.get(runnerName);
         if (!runner) {
             this.messageData.response = `Runner ${runnerName} not found`;
             return this.messageData
         }
-        const leaderboard = new Leaderboard(game);
-        const fuzzyCategory = leaderboard.fuzzyCategory(query);
+        const leaderboard = new Leaderboard(fullSpeedrunGame);
+        const fuzzyCategory = leaderboard.fuzzyCategory(categoryName);
         const [ { item: category } ] = fuzzyCategory;
         const personalBest: IRun = await leaderboard.fetchPersonalBest(
             category,
