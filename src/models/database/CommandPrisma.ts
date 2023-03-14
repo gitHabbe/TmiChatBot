@@ -10,8 +10,6 @@ export class CommandPrisma extends Prisma {
   }
 
   async add(name: string, content: string, creator: string): Promise<Command> {
-    const command = await this.find(name);
-    if (command) throw new Error("Command already exists");
     return this.db.create({
       data: {
         name: name,
