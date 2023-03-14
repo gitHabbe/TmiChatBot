@@ -3,6 +3,7 @@ import { ITwitchChannel } from "../src/interfaces/twitch";
 import { JoinedUser } from "../src/interfaces/prisma";
 import { MessageData } from "../src/models/tmi/MessageData";
 import { ChatUserstate } from "tmi.js";
+import { SpeedrunGame } from "../src/interfaces/general"
 
 export const tweetMockData: ITwitterTweetResponse = {
     data: {
@@ -65,7 +66,7 @@ export const commandMockData = {
     updatedAt: new Date()
 }
 
-export const offlineTwitchChannelMock: ITwitchChannel[] = [ {
+export const offlineTwitchChannelMock: ITwitchChannel = {
     id: "0",
     started_at: "",
     display_name: "Habbe",
@@ -74,14 +75,14 @@ export const offlineTwitchChannelMock: ITwitchChannel[] = [ {
     game_id: "123",
     game_name: "Diddy Kong Racing",
     islive: true
-} ];
+};
 
 let onlineDate = new Date()
 onlineDate.setHours(onlineDate.getHours() - 2)
 onlineDate.setMinutes(onlineDate.getMinutes() - 5)
 onlineDate.setSeconds(onlineDate.getSeconds() - 34)
 
-export const onlineTwitchChannelMock: ITwitchChannel[] = [ {
+export const onlineTwitchChannelsMock: ITwitchChannel[] = [ {
     id: "0",
     started_at: onlineDate.toISOString(),
     display_name: "Habbe",
@@ -91,6 +92,17 @@ export const onlineTwitchChannelMock: ITwitchChannel[] = [ {
     game_name: "Diddy Kong Racing",
     islive: true
 } ];
+
+export const onlineTwitchChannelMock: ITwitchChannel = {
+    id: "0",
+    started_at: onlineDate.toISOString(),
+    display_name: "Habbe",
+    title: "Mock title",
+    broadcaster_login: "habbe",
+    game_id: "123",
+    game_name: "Diddy Kong Racing",
+    islive: true
+};
 
 export const messageDataMock = new MessageData("#habbe", {}, "This is a test message");
 
@@ -118,6 +130,33 @@ export const chatterMock: ChatUserstate = {
     'user-type': 'mod',
     'emotes-raw': '25:0-4',
     'badges-raw': 'broadcaster/1,warcraft/horde',
-    'username': 'habbe',
+    'username': 'habbee',
     'message-type': 'chat'
 };
+
+export const speedrunGameMock: SpeedrunGame = {
+    abbreviation: "dkr",
+    id: "9dow9e1p",
+    links: [
+        {
+            rel: "leaderboard",
+            uri: "https://www.speedrun.com/api/v1/leaderboards/9dow9e1p/category/q25qqv2o"
+        }
+    ],
+    international: "Diddy Kong Racing",
+    twitch: "Diddy Kong Racing",
+    platforms: []
+}
+export const prismaSpeedrunGameMock: SpeedrunGame = {
+    abbreviation: "dkr",
+    id: "9dow9e1p",
+    links: [
+        {
+            rel: "leaderboard",
+            uri: "https://www.speedrun.com/api/v1/leaderboards/9dow9e1p/category/q25qqv2o"
+        }
+    ],
+    international: "Diddy Kong Racing",
+    twitch: "Diddy Kong Racing",
+    platforms: []
+}
