@@ -1,20 +1,20 @@
 import { User } from "@prisma/client";
 import { IVideo } from "../../interfaces/twitch";
-import { Prisma } from "./Prisma";
+import { DatabaseSingleton, Prisma } from "./Prisma"
+import { ModelName } from "../../interfaces/prisma"
 
-export class TimestampPrisma extends Prisma {
-  private db = this.prisma.timestamp;
+export class TimestampPrisma {
+  private db = DatabaseSingleton.getInstance().get();
+  private client = this.db[ModelName.timestamp]
 
-  constructor(private user: User) {
-    super();
-  }
+  constructor(private user: User) {}
 
   async add(video: IVideo, name: string, madeBy: string) {
     const { url, created_at, id, viewable } = video;
     const started_date = new Date(created_at).getTime();
     const now_date = new Date().getTime();
     const secondsAgo: number = Math.floor((now_date - started_date) / 1000);
-    return this.db.create({
+    return this.client.create({
       data: {
         name: name,
         url: url,
@@ -29,7 +29,7 @@ export class TimestampPrisma extends Prisma {
   async remove(deleteName: string) {
     const timestamp = await this.find(deleteName);
     if (!timestamp) throw new Error(`Timestamp ${deleteName} doesn't exist`);
-    return await this.db.delete({
+    return await this.client.delete({
       where: {
         id: timestamp.id,
       },
@@ -37,7 +37,7 @@ export class TimestampPrisma extends Prisma {
   };
 
   async find(name: string) {
-    const timestamp = await this.db.findFirst({
+    const timestamp = await this.client.findFirst({
       where: {
         userId: this.user.id,
         name: name,
@@ -49,7 +49,7 @@ export class TimestampPrisma extends Prisma {
   };
 
   async findAll() {
-    const allTimestamps = await this.db.findMany({
+    const allTimestamps = await this.client.findMany({
       where: {
         userId: this.user.id,
       },
