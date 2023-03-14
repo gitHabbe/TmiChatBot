@@ -1,5 +1,9 @@
 import { ITwitchChannel } from "../src/interfaces/twitch";
-import { messageDataMock, offlineTwitchChannelMock, onlineTwitchChannelMock } from "./mockData";
+import {
+    messageDataMock,
+    offlineTwitchChannelMock,
+    onlineTwitchChannelMock,
+} from "./mockData"
 import { TwitchFetch } from "../src/models/fetch/TwitchTv";
 import { TwitchTitle } from "../src/models/commands/twitch/TwitchTitle";
 import { TwitchUptime } from "../src/models/commands/twitch/TwitchUptime";
@@ -40,10 +44,10 @@ describe("Standard commands", () => {
         spy.mockRestore()
     })
 
-    function mockGetChannelsMethod(twitchFetch: TwitchFetch, twitchChannelMockData: ITwitchChannel[]) {
+    function mockGetChannelsMethod(twitchFetch: TwitchFetch, twitchChannelMockData: ITwitchChannel) {
         return jest
-            .spyOn(twitchFetch, "channelList")
-            .mockImplementation(async (): Promise<ITwitchChannel[]> => twitchChannelMockData);
+            .spyOn(twitchFetch, "singleChannel")
+            .mockImplementation(async (): Promise<ITwitchChannel> => twitchChannelMockData);
     }
 
 })
