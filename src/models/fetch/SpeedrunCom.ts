@@ -1,21 +1,18 @@
-import { IAxiosOptions } from "../../interfaces/Axios";
-import { AxiosInstance } from "axios";
-import { speedrunAPI } from "../../config/speedrunConfig";
+import { IAxiosOptions } from "../../interfaces/Axios"
+import { AxiosInstance, AxiosResponse } from "axios"
+import { speedrunAPI } from "../../config/speedrunConfig"
 import {
   ICategoryResponse,
   ICategoryType,
-  IGameResponse,
-  IGameSearchResponse,
-  IGameType,
   ILeaderboard,
   ILeaderboardResponse,
   IRunner,
   IRunnerResponse
-} from "../../interfaces/speedrun";
-import { FullGame } from "../../interfaces/prisma";
-import { ITrack } from "../../interfaces/specificGames";
+} from "../../interfaces/speedrun"
+import { ITrack } from "../../interfaces/specificGames"
+import { FullSpeedrunGame, SpeedrunGame, SpeedrunGameResponse, SpeedrunResponse } from "../../interfaces/general"
 
-export class SpeedrunGame {
+export class SpeedrunApi {
   private options: IAxiosOptions = {
     name: this.name,
     type: "game",
@@ -24,35 +21,41 @@ export class SpeedrunGame {
 
   constructor(private name: string, private axiosInstance: AxiosInstance = speedrunAPI) {}
 
-  async fetch(): Promise<IGameType[]> {
+  async fetch(): Promise<SpeedrunGame[]> {
     const baseURL = this.options.url;
     this.options.url = `${baseURL}/${this.name}`;
     try {
-      const axiosResponse = await this.axiosInstance.get<IGameResponse>(this.options.url);
-      return [ axiosResponse.data.data ]
+      const { data: { data } }: AxiosResponse<SpeedrunResponse<SpeedrunGameResponse>> = await this.axiosInstance.get(this.options.url);
+      const speedrunGame = SpeedrunApi.convertResponseToSpeedrunGame(data)
+      return [ speedrunGame ]
     } catch (e) {
-      // console.log(e);
-      console.log("USING CATCH")
       this.options.url = `${baseURL}?name=${this.name}`;
-      const fetchAttempt1 = await this.axiosInstance.get<IGameSearchResponse>(this.options.url);
+      const fetchAttempt1 = await this.axiosInstance.get<SpeedrunResponse<SpeedrunGameResponse[]>>(this.options.url);
       if (fetchAttempt1.data.data.length > 0) {
-        return fetchAttempt1.data.data
+        return fetchAttempt1.data.data.map(SpeedrunApi.convertResponseToSpeedrunGame)
       }
       this.options.url = `${baseURL}?abbreviation=${this.name}`;
-      const fetchAttempt2 = await this.axiosInstance.get<IGameSearchResponse>(this.options.url);
-      return fetchAttempt2.data.data
+      const fetchAttempt2 = await this.axiosInstance.get<SpeedrunResponse<SpeedrunGameResponse[]>>(this.options.url);
+      return fetchAttempt2.data.data.map(SpeedrunApi.convertResponseToSpeedrunGame)
     }
+  }
+
+  private static convertResponseToSpeedrunGame(axiosResponse: SpeedrunGameResponse) {
+    return Object.assign({
+      international: axiosResponse.names.international,
+      twitch: axiosResponse.names.twitch
+    }, axiosResponse)
   }
 }
 
 export class SpeedrunCategory {
   private options: IAxiosOptions = {
-    name: this.game.names.international,
+    name: this.game.international,
     type: "category",
     url: `/games/${this.game.id}/categories`,
   };
 
-  constructor(private game: IGameType, private axiosInstance: AxiosInstance = speedrunAPI) {}
+  constructor(private game: SpeedrunGame, private axiosInstance: AxiosInstance = speedrunAPI) {}
 
   async fetch() {
     const { data } = await this.axiosInstance.get<ICategoryResponse>(this.options.url);
@@ -64,14 +67,21 @@ export class SpeedrunLeaderboard {
   private options: IAxiosOptions = {
     name: "World record",
     type: "Leaderboard",
-    url: `/leaderboards/${this.game.id}/category/${this.category.id}?top=1`,
+    url: `/leaderboards/${this.game.id}/category/${this.category.id}`,
   };
 
-  constructor(private game: FullGame, private category: ICategoryType, private axiosInstance: AxiosInstance = speedrunAPI) {}
+  constructor(private game: FullSpeedrunGame, private category: ICategoryType, private axiosInstance: AxiosInstance = speedrunAPI) {}
 
-  async fetch(): Promise<ILeaderboard> {
+  async fetchWorldRecord(): Promise<ILeaderboard> {
+    this.options.url += "?top=1"
     const axiosResponse = await this.axiosInstance.get<ILeaderboardResponse>(this.options.url);
     return axiosResponse.data.data
+  }
+
+  async fetchLeaderboard(): Promise<ILeaderboard> {
+    const axiosResponse = await this.axiosInstance.get<ILeaderboardResponse>(this.options.url);
+    return axiosResponse.data.data
+
   }
 }
 
