@@ -1,6 +1,7 @@
 import { DatabaseSingleton } from "./Prisma";
 import { FullGame, ModelName } from "../../interfaces/prisma";
 import { ICategoryType, IGameType, Link, } from "../../interfaces/speedrun";
+import { FullSpeedrunGame, SpeedrunGame } from "../../interfaces/general"
 
 // export class SpeedrunFetch {
 //
@@ -28,29 +29,15 @@ export class GamePrisma {
 
   constructor(private name: string) {}
 
-  // pull = async (): Promise<FullGame | null> => {
-  //   const fullGame: FullGame | null = await this.get();
-  //   const speedrunFetch = new SpeedrunFetch();
-  //   const { game, categories } = await speedrunFetch.getLeaderboard(this.name);
-  //   if (fullGame === null) {
-  //     const savedGame = await this.save(game, categories);
-  //     this.name = savedGame.abbreviation;
-  //     return await this.get();
-  //   }
-  //   return fullGame;
-  // };
-
-  async get(): Promise<FullGame | null> {
-    return this.client.findFirst({
+  async get(): Promise<FullSpeedrunGame | null> {
+    const game = await this.client.findFirst({
       where: {
         OR: [
           {
             abbreviation: this.name,
           },
           {
-            names: {
-              international: this.name,
-            },
+            international: this.name,
           },
         ],
       },
@@ -60,17 +47,24 @@ export class GamePrisma {
             links: true,
           },
         },
-        names: true,
         platforms: true,
+        links: true,
       },
     });
+    if (!game) {
+      return null
+    }
+    return {
+      id: game.id,
+      abbreviation: game.abbreviation,
+      international: game.international,
+      twitch: game.twitch,
+      links: game.links,
+      categories: game.categories,
+      platforms: game.platforms.map((platform) => platform.platformId),
+    }
   };
-
-  getAll() {
-    throw new Error(`Uncallable`);
-  };
-
-  async save(game: IGameType, categories: ICategoryType[]) {
+  async save(game: SpeedrunGame, categories: ICategoryType[]) {
     // const speedrunFetch = new SpeedrunFetch();
     // const { game, categories } = await speedrunFetch.getLeaderboard(this.name);
 
@@ -78,14 +72,13 @@ export class GamePrisma {
       data: {
         id: game.id,
         abbreviation: game.abbreviation,
+        international: game.international,
+        twitch: game.twitch,
         categories: {
           create: this.categories(categories),
         },
         links: {
           create: this.links(game),
-        },
-        names: {
-          create: this.names(game),
         },
         platforms: {
           create: this.platforms(game),
@@ -111,7 +104,7 @@ export class GamePrisma {
     });
   };
 
-  private links(game: IGameType) {
+  private links(game: SpeedrunGame) {
     return game.links.map((link: Link) => {
       return {
         rel: link.rel,
@@ -127,7 +120,7 @@ export class GamePrisma {
     };
   };
 
-  private platforms(game: IGameType) {
+  private platforms(game: SpeedrunGame) {
     return game.platforms.map((platform) => {
       return {
         platformId: platform,
