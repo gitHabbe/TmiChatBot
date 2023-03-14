@@ -1,7 +1,36 @@
-import { JoinedUser, Model, ModelName } from "../../interfaces/prisma";
-import { DatabaseSingleton } from "./Prisma";
-import { Component, User } from "@prisma/client";
-import { ModuleFamily } from "../../interfaces/tmi";
+import { JoinedUser, ModelName } from "../../interfaces/prisma"
+import { DatabaseSingleton } from "./Prisma"
+import { User } from "@prisma/client"
+import { ModuleFamily } from "../../interfaces/tmi"
+import { ComponentPrisma } from "./ComponentPrisma"
+import { CommandPrisma } from "./CommandPrisma"
+import { TrustPrisma } from "./TrustPrisma"
+
+class DeletePrisma {
+  private db = DatabaseSingleton.getInstance().get();
+  private user = this.db[ModelName.user];
+  private component = this.db[ModelName.component];
+  private trust = this.db[ModelName.trust];
+  private timestamp = this.db[ModelName.timestamp];
+  private command = this.db[ModelName.command];
+  private setting = this.db[ModelName.setting];
+
+  constructor(private name: string) {}
+
+
+  async deleteAll() {
+    const findFirst = await this.user.findFirst({ where: { name: this.name } })
+    if (!findFirst) {
+      throw new Error("User not found")
+    }
+    await this.component.deleteMany({ where: { userId: findFirst.id } })
+    await this.command.deleteMany({ where: { userId: findFirst.id } })
+    await this.timestamp.deleteMany({ where: { userId: findFirst.id } })
+    await this.trust.deleteMany({ where: { userId: findFirst.id } })
+    await this.setting.deleteMany({ where: { userId: findFirst.id } })
+    await this.user.delete({ where: { id: findFirst.id } })
+  }
+}
 
 export class UserPrisma {
   private db = DatabaseSingleton.getInstance().get();
@@ -34,8 +63,9 @@ export class UserPrisma {
     });
   }
 
-  delete(): Promise<User> {
-    return this.client.delete({ where: { name: this.name } });
+  async delete() {
+    const deletePrisma = new DeletePrisma(this.name)
+    await deletePrisma.deleteAll()
   };
 
   private async create() {
