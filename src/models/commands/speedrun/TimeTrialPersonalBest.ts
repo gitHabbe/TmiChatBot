@@ -18,7 +18,6 @@ export class TimeTrialPersonalBest implements ICommand {
         let message = this.messageData.message.split(" ")
         message.splice(1, 1)
         this.messageData.message = message.join(" ")
-        const stringExtract = new StringExtract(this.messageData);
         const messageParser = new MessageParser()
         const gameName = await messageParser.gameName(this.messageData, 1)
         // const gameName: string = await stringExtract.game();
