@@ -13,20 +13,12 @@ generator client {
 model Game {
   id            String @id
   abbreviation  String @unique
-
-  names       GameNames?
-  platforms   GamePlatform[]
-  links       GameLink[]
-  categories  Category[]
-}
-
-model GameNames {
-  id            Int    @id @default(autoincrement())
   international String
   twitch        String
 
-  gameId  String
-  game    Game  @relation(fields: [gameId], references: [id])
+  platforms   GamePlatform[]
+  links       GameLink[]
+  categories  Category[]
 }
 
 model GamePlatform {
