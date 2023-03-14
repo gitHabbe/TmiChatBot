@@ -1,15 +1,17 @@
 import { CategoryLink } from ".prisma/client";
 import { FullGame } from "../../interfaces/prisma";
-import { ICategoryType, IRun, } from "../../interfaces/speedrun";
+import { ICategoryType, IRun } from "../../interfaces/speedrun"
 // import { SpeedrunCom } from "./SpeedrunCom";
 import { fuseSearch } from "../../utility/fusejs";
 import { SpeedrunLeaderboard } from "./SpeedrunCom";
+import { Category, FullSpeedrunGame, Link } from "../../interfaces/general"
 
 export class Leaderboard {
-  constructor(private game: FullGame) {}
+  constructor(private game: FullSpeedrunGame) {}
 
   private validCategories = () => {
-    const hasLeaderboard = ({ rel }: CategoryLink) => rel === "leaderboard";
+    this.game.categories[0].links[0].rel
+    const hasLeaderboard = ({ rel }: Link) => rel === "leaderboard";
     return this.game.categories.filter(({ links }) => {
       return links.findIndex(hasLeaderboard) >= 0;
     });
@@ -53,7 +55,7 @@ export class Leaderboard {
 
   async fetchWorldRecord(category: ICategoryType): Promise<IRun> {
     const speedrunLeaderboard = new SpeedrunLeaderboard(this.game, category);
-    const leaderboard = await speedrunLeaderboard.fetch();
+    const leaderboard = await speedrunLeaderboard.fetchWorldRecord();
     const { runs: [ worldRecord ] } = leaderboard;
 
     return worldRecord;
@@ -61,7 +63,7 @@ export class Leaderboard {
 
   async fetchPersonalBest(category: ICategoryType, runnerId: string): Promise<IRun> {
     const speedrunLeaderboard = new SpeedrunLeaderboard(this.game, category);
-    const leaderboard = await speedrunLeaderboard.fetch();
+    const leaderboard = await speedrunLeaderboard.fetchLeaderboard();
     const { runs } = leaderboard
     const personalRun: IRun | undefined = runs.find((run) => {
       return run.run.players[0].id === runnerId;

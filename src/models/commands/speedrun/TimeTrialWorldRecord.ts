@@ -8,8 +8,7 @@ import { ModuleFamily } from "../../../interfaces/tmi";
 export class TimeTrialWorldRecord implements ICommand {
     moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN
 
-    constructor(public messageData: MessageData) {
-    }
+    constructor(public messageData: MessageData) {}
 
     async run(): Promise<MessageData> {
         const stringExtract = new StringExtract(this.messageData);

@@ -39,10 +39,10 @@ export class IndividualWorldRecordDiddyKongRacing extends ParseMessage implement
 
 export class TimeTrialWorldRecordDiddyKongRacing implements ICommand {
     moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN
+
     private jsonTimeTrials = new JsonTimeTrials();
 
-    constructor(public messageData: MessageData) {
-    }
+    constructor(public messageData: MessageData) {}
 
     parseMessage() {
         const { message } = this.messageData;
@@ -113,9 +113,7 @@ export class TimeTrialPersonalBestDiddyKongRacing implements ICommand {
     moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN
     private jsonTimeTrials = new JsonTimeTrials();
 
-    constructor(public messageData: MessageData, private targetUser: string) {
-
-    }
+    constructor(public messageData: MessageData, private targetUser: string) {}
 
     parseMessage() {
         const { message } = this.messageData;
@@ -172,7 +170,7 @@ export class TimeTrialPersonalBestDiddyKongRacing implements ICommand {
         if (isShortcut) shortcut = "shortcut"
         const [ { item } ] = fuseSearch<ITimeTrialJson>(dkrLevels, query.join(" "));
         const dkrtt = new DiddyKongRacingTimeTrialLeaderboard(item, parseInt(laps), shortcut);
-        const res = await dkrtt.fetchPersonalBest("");
+        const res = await dkrtt.fetchPersonalBest(this.targetUser);
         // const res = await worldRecordApi.fetch()
         const run = res.times.find((run) => {
             return run.username.toUpperCase() === this.targetUser.toUpperCase()

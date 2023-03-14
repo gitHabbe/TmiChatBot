@@ -9,22 +9,20 @@ export class StringExtract {
   constructor(private messageData: MessageData) {}
 
   async game(): Promise<string> {
-    const { message } = this.messageData;
+    const { message, channel } = this.messageData;
     const messageArray = message.split(" ").slice(1);
     if (!messageArray || !messageArray[0]) {
-      const twitchChannels = await this.twitchFetch.channelList("CHANGE ME")
-      const { game_name } = this.twitchFetch.filteredChannel(twitchChannels, this.messageData.channel);
+      const { game_name } = await this.twitchFetch.singleChannel(channel)
       return game_name;
     }
     return messageArray[0];
   };
 
   async category(): Promise<string> {
-    const { message } = this.messageData;
+    const { message, channel } = this.messageData;
     const messageArray = message.split(" ").slice(2);
     if (!messageArray || !messageArray[0]) {
-      const twitchChannels = await this.twitchFetch.channelList("CHANGE ME");
-      const { title } = this.twitchFetch.filteredChannel(twitchChannels, this.messageData.channel);
+      const { title } = await this.twitchFetch.singleChannel(channel)
       return title;
     }
     return messageArray.join(" ");
