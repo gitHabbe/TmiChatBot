@@ -3,8 +3,12 @@ import { StringExtract } from "../../StringExtract";
 import { TimeTrialSupport } from "../../../interfaces/speedrun";
 import { TimeTrialPersonalBestDiddyKongRacing } from "../Speedrun";
 import { MessageData } from "../../tmi/MessageData";
+import { ModuleFamily } from "../../../interfaces/tmi"
+import { MessageParser } from "../../tmi/MessageParse"
 
 export class TimeTrialPersonalBest implements ICommand {
+    moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN;
+
     constructor(public messageData: MessageData) {
     }
 
@@ -15,7 +19,9 @@ export class TimeTrialPersonalBest implements ICommand {
         message.splice(1, 1)
         this.messageData.message = message.join(" ")
         const stringExtract = new StringExtract(this.messageData);
-        const gameName: string = await stringExtract.game();
+        const messageParser = new MessageParser()
+        const gameName = await messageParser.gameName(this.messageData, 1)
+        // const gameName: string = await stringExtract.game();
         switch (gameName.toUpperCase()) {
             case TimeTrialSupport.DKR:
                 return new TimeTrialPersonalBestDiddyKongRacing(this.messageData, targetUser).run();
