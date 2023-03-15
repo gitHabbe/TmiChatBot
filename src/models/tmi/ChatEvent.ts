@@ -1,6 +1,6 @@
 import { ChatUserstate } from "tmi.js";
 import { ModuleFamily } from "../../interfaces/tmi";
-import { CommandList, StandardCommandList } from "../commands/StandardCommandList";
+import { CommandList, StandardCommandMap } from "../commands/StandardCommandMap";
 import { ICommand } from "../../interfaces/Command";
 import { MessageParser } from "./MessageParse";
 import { MessageData } from "./MessageData";
@@ -40,7 +40,7 @@ export class ChatEvent {
 
     private static async standardCommandResponse(messageDataParam: MessageData): Promise<string> {
         let messageData = messageDataParam;
-        const commandList: CommandList = new StandardCommandList(messageData);
+        const commandList: CommandList = new StandardCommandMap(messageData);
         const messageParser: MessageParser = new MessageParser();
         const commandName: string = messageParser.getCommandName(messageData.message);
         const command: ICommand | undefined = commandList.get(commandName);

@@ -31,7 +31,7 @@ export interface CommandList {
   get(commandName: string): ICommand | undefined;
 }
 
-export class StandardCommandList implements CommandList {
+export class StandardCommandMap implements CommandList {
   private commandMap = new Map<string, ICommand>();
 
   constructor(public messageData: MessageData) {
