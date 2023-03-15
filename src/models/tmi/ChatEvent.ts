@@ -38,13 +38,6 @@ export class ChatEvent {
         return false;
     }
 
-    async onJoin(ircChannel: string, username: string, self: boolean) {
-        console.log(`I HAVE JOINED ${ircChannel}`);
-        const channel: string = ircChannel.slice(1);
-        const userModel = new UserPrisma(channel);
-        await userModel.get();
-    }
-
     private static async standardCommandResponse(messageDataParam: MessageData): Promise<string> {
         let messageData = messageDataParam;
         const commandList: CommandList = new StandardCommandList(messageData);
@@ -77,5 +70,12 @@ export class ChatEvent {
 
         const commandData = await command.run();
         return commandData.response;
+    }
+
+    async onJoin(ircChannel: string, username: string, self: boolean) {
+        console.log(`I HAVE JOINED ${ircChannel}`);
+        const channel: string = ircChannel.slice(1);
+        const userModel = new UserPrisma(channel);
+        await userModel.get();
     }
 }
