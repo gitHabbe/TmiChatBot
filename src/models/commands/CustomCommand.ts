@@ -3,8 +3,10 @@ import { UserPrisma } from "../database/UserPrisma";
 import { CommandPrisma } from "../database/CommandPrisma";
 import { ICommand } from "../../interfaces/Command";
 import { MessageData } from "../tmi/MessageData";
+import { ModuleFamily } from "../../interfaces/tmi"
 
 export class CustomCommand implements ICommand {
+  moduleFamily: ModuleFamily = ModuleFamily.PROTECTED
 
   constructor(public messageData: MessageData) {}
 

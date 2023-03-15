@@ -1,9 +1,10 @@
-import { twitterAPI, twitterRegex } from "../../config/twitterConfig";
-import { youtubeAPI, youtubeRegex } from "../../config/youtubeConfig";
-import { ITwitterTweet, ITwitterTweetResponse, ITwitterUser, IYoutubePagination } from "../../interfaces/socialMedia";
-import { numberToRoundedWithLetter, youtubeDurationToHHMMSS } from "../../utility/dateFormat";
-import { ICommand } from "../../interfaces/Command";
-import { MessageData } from "../tmi/MessageData";
+import { twitterAPI, twitterRegex } from "../../config/twitterConfig"
+import { youtubeAPI, youtubeRegex } from "../../config/youtubeConfig"
+import { ITwitterTweet, ITwitterTweetResponse, ITwitterUser, IYoutubePagination } from "../../interfaces/socialMedia"
+import { numberToRoundedWithLetter, youtubeDurationToHHMMSS } from "../../utility/dateFormat"
+import { ICommand } from "../../interfaces/Command"
+import { MessageData } from "../tmi/MessageData"
+import { ModuleFamily } from "../../interfaces/tmi"
 
 export class RegexPattern {
   constructor(public pattern: RegExp, public text: string) {}
@@ -58,6 +59,8 @@ class TwitterLink implements SocialMediaLink {
 }
 
 export class LinkCommand implements ICommand {
+  moduleFamily: ModuleFamily = ModuleFamily.PROTECTED
+
   private socialMediaLinks: SocialMediaLink[] = []
 
   constructor(public messageData: MessageData) {
@@ -72,7 +75,6 @@ export class LinkCommand implements ICommand {
       if (socialMediaLink.regexPattern.parse()) return socialMediaLink;
     })
   }
-
   async run(): Promise<MessageData> {
     const isLink = this.getLink()
     if (isLink === undefined) throw new Error("Not a link")
