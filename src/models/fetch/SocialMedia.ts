@@ -63,13 +63,13 @@ export class YoutubeLink implements Link {
     try {
       const videos = await this.fetchVideos();
       const video = videos.items[0];
-      const { viewCount, likeCount, dislikeCount } = video.statistics;
-      const likePercent = stringToProbabilityPercent(likeCount, dislikeCount);
-      const duration = youtubeDurationToHHMMSS(video.contentDetails.duration);
+      const { viewCount, likeCount } = video.statistics;
+      const videoDuration = youtubeDurationToHHMMSS(video.contentDetails.duration);
       const views = numberToRoundedWithLetter(viewCount);
       const title = video.snippet.title;
+      const videoLikeCount = numberToRoundedWithLetter(likeCount)
 
-      return `${title} [${duration} - ${likePercent}% - ${views}]`;
+      return `${title} [${videoDuration} - ${videoLikeCount}👍 - ${views}]`;
     } catch (error: any) {
       if (error) return error.message;
       return "";
