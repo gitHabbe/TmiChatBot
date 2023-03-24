@@ -1,6 +1,6 @@
 import { ChatUserstate } from "tmi.js"
 import { ModuleFamily } from "../../interfaces/tmi"
-import { CommandList, StandardCommandMap } from "../commands/StandardCommandMap"
+import { StandardCommandMap } from "../commands/StandardCommandMap"
 import { ICommand } from "../../interfaces/Command"
 import { MessageParser } from "./MessageParse"
 import { MessageData } from "./MessageData"
@@ -9,6 +9,7 @@ import { ClientSingleton } from "./ClientSingleton"
 import { JoinedUser } from "../../interfaces/prisma"
 import { Command, Component, Setting } from "@prisma/client"
 import { ComponentPrisma } from "../database/ComponentPrisma"
+import { LinkParser, TwitterLink } from "../fetch/SocialMedia"
 
 
 export class ChatEvent {
@@ -20,34 +21,44 @@ export class ChatEvent {
         const joinedUser: JoinedUser = await userModel.get()
 
 
-        const isCustomCommand: boolean = await ChatEvent.customCommandAction(channel, message)
-        if (isCustomCommand) return
-
-        const standardCommandResponse: string = await ChatEvent.standardCommandResponse(messageData)
         const client = ClientSingleton.getInstance().get()
-        if (standardCommandResponse !== "") client.say(channel, standardCommandResponse)
+        const customCommandResponse: string = await ChatEvent.customCommandAction(channel, message)
+        if (customCommandResponse !== "") {
+            client.say(channel, customCommandResponse)
+            return
+        }
+
+        const standardCommandResponse: string = await ChatEvent.standardCommandAction(messageData)
+        if (standardCommandResponse !== "") {
+            client.say(channel, standardCommandResponse)
+            return
+        }
+
+        const socialCommandResponse = await ChatEvent.socialCommandAction(messageData)
+        if (socialCommandResponse) {
+            client.say(channel, socialCommandResponse)
+            return
+        }
     }
 
-    private static async customCommandAction(channel: string, message: string): Promise<boolean> {
+    private static async customCommandAction(channel: string, message: string): Promise<string> {
         const userModel: UserPrisma = new UserPrisma(channel)
         const joinedUser: JoinedUser = await userModel.get()
         const isCustomCommand: Command[] = joinedUser.commands.filter((command: Command) => {
             return command.name === message
         })
         if (isCustomCommand.length > 0) {
-            const client = ClientSingleton.getInstance().client
-            await client.say(channel, isCustomCommand[0].name)
-            return true
+            return isCustomCommand[0].content
         }
-        return false
+        return ""
     }
 
-    private static async standardCommandResponse(messageDataParam: MessageData): Promise<string> {
+    private static async standardCommandAction(messageDataParam: MessageData): Promise<string> {
         let messageData = messageDataParam
-        const commandList: CommandList = new StandardCommandMap(messageData)
+        const standardCommandMap = new StandardCommandMap(messageData)
         const messageParser: MessageParser = new MessageParser()
         const commandName: string = messageParser.getCommandName(messageData.message)
-        const command: ICommand | undefined = commandList.get(commandName)
+        const command: ICommand | undefined = standardCommandMap.get(commandName)
         if (!command) {
             return ""
         }
@@ -81,5 +92,11 @@ export class ChatEvent {
         const channel: string = ircChannel.slice(1)
         const userModel = new UserPrisma(channel)
         await userModel.get()
+    }
+
+    private static async socialCommandAction(messageData: MessageData) {
+        const { message } = messageData;
+        const linkParser = new LinkParser(message)
+        return await linkParser.matchRegex()
     }
 }
