@@ -7,6 +7,7 @@ import {
 } from "../../interfaces/twitch"
 import { AxiosInstance } from "axios";
 import { twitchAPI } from "../../config/twitchConfig";
+import { ApiError } from "../error/ChatError"
 
 export class TwitchFetch {
     private api: AxiosInstance = twitchAPI;
@@ -25,7 +26,7 @@ export class TwitchFetch {
         const targetChannel = twitchChannel.find((channel: ITwitchChannel) => {
             return channel.display_name.toLowerCase() === channelParameter.toLowerCase()
         })
-        if (targetChannel === undefined) throw new Error("Error using command")
+        if (!targetChannel) throw new ApiError("Channel not found on Twitch");
         return targetChannel;
     }
 

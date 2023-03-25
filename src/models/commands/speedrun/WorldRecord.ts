@@ -8,6 +8,7 @@ import { ModuleFamily } from "../../../interfaces/tmi"
 import { MessageParser } from "../../tmi/MessageParse"
 import { SpeedrunApi, SpeedrunCategory } from "../../fetch/SpeedrunCom"
 import { Category, FullSpeedrunGame, SpeedrunGame, SpeedrunResponse } from "../../../interfaces/general"
+import { ChatError } from "../../error/ChatError"
 
 export class SpeedrunGameCollection {
 
@@ -36,8 +37,8 @@ export class SpeedrunGameCollection {
             const isAbbreviationCorrect = game.abbreviation.toUpperCase() === gameName.toUpperCase()
             return isNameCorrect || isAbbreviationCorrect
         })
-        if (!foundGame || gameList.length === 0) {
-            throw new Error(`Game ${gameName} not found on SpeedrunDotCom`)
+        if (!fetchedGame || gameList.length === 0) {
+            throw new ChatError(`Game "${gameName}" not found on SpeedrunDotCom`)
         }
         const speedrunCategory = new SpeedrunCategory(foundGame)
         const categoryList: SpeedrunResponse<Category[]> = await speedrunCategory.fetch()
