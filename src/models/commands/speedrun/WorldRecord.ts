@@ -10,7 +10,7 @@ import { SpeedrunApi, SpeedrunCategory } from "../../fetch/SpeedrunCom"
 import { Category, FullSpeedrunGame, SpeedrunGame, SpeedrunResponse } from "../../../interfaces/general"
 import { ChatError } from "../../error/ChatError"
 
-export class SpeedrunGameCollection {
+export class SpeedrunGameData {
 
     constructor(private messageData: MessageData) {}
 

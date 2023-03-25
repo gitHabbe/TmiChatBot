@@ -10,7 +10,7 @@ import { MessageData } from "../../tmi/MessageData";
 import { ModuleFamily } from "../../../interfaces/tmi";
 import { MessageParser } from "../../tmi/MessageParse"
 import { SpeedrunCategory, SpeedrunApi } from "../../fetch/SpeedrunCom"
-import { SpeedrunGameCollection } from "./WorldRecord"
+import { SpeedrunGameData } from "./WorldRecord"
 
 export class PersonalBest implements ICommand {
     moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN
@@ -20,8 +20,8 @@ export class PersonalBest implements ICommand {
 
     async run(): Promise<MessageData> {
         const messageArray = this.messageData.message.split(" ");
-        const speedrunGameCollection = new SpeedrunGameCollection(this.messageData)
         const { fullSpeedrunGame, categoryName } = await speedrunGameCollection.getFullSpeedrunGame(2)
+        const speedrunGameCollection = new SpeedrunGameData(this.messageData)
         const runnerModel = new RunnerPrisma();
         const runnerName = messageArray.splice(1, 1).join();
         const runner = await runnerModel.get(runnerName);
