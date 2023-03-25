@@ -6,8 +6,8 @@ import { MessageData } from "../../tmi/MessageData";
 import { ModuleFamily } from "../../../interfaces/tmi";
 
 export class TwitchTitle implements ICommand {
-    private twitchFetch: TwitchFetch
     public moduleFamily: ModuleFamily = ModuleFamily.TITLE;
+    private twitchFetch: TwitchFetch
 
     constructor(public messageData: MessageData, twitchFetch?: TwitchFetch) {
         this.twitchFetch = twitchFetch || new TwitchFetch()
