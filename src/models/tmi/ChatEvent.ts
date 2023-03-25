@@ -7,9 +7,10 @@ import { MessageData } from "./MessageData"
 import { UserPrisma } from "../database/UserPrisma"
 import { ClientSingleton } from "./ClientSingleton"
 import { JoinedUser } from "../../interfaces/prisma"
-import { Command, Component, Setting } from "@prisma/client"
+import { Command, Component } from "@prisma/client"
 import { ComponentPrisma } from "../database/ComponentPrisma"
-import { LinkParser, TwitterLink } from "../fetch/SocialMedia"
+import { LinkParser } from "../fetch/SocialMedia"
+import { ChatError } from "../error/ChatError"
 
 
 export class ChatEvent {
@@ -19,31 +20,36 @@ export class ChatEvent {
         const messageData: MessageData = new MessageData(channel, chatter, message)
         const userModel = new UserPrisma(messageData.channel)
         const joinedUser: JoinedUser = await userModel.get()
-
-
         const client = ClientSingleton.getInstance().get()
-        const customCommandResponse: string = await ChatEvent.customCommandAction(channel, message)
-        if (customCommandResponse !== "") {
-            client.say(channel, customCommandResponse)
-            return
-        }
 
-        const standardCommandResponse: string = await ChatEvent.standardCommandAction(messageData)
-        if (standardCommandResponse !== "") {
-            client.say(channel, standardCommandResponse)
-            return
-        }
+        try {
+            const customCommandResponse: string = await ChatEvent.customCommandAction(message, joinedUser)
+            if (customCommandResponse !== "") {
+                client.say(channel, customCommandResponse)
+                return
+            }
 
-        const socialCommandResponse = await ChatEvent.socialCommandAction(messageData)
-        if (socialCommandResponse) {
-            client.say(channel, socialCommandResponse)
-            return
+            const standardCommandResponse: string = await ChatEvent.standardCommandAction(messageData, joinedUser)
+            if (standardCommandResponse !== "") {
+                client.say(channel, standardCommandResponse)
+                return
+            }
+
+            const socialCommandResponse = await ChatEvent.socialCommandAction(messageData)
+            if (socialCommandResponse) {
+                client.say(channel, socialCommandResponse)
+                return
+            }
+        }
+        catch (error) {
+            if (error instanceof ChatError) {
+                client.say(channel, error.message)
+            }
+            else if (error instanceof Error) {}
         }
     }
 
-    private static async customCommandAction(channel: string, message: string): Promise<string> {
-        const userModel: UserPrisma = new UserPrisma(channel)
-        const joinedUser: JoinedUser = await userModel.get()
+    private static async customCommandAction(message: string, joinedUser: JoinedUser): Promise<string> {
         const isCustomCommand: Command[] = joinedUser.commands.filter((command: Command) => {
             return command.name === message
         })
@@ -53,15 +59,11 @@ export class ChatEvent {
         return ""
     }
 
-    private static async standardCommandAction(messageDataParam: MessageData): Promise<string> {
-        let messageData = messageDataParam
+    private static async standardCommandAction(messageData: MessageData, joinedUser: JoinedUser): Promise<string> {
         const standardCommandMap = new StandardCommandMap(messageData)
         const messageParser: MessageParser = new MessageParser()
         const commandName: string = messageParser.getCommandName(messageData.message)
-        const command: ICommand | undefined = standardCommandMap.get(commandName)
-        if (!command) {
-            return ""
-        }
+        const command: ICommand = standardCommandMap.get(commandName)
 
         const isProtected = command.moduleFamily === ModuleFamily.PROTECTED
         if (isProtected) {
@@ -71,20 +73,20 @@ export class ChatEvent {
 
         const chatter: string | undefined = messageData.chatter.username?.toUpperCase()
         const streamer: string = messageData.channel.toUpperCase()
-        const userModel = new UserPrisma(messageData.channel)
-        const joinedUser: JoinedUser = await userModel.get()
         const componentPrisma = new ComponentPrisma(joinedUser, messageData.channel)
         const isComponentEnabled: Component | undefined = componentPrisma.isFamilyEnabled(command.moduleFamily)
-        if (!isComponentEnabled) {
-            if (streamer === chatter) {
-                return `Command: ${commandName} is not enabled. Use "!toggle ${command.moduleFamily}"`
-            } else {
-                return ""
-            }
+        if (!isComponentEnabled && streamer === chatter) {
+            return `Command: ${commandName} is not enabled. Use "!toggle ${command.moduleFamily}"`
         }
 
         const commandData = await command.run()
         return commandData.response
+    }
+
+    private static async socialCommandAction(messageData: MessageData) {
+        const { message } = messageData;
+        const linkParser = new LinkParser(message)
+        return await linkParser.matchRegex()
     }
 
     async onJoin(ircChannel: string, username: string, self: boolean) {
@@ -92,11 +94,5 @@ export class ChatEvent {
         const channel: string = ircChannel.slice(1)
         const userModel = new UserPrisma(channel)
         await userModel.get()
-    }
-
-    private static async socialCommandAction(messageData: MessageData) {
-        const { message } = messageData;
-        const linkParser = new LinkParser(message)
-        return await linkParser.matchRegex()
     }
 }
