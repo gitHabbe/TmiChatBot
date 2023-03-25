@@ -20,8 +20,11 @@ export class PersonalBest implements ICommand {
 
     async run(): Promise<MessageData> {
         const messageArray = this.messageData.message.split(" ");
-        const { fullSpeedrunGame, categoryName } = await speedrunGameCollection.getFullSpeedrunGame(2)
-        const speedrunGameCollection = new SpeedrunGameData(this.messageData)
+        const speedrunGameData = new SpeedrunGameData(this.messageData)
+        const index = 2
+        const fullSpeedrunGame = await speedrunGameData.getFullSpeedrunGame(index)
+        const messageParser = new MessageParser()
+        const categoryName: string = await messageParser.categoryName(this.messageData, index + 1)
         const runnerModel = new RunnerPrisma();
         const runnerName = messageArray.splice(1, 1).join();
         const runner = await runnerModel.get(runnerName);

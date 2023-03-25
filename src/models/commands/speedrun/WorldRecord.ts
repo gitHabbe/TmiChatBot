@@ -14,49 +14,48 @@ export class SpeedrunGameData {
 
     constructor(private messageData: MessageData) {}
 
-    async getFullSpeedrunGame(index: number = 1) {
+    async getFullSpeedrunGame(index: number = 1): Promise<FullSpeedrunGame> {
         const messageParser = new MessageParser()
         const gameName: string = await messageParser.gameName(this.messageData, index)
-        const gameModel = new GamePrisma(gameName)
-        let fullSpeedrunGame: FullSpeedrunGame | null = await gameModel.get()
-        const categoryName: string = await messageParser.categoryName(this.messageData, index + 1)
+        const gamePrisma = new GamePrisma(gameName)
+        let fullSpeedrunGame: FullSpeedrunGame | null = await gamePrisma.get()
         if (!fullSpeedrunGame) {
-            const { foundGame, validCategories } = await this.fetchFullSpeedrunGame(gameName)
-            const gameModel = new GamePrisma(foundGame.international)
-            await gameModel.save(foundGame, validCategories)
-            fullSpeedrunGame = SpeedrunGameCollection.buildFullSpeedrunGame(foundGame, validCategories)
+            const { fetchedGame, validCategories } = await this.fetchFullSpeedrunGame(gameName)
+            await gamePrisma.save(fetchedGame, validCategories)
+            fullSpeedrunGame = SpeedrunGameData.buildFullSpeedrunGame(fetchedGame, validCategories)
         }
-        return { fullSpeedrunGame, categoryName }
+        return fullSpeedrunGame
     }
 
-    private async fetchFullSpeedrunGame(gameName: string) {
+    private async fetchFullSpeedrunGame(gameName: string): Promise<{ validCategories: Category[]; fetchedGame: SpeedrunGame }> {
         const speedrunGame = new SpeedrunApi(gameName)
         const gameList: SpeedrunGame[] = await speedrunGame.fetch()
-        const foundGame: SpeedrunGame | undefined = gameList.find(game => {
-            const isNameCorrect = game.international.toUpperCase() === gameName.toUpperCase()
-            const isAbbreviationCorrect = game.abbreviation.toUpperCase() === gameName.toUpperCase()
+        const fetchedGame: SpeedrunGame | undefined = gameList.find(game => {
+            const isNameCorrect: boolean = game.international.toUpperCase() === gameName.toUpperCase()
+            const isAbbreviationCorrect: boolean = game.abbreviation.toUpperCase() === gameName.toUpperCase()
             return isNameCorrect || isAbbreviationCorrect
         })
         if (!fetchedGame || gameList.length === 0) {
             throw new ChatError(`Game "${gameName}" not found on SpeedrunDotCom`)
         }
-        const speedrunCategory = new SpeedrunCategory(foundGame)
+        const speedrunCategory = new SpeedrunCategory(fetchedGame)
         const categoryList: SpeedrunResponse<Category[]> = await speedrunCategory.fetch()
         const validCategories: Category[] = categoryList.data.filter(category => {
             return category.links.find(link => link.rel === "leaderboard")
         })
-        return { foundGame, validCategories }
+        return { fetchedGame, validCategories }
     }
 
-    private static buildFullSpeedrunGame(foundGame: SpeedrunGame, validCategories: Category[]) {
+    private static buildFullSpeedrunGame(foundGame: SpeedrunGame, validCategories: Category[]): FullSpeedrunGame {
+        const { links, platforms, twitch, id, international, abbreviation } = foundGame
         return {
-            id: foundGame.id,
-            abbreviation: foundGame.abbreviation,
-            international: foundGame.international,
-            twitch: foundGame.twitch,
-            links: foundGame.links,
+            id,
+            abbreviation,
+            international,
+            twitch,
+            links,
             categories: validCategories,
-            platforms: foundGame.platforms,
+            platforms,
         }
     }
 }
@@ -67,8 +66,11 @@ export class WorldRecord implements ICommand {
     constructor(public messageData: MessageData) {}
 
     async run(): Promise<MessageData> {
-        const speedrunGameCollection = new SpeedrunGameCollection(this.messageData)
-        const { fullSpeedrunGame, categoryName } = await speedrunGameCollection.getFullSpeedrunGame(1)
+        const speedrunGameData = new SpeedrunGameData(this.messageData)
+        const index = 1
+        const fullSpeedrunGame: FullSpeedrunGame = await speedrunGameData.getFullSpeedrunGame(index)
+        const messageParser = new MessageParser()
+        const categoryName: string = await messageParser.categoryName(this.messageData, index + 1)
         const leaderboard = new Leaderboard(fullSpeedrunGame);
         const fuzzyCategory = leaderboard.fuzzyCategory(categoryName);
         const [ { item: category } ] = fuzzyCategory;
