@@ -37,15 +37,12 @@ export class TimestampPrisma {
   };
 
   async find(name: string) {
-    const timestamp = await this.client.findFirst({
+    return await this.client.findFirst({
       where: {
         userId: this.user.id,
         name: name,
       },
     });
-    if (timestamp === null) throw new Error(`Timestamp: ${name} not found`);
-
-    return timestamp;
   };
 
   async findAll() {
