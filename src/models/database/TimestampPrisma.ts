@@ -1,6 +1,6 @@
-import { User } from "@prisma/client";
-import { IVideo } from "../../interfaces/twitch";
-import { DatabaseSingleton, Prisma } from "./Prisma"
+import { User } from "@prisma/client"
+import { IVideo } from "../../interfaces/twitch"
+import { DatabaseSingleton } from "./Prisma"
 import { ModelName } from "../../interfaces/prisma"
 
 export class TimestampPrisma {

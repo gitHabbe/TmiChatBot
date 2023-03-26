@@ -15,7 +15,7 @@ interface Link {
 export class LinkParser {
   constructor(private message: string) {}
 
-  async matchRegex(): Promise<string | null> {
+  async matchRegex(): Promise<string> {
     let regex = youtubeRegex.exec(this.message);
     if (regex) {
       const youtubeLink = new YoutubeLink(regex);
@@ -26,7 +26,7 @@ export class LinkParser {
       const twitterLink = new TwitterLink(regex);
       return await twitterLink.getMessage();
     }
-    return null;
+    return "";
   };
 }
 

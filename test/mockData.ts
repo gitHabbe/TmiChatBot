@@ -1,8 +1,8 @@
-import { ITwitterTweetResponse, IYoutubePagination } from "../src/interfaces/socialMedia";
-import { ITwitchChannel } from "../src/interfaces/twitch";
-import { JoinedUser } from "../src/interfaces/prisma";
-import { MessageData } from "../src/models/tmi/MessageData";
-import { ChatUserstate } from "tmi.js";
+import { ITwitterTweetResponse, IYoutubePagination } from "../src/interfaces/socialMedia"
+import { ITwitchChannel } from "../src/interfaces/twitch"
+import { JoinedUser } from "../src/interfaces/prisma"
+import { MessageData } from "../src/models/tmi/MessageData"
+import { ChatUserstate } from "tmi.js"
 import { SpeedrunGame } from "../src/interfaces/general"
 import { PokemonMove } from "../src/interfaces/pokemon"
 

@@ -1,10 +1,6 @@
 import { JoinedUser, ModelName } from "../../interfaces/prisma"
 import { DatabaseSingleton } from "./Prisma"
-import { User } from "@prisma/client"
 import { ModuleFamily } from "../../interfaces/tmi"
-import { ComponentPrisma } from "./ComponentPrisma"
-import { CommandPrisma } from "./CommandPrisma"
-import { TrustPrisma } from "./TrustPrisma"
 
 class DeletePrisma {
   private db = DatabaseSingleton.getInstance().get();
@@ -20,9 +16,7 @@ class DeletePrisma {
 
   async deleteAll() {
     const findFirst = await this.user.findFirst({ where: { name: this.name } })
-    if (!findFirst) {
-      throw new Error("User not found")
-    }
+    if (!findFirst) throw new Error("User not found")
     await this.component.deleteMany({ where: { userId: findFirst.id } })
     await this.command.deleteMany({ where: { userId: findFirst.id } })
     await this.timestamp.deleteMany({ where: { userId: findFirst.id } })
