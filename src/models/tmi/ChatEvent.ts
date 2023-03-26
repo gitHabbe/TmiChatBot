@@ -23,63 +23,60 @@ export class ChatEvent {
         const client = ClientSingleton.getInstance().get()
 
         try {
-            const customCommandResponse: string = await ChatEvent.customCommandAction(message, joinedUser)
-            if (customCommandResponse !== "") {
-                client.say(channel, customCommandResponse)
-                return
-            }
-
-            const standardCommandResponse: string = await ChatEvent.standardCommandAction(messageData, joinedUser)
-            if (standardCommandResponse !== "") {
-                client.say(channel, standardCommandResponse)
-                return
-            }
-
-            const socialCommandResponse = await ChatEvent.socialCommandAction(messageData)
-            if (socialCommandResponse) {
-                client.say(channel, socialCommandResponse)
-                return
+            const commandsList = [
+                await ChatEvent.customCommandAction(message, joinedUser),
+                await ChatEvent.standardCommandAction(messageData, joinedUser),
+                await ChatEvent.socialCommandAction(messageData)
+            ]
+            for (let commandsListElement of commandsList) {
+                if (commandsListElement) {
+                    client.say(channel, commandsListElement)
+                    return
+                }
             }
         }
         catch (error) {
             if (error instanceof ChatError) {
                 client.say(channel, error.message)
             }
-            else if (error instanceof Error) {}
+            else if (error instanceof Error) {
+                console.log(`NON-CHAT-MSG: ${error.message}`)
+            }
         }
     }
 
     private static async customCommandAction(message: string, joinedUser: JoinedUser): Promise<string> {
-        const isCustomCommand: Command[] = joinedUser.commands.filter((command: Command) => {
+        const isCustomCommand: Command | undefined = joinedUser.commands.find((command: Command) => {
             return command.name === message
         })
-        if (isCustomCommand.length > 0) {
-            return isCustomCommand[0].content
-        }
-        return ""
+        if (!isCustomCommand) return ""
+
+        return isCustomCommand.content
     }
 
     private static async standardCommandAction(messageData: MessageData, joinedUser: JoinedUser): Promise<string> {
-        const standardCommandMap = new StandardCommandMap(messageData)
+        const userPrefix = joinedUser.settings.find((setting: Setting) => {
+            return setting.type === "prefix"
+        })
+        const prefix: string = userPrefix?.value || "!"
+        const standardCommandMap = new StandardCommandMap(messageData, joinedUser)
         const messageParser: MessageParser = new MessageParser()
-        const commandName: string = messageParser.getCommandName(messageData.message)
-        const command: ICommand = standardCommandMap.get(commandName)
+        const commandName: string = messageParser.getCommandName(messageData.message, prefix)
         const command: ICommand | undefined = standardCommandMap.get(commandName)
         if (!command) {
             return ""
         }
 
-        const isProtected = command.moduleFamily === ModuleFamily.PROTECTED
-        if (isProtected) {
+        const componentProtected = command.moduleFamily === ModuleFamily.PROTECTED
+        if (componentProtected) {
             const commandData = await command.run()
             return commandData.response
         }
 
         const chatter: string | undefined = messageData.chatter.username?.toUpperCase()
         const streamer: string = messageData.channel.toUpperCase()
-        const componentPrisma = new ComponentPrisma(joinedUser, messageData.channel)
-        const isComponentEnabled: Component | undefined = componentPrisma.isFamilyEnabled(command.moduleFamily)
-        if (!isComponentEnabled && streamer === chatter) {
+        const familyEnabled = ChatEvent.isFamilyEnabled(joinedUser, command.moduleFamily)
+        if (!familyEnabled && streamer === chatter) {
             return `Command: ${commandName} is not enabled. Use "!toggle ${command.moduleFamily}"`
         }
 
@@ -87,7 +84,15 @@ export class ChatEvent {
         return commandData.response
     }
 
-    private static async socialCommandAction(messageData: MessageData) {
+    private static isFamilyEnabled(joinedUser: JoinedUser, moduleFamily: ModuleFamily) {
+        return joinedUser.components.find((userComponent: Component) => {
+            const isCommand = userComponent.name.toUpperCase() === moduleFamily.toUpperCase();
+            if (!isCommand) return false
+            return userComponent.enabled
+        })
+    }
+
+    private static async socialCommandAction(messageData: MessageData): Promise<string> {
         const { message } = messageData;
         const linkParser = new LinkParser(message)
         return await linkParser.matchRegex()
