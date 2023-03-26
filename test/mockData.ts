@@ -4,6 +4,7 @@ import { JoinedUser } from "../src/interfaces/prisma";
 import { MessageData } from "../src/models/tmi/MessageData";
 import { ChatUserstate } from "tmi.js";
 import { SpeedrunGame } from "../src/interfaces/general"
+import { PokemonMove } from "../src/interfaces/pokemon"
 
 export const tweetMockData: ITwitterTweetResponse = {
     data: {
@@ -105,6 +106,7 @@ export const onlineTwitchChannelMock: ITwitchChannel = {
 };
 
 export const messageDataMock = new MessageData("#habbe", {}, "This is a test message");
+export const messagePokemonDataMock = new MessageData("#habbe", {}, "!pokemonmove slash");
 
 export const joinedUserMock: JoinedUser = {
     id: 1,
@@ -159,4 +161,32 @@ export const prismaSpeedrunGameMock: SpeedrunGame = {
     international: "Diddy Kong Racing",
     twitch: "Diddy Kong Racing",
     platforms: []
+}
+
+export const pokemonMoveMock: PokemonMove = {
+    id: 52,
+    name: "ember",
+    names: [
+        {
+            language: {
+                name: "en"
+            },
+            name: "Ember"
+        }
+    ],
+    damage_class: { name: "special" },
+    meta: {
+        crit_rate: 0,
+        flinch_chance: 0,
+        ailment:
+            {
+                name: "burn"
+            },
+        ailment_chance: 10
+    },
+    power: 40,
+    pp: 25,
+    priority: 0,
+    type: { name: "fire" },
+    accuracy: 100
 }

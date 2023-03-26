@@ -539,3 +539,86 @@ export class UserLeave implements ICommand {
     }
 }
 
+export class Pokemon implements ICommand {
+    public moduleFamily: ModuleFamily = ModuleFamily.POKEMON
+    private pokeAPI: PokemonAPI
+
+    constructor(public messageData: MessageData, pokeAPI?: PokemonAPI) {
+        this.pokeAPI = pokeAPI || new PokemonAPI()
+    }
+
+    private getUser = async (userPrisma: UserPrisma) => {
+        const user = await userPrisma.get();
+        if (!user) throw new Error(`msg`);
+        return user;
+    }
+
+    private formatPokemonStats = (pokemon: IPokemon) => {
+        const truncatedStats = [ "HP", "A", "D", "SA", "SD", "S" ];
+        const stats = pokemon.stats.map((stat: IPokemonStat, i: number) => {
+            return `${truncatedStats[i]}:${stat.base_stat}`;
+        });
+        const statsString = stats.join(" ");
+        const types = pokemon.types.map((type) => {
+            return type.type.name[0].toUpperCase() + type.type.name.slice(1);
+        });
+        const typesString = types.join(" & ");
+        const { name, id } = pokemon;
+        const formalName = name[0].toUpperCase() + name.slice(1);
+
+        return `${formalName} #${id} | ${typesString} | ${statsString}`;
+    };
+
+    run = async () => {
+        const { channel, message } = this.messageData;
+        const targetPokemon = message.split(" ")[1];
+        const userPrisma = new UserPrisma(channel);
+        const user = await this.getUser(userPrisma);
+        const pokemon = await this.pokeAPI.fetchPokemon(targetPokemon)
+        this.messageData.response = this.formatPokemonStats(pokemon);
+
+        return this.messageData;
+    }
+}
+
+export class PokemonMoveImpl implements ICommand {
+    public moduleFamily: ModuleFamily = ModuleFamily.POKEMON
+    private pokeAPI: PokemonAPI
+
+    constructor(public messageData: MessageData, pokeAPI?: PokemonAPI) {
+        this.pokeAPI = pokeAPI || new PokemonAPI()
+    }
+
+    async run(): Promise<MessageData> {
+        const { message } = this.messageData
+        const messageParser = new MessageParser()
+        const pokemonMoveName = messageParser.getPokemonMove(message, 1)
+        const pokemonMove: PokemonMove = await this.pokeAPI.fetchMove(pokemonMoveName)
+        let response = ""
+        const name = pokemonMove.names.find(hit => hit.language.name === 'en')?.name || pokemonMove.name
+        response += `${this.toTitleCase(name)}`
+        response += ` [${this.toTitleCase(pokemonMove.type.name)}] |`
+        response += ` PWR:${pokemonMove.power}`
+        response += ` PP:${pokemonMove.pp}`
+        response += ` ACC:${pokemonMove.accuracy}`
+        if (pokemonMove.meta.crit_rate) {
+            response += ` Crit: ${pokemonMove.meta.crit_rate}`
+        }
+        if (pokemonMove.meta.flinch_chance) {
+            response += ` Flinch: ${pokemonMove.meta.flinch_chance}`
+        }
+        if (pokemonMove.meta.ailment_chance) {
+            response += ` | Proc: ${this.toTitleCase(pokemonMove.meta.ailment.name)}(${pokemonMove.meta.ailment_chance}%)`
+        }
+
+        this.messageData.response = response
+        return this.messageData
+    }
+
+    private toTitleCase(str: string) {
+        return str.toLowerCase().split(' ').map(function (word) {
+            return (word.charAt(0).toUpperCase() + word.slice(1))
+        }).join(' ')
+    }
+
+}

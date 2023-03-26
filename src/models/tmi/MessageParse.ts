@@ -35,4 +35,8 @@ export class MessageParser {
         }
         return targetCategory
     }
+
+    getPokemonMove(message: string, index: number) {
+        return message.split(" ").slice(index).join("-")
+    }
 }
