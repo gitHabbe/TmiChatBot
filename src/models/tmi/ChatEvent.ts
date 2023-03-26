@@ -64,6 +64,10 @@ export class ChatEvent {
         const messageParser: MessageParser = new MessageParser()
         const commandName: string = messageParser.getCommandName(messageData.message)
         const command: ICommand = standardCommandMap.get(commandName)
+        const command: ICommand | undefined = standardCommandMap.get(commandName)
+        if (!command) {
+            return ""
+        }
 
         const isProtected = command.moduleFamily === ModuleFamily.PROTECTED
         if (isProtected) {
