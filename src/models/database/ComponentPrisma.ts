@@ -43,14 +43,4 @@ export class ComponentPrisma extends Prisma {
       },
     });
   };
-
-  isFamilyEnabled(commandModule: ModuleFamily): Component | undefined {
-    return this.user.components.find((userComponent: Component) => {
-      const isCommand = userComponent.name.toUpperCase() === commandModule.toUpperCase();
-      if (isCommand) {
-        return userComponent.enabled
-      }
-      return false
-    })
-  }
 }
