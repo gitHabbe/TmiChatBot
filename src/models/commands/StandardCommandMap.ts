@@ -1,5 +1,5 @@
-import { CommandName, ComponentsSupport, ModuleFamily } from "../../interfaces/tmi"
-import { ICommand, ICommandUser } from "../../interfaces/Command"
+import { CommandName, ComponentsSupport } from "../../interfaces/tmi"
+import { ICommand } from "../../interfaces/Command"
 import { TwitchTitle } from "./twitch/TwitchTitle"
 import { TwitchUptime } from "./twitch/TwitchUptime"
 import { WorldRecord } from "./speedrun/WorldRecord"
@@ -14,8 +14,8 @@ import {
     DeleteTimestamp,
     FindTimestamp,
     NewCommand,
-    Pokemon,
     Pokemon, PokemonMoveImpl,
+    SetPrefix,
     Slots,
     Timestamp,
     ToggleComponent,
@@ -27,16 +27,6 @@ import { SetSpeedrunner } from "./speedrun/SetSpeedrunner"
 import { TimeTrialWorldRecord } from "./speedrun/TimeTrialWorldRecord"
 import { TimeTrialPersonalBest } from "./speedrun/TimeTrialPersonalBest"
 import { JoinedUser } from "../../interfaces/prisma"
-
-class SetPrefix implements ICommandUser {
-    moduleFamily: ModuleFamily = ModuleFamily.PROTECTED
-
-    constructor(public messageData: MessageData, private joinedUser: JoinedUser) {}
-
-    run(): Promise<MessageData> {
-        return Promise.resolve(undefined);
-    }
-}
 
 export class StandardCommandMap {
     private commandMap = new Map<string, ICommand>()

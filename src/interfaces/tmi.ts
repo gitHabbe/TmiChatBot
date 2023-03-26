@@ -28,6 +28,7 @@ export enum CommandName {
   TTPB = "TTPB",
   TOGGLE = "TOGGLE",
   SETSPEEDRUNNER = "SETSPEEDRUNNER",
+  SETPREFIX = "SETPREFIX",
 }
 
 export enum ModuleFamily {
