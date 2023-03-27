@@ -2,7 +2,11 @@ import { MessageData } from "./MessageData"
 import { TwitchFetch } from "../fetch/TwitchTv"
 
 export class MessageParser {
-    getCommandName(message: string): string {
+    getCommandName(message: string, targetPrefix: string): string {
+        const chatterPrefix = message.slice(0, 1)
+        if (chatterPrefix !== targetPrefix) {
+            return "No Standard Command"
+        }
         const chatterCommand = this.getWordIndex(message, 0)
         return chatterCommand.slice(1).toUpperCase()
     };
