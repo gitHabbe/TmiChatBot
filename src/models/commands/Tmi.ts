@@ -292,52 +292,6 @@ export class ToggleComponent implements ICommand {
     }
 }
 
-export class Pokemon implements ICommand {
-    public moduleFamily: ModuleFamily = ModuleFamily.POKEMON
-
-    constructor(public messageData: MessageData) {}
-
-    private getUser = async (userPrisma: UserPrisma) => {
-        const user = await userPrisma.get();
-        if (!user) throw new Error(`msg`);
-        return user;
-    }
-
-    private formatPokemonStats = (pokemon: IPokemon) => {
-        const truncatedStats = [ "HP", "A", "D", "SA", "SD", "S" ];
-        const stats = pokemon.stats.map((stat: IPokemonStat, i: number) => {
-            return `${truncatedStats[i]}:${stat.base_stat}`;
-        });
-        const statsString = stats.join(" ");
-        const types = pokemon.types.map((type) => {
-            return type.type.name[0].toUpperCase() + type.type.name.slice(1);
-        });
-        const typesString = types.join(" & ");
-        const { name, id } = pokemon;
-        const formalName = name[0].toUpperCase() + name.slice(1);
-
-        return `${formalName} #${id} | ${typesString} | ${statsString}`;
-    };
-
-    run = async () => {
-        const { channel, message } = this.messageData;
-        const targetPokemon = message.split(" ")[1];
-        const targetComponent = "POKEMON";
-        const userPrisma = new UserPrisma(channel);
-        const user = await this.getUser(userPrisma);
-        const component = new ComponentPrisma(user, targetComponent);
-        const isEnabled = await component.isEnabled();
-        if (!isEnabled) {
-            this.messageData.response = `Component ${targetComponent} is not enabled`;
-            return this.messageData
-        }
-        const pokemon = await pokemonAPI.get<IPokemon>(`pokemon/${targetPokemon}`);
-        this.messageData.response = this.formatPokemonStats(pokemon.data);
-
-        return this.messageData;
-    }
-}
-
 export class NewCommand implements ICommand {
     moduleFamily: ModuleFamily = ModuleFamily.PROTECTED
 
@@ -516,7 +470,6 @@ export class UserLeave implements ICommand {
             this.messageData.response = `I am not in your chat`;
             return this.messageData;
         }
-        // jsonUser.remove(deleteUser.name);
         const user = new UserPrisma(chatter.username);
         const deleteUser = await user.get();
         await user.delete();
@@ -535,8 +488,7 @@ export class UserLeave implements ICommand {
 export class SetPrefix implements ICommandUser {
     moduleFamily: ModuleFamily = ModuleFamily.PROTECTED
 
-    constructor(public messageData: MessageData, public user: JoinedUser) {
-    }
+    constructor(public messageData: MessageData, public user: JoinedUser) {}
 
     async run(): Promise<MessageData> {
         const { channel, chatter } = this.messageData
@@ -622,21 +574,23 @@ export class PokemonMoveImpl implements ICommand {
         const messageParser = new MessageParser()
         const pokemonMoveName = messageParser.getPokemonMove(message, 1)
         const pokemonMove: PokemonMove = await this.pokeAPI.fetchMove(pokemonMoveName)
+        const { pp, names, accuracy, name, power, meta, type } = pokemonMove
+        const pokemonName = names.find(hit => hit.language.name === 'en')?.name || name
         let response = ""
-        const name = pokemonMove.names.find(hit => hit.language.name === 'en')?.name || pokemonMove.name
-        response += `${this.toTitleCase(name)}`
-        response += ` [${this.toTitleCase(pokemonMove.type.name)}] |`
-        response += ` PWR:${pokemonMove.power}`
-        response += ` PP:${pokemonMove.pp}`
-        response += ` ACC:${pokemonMove.accuracy}`
-        if (pokemonMove.meta.crit_rate) {
-            response += ` Crit: ${pokemonMove.meta.crit_rate}`
+        response += `${this.toTitleCase(pokemonName)}`
+        response += ` [${this.toTitleCase(type.name)}] |`
+        response += ` PWR:${power}`
+        response += ` PP:${pp}`
+        response += ` ACC:${accuracy}`
+        const { crit_rate, ailment_chance, flinch_chance, ailment } = meta
+        if (crit_rate) {
+            response += ` Crit: ${crit_rate}`
         }
-        if (pokemonMove.meta.flinch_chance) {
-            response += ` Flinch: ${pokemonMove.meta.flinch_chance}`
+        if (flinch_chance) {
+            response += ` Flinch: ${flinch_chance}`
         }
-        if (pokemonMove.meta.ailment_chance) {
-            response += ` | Proc: ${this.toTitleCase(pokemonMove.meta.ailment.name)}(${pokemonMove.meta.ailment_chance}%)`
+        if (ailment_chance) {
+            response += ` | Proc: ${this.toTitleCase(ailment.name)}(${ailment_chance}%)`
         }
 
         this.messageData.response = response
