@@ -2,9 +2,11 @@ import { ITwitterTweetResponse, IYoutubePagination } from "../src/interfaces/soc
 import { ITwitchChannel } from "../src/interfaces/twitch"
 import { JoinedUser } from "../src/interfaces/prisma"
 import { MessageData } from "../src/models/tmi/MessageData"
-import { ChatUserstate } from "tmi.js"
+import { ChatUserstate, Client } from "tmi.js"
 import { SpeedrunGame } from "../src/interfaces/general"
 import { PokemonMove } from "../src/interfaces/pokemon"
+import { Command } from "@prisma/client"
+import { TmiClient } from "../src/interfaces/tmi"
 
 export const tweetMockData: ITwitterTweetResponse = {
     data: {
@@ -57,7 +59,7 @@ export const youtubeVideoMockData: IYoutubePagination = {
     ]
 };
 
-export const commandMockData = {
+export const commandMockData: Command = {
     id: 1,
     content: "This is the content",
     madeBy: "Made by",
@@ -132,7 +134,7 @@ export const chatterMock: ChatUserstate = {
     'user-type': 'mod',
     'emotes-raw': '25:0-4',
     'badges-raw': 'broadcaster/1,warcraft/horde',
-    'username': 'habbee',
+    'username': 'habbe',
     'message-type': 'chat'
 };
 
@@ -189,4 +191,40 @@ export const pokemonMoveMock: PokemonMove = {
     priority: 0,
     type: { name: "fire" },
     accuracy: 100
+}
+
+export interface TmiClientTest extends Omit<TmiClient, "say" | "part" | "join" | "connect" | "on"> {
+    channel: string;
+    response: string
+
+    say(channel: string, response: string): void;
+    part(channel: string): Promise<[ string ]>;
+    on(event: any, listener: any): Client;
+    connect(): Promise<[ string, number ]>;
+    say(channel: string, message: string): void;
+    join(channel: string): Promise<[ string ]>;
+}
+
+export const fakeClient: TmiClientTest = {
+    channel: "no channel",
+    response: "no response",
+    say(channel, response) {
+        this.channel = channel
+        this.response = response
+    },
+
+    part(channel: string): Promise<[ string ]> {
+        this.channel = channel
+        this.response = `leaving channel: ${channel}`
+        return Promise.resolve([ "" ])
+    },
+    connect(): Promise<[ string, number ]> {
+        return Promise.resolve([ "", 0 ])
+    },
+    join(): Promise<[ string ]> {
+        return Promise.resolve([ "" ])
+    },
+    on(event: any, listener: any): Client {
+        return new Client({})
+    }
 }
