@@ -1,4 +1,4 @@
-import { ICommand } from "../../interfaces/Command"
+import { ICommand, ICommandUser } from "../../interfaces/Command"
 import { ChatUserstate } from "tmi.js"
 import { TrustPrisma } from "../database/TrustPrisma"
 import { UserPrisma } from "../database/UserPrisma"
@@ -6,65 +6,68 @@ import { ComponentPrisma } from "../database/ComponentPrisma"
 import { MessageData } from "../tmi/MessageData"
 import { ModuleFamily, TmiClient } from "../../interfaces/tmi"
 import { JoinedUser } from "../../interfaces/prisma"
-import { Trust } from "@prisma/client"
+import { Command, Trust } from "@prisma/client"
 import { TwitchFetch } from "../fetch/TwitchTv"
 import { IVideo } from "../../interfaces/twitch"
 import { TimestampPrisma } from "../database/TimestampPrisma"
 import { CommandPrisma } from "../database/CommandPrisma"
-import { IPokemon, IPokemonStat } from "../../interfaces/pokemon"
-import { pokemonAPI } from "../../config/pokemonConfig"
+import { IPokemon, IPokemonStat, PokemonMove } from "../../interfaces/pokemon"
 import { randomInt } from "../../utility/math"
 import { ClientSingleton } from "../tmi/ClientSingleton"
 import { JsonChannels } from "../JsonArrayFile"
 import { TrustLevel } from "../tmi/TrustLevel"
+import { SettingPrisma } from "../database/SettingPrisma"
+import { ChatError } from "../error/ChatError"
+import { PokemonAPI } from "../fetch/PokemonAPI"
+import { MessageParser } from "../tmi/MessageParse"
 
 export class AddTrust implements ICommand {
     moduleFamily: ModuleFamily = ModuleFamily.PROTECTED
 
     constructor(public messageData: MessageData) {}
 
-    private async addTrust(user: JoinedUser, chatter: ChatUserstate, newTrust: string) {
+    private static async addTrust(user: JoinedUser, chatter: ChatUserstate, newTrust: string) {
         const trust = new TrustPrisma(user, chatter);
         return await trust.save(newTrust, newTrust);
     }
 
-    private async getUser(channel: string): Promise<JoinedUser> {
+    private static async getUser(channel: string): Promise<JoinedUser> {
         const userPrisma = new UserPrisma(channel);
         return await userPrisma.get();
     }
 
     async run(): Promise<MessageData> {
         const { channel, message, chatter } = this.messageData;
-        if (!chatter["user-id"]) {
-            throw new Error("asdf")
-        }
-        const newTrust = message.split(" ")[1];
-        if (!newTrust) throw new Error("No user specified");
-        const user: JoinedUser = await this.getUser(channel);
-        const isTrusted = user.trusts.find((user: Trust) => {
-            return user.name.toUpperCase() === newTrust.toUpperCase();
+        const user: JoinedUser = await AddTrust.getUser(channel);
+        this.cannotCreateTrustError(user)
+        const newTrust = this.newTrustNotSpecifiedError(message)
+        this.alreadyTrustedError(user, newTrust)
+
+        const addTrust = await AddTrust.addTrust(user, chatter, newTrust);
+        this.messageData.response = `${addTrust.name} added to trust-list`;
+        return this.messageData;
+    }
+
+    private alreadyTrustedError(user: JoinedUser, newTrust: string) {
+        const isAlreadyTrusted = user.trusts.find((user: Trust) => {
+            return user.name.toUpperCase() === newTrust.toUpperCase()
         })
-        if (!chatter.username) throw new Error("Creator not specified");
-        const canAddTrust = user.trusts.some((user: Trust) => {
-            if (!chatter.username) throw new Error("Creator not specified");
-            return user.name.toUpperCase() === chatter.username.toUpperCase();
-        }) || chatter.username.toUpperCase() === channel.toUpperCase();
-        if (!canAddTrust) {
-            this.messageData.response = `${chatter.username} cannot add trust`
-            return this.messageData
+        if (isAlreadyTrusted) {
+            throw new ChatError(`${isAlreadyTrusted.name} is already trusted`)
         }
-        if (isTrusted) {
-            this.messageData.response = `${isTrusted.name} is already trusted`
-            return this.messageData
+    }
+
+    private newTrustNotSpecifiedError(message: string) {
+        const newTrust = message.split(" ")[1]
+        if (!newTrust) throw new ChatError("No user specified")
+        return newTrust
+    }
 
     private cannotCreateTrustError(user: JoinedUser) {
         const trustLevel = new TrustLevel(this.messageData, user)
         if (!trustLevel.isTrusted()) {
             throw new Error("This user cannot create trust")
         }
-        const addTrust = await this.addTrust(user, chatter, newTrust);
-        this.messageData.response = `${addTrust.name} added to trust-list`;
-        return this.messageData;
     }
 }
 
@@ -131,42 +134,40 @@ export class Timestamp implements ICommand {
 
     private getUser = async (channel: string) => {
         const userPrisma = new UserPrisma(channel);
-        const user = await userPrisma.get();
-        if (!user) throw new Error(`msg`);
-        return user;
+        return await userPrisma.get();
     }
 
     private fetchStreamerVideos = async () => {
         const { channel } = this.messageData
         const twitchFetch = new TwitchFetch()
-        const videos = await twitchFetch.fetchVideos(channel)
-        return videos
+        return await twitchFetch.fetchVideos(channel)
     };
 
-    // TODO: Uniqueness
     run = async () => {
         const { channel, message, chatter } = this.messageData;
         const twitchFetch = new TwitchFetch()
-        const { started_at } = await twitchFetch.singleChannel(channel)
-        if (started_at === "") {
-            this.messageData.response = `${channel} is not live. Cannot create timestamp.`;
-            return this.messageData;
-        }
-        if (!chatter.username) throw new Error("Creator not specified");
-        await this.isTrusted(channel, chatter);
+        await this.streamerNotLiveError(twitchFetch, channel)
         const user = await this.chatterNotTrustedError(channel)
         const timestampName: string = message.split(" ")[1];
-        const user = await this.getUser(channel);
         const videos: IVideo[] = await this.fetchStreamerVideos();
         const timestamp = new TimestampPrisma(user);
+        await Timestamp.timestampAlreadyExistsError(timestamp, timestampName)
+        if (!chatter.username) throw new Error("Useless error")
         const newTimestamp = await timestamp.add(
             videos[0],
-            timestampName,
+            timestampName.toLowerCase(),
             chatter.username
         );
         this.messageData.response = `Timestamp ${newTimestamp.name} created. Use !findts ${newTimestamp.name} to watch it`;
 
         return this.messageData;
+    }
+
+    private static async timestampAlreadyExistsError(timestamp: TimestampPrisma, timestampName: string) {
+        const oldTimestamp = await timestamp.find(timestampName.toLowerCase())
+        if (oldTimestamp) {
+            throw new ChatError(`Timestamp ${timestampName} already exists`)
+        }
     }
 
     private async chatterNotTrustedError(channel: string) {
@@ -178,6 +179,12 @@ export class Timestamp implements ICommand {
         return user
     }
 
+    private async streamerNotLiveError(twitchFetch: TwitchFetch, channel: string) {
+        const { started_at } = await twitchFetch.singleChannel(channel)
+        if (!started_at) {
+            throw new ChatError(`${channel} is not live. Cannot create timestamp.`)
+        }
+    }
 }
 
 export class FindTimestamp implements ICommand {
@@ -195,15 +202,15 @@ export class FindTimestamp implements ICommand {
     run = async () => {
         const { channel, message, chatter } = this.messageData;
         const user = await this.getUser(channel);
-        const timestampObj = new TimestampPrisma(user);
         const trustLevel = new TrustLevel(this.messageData, user)
         if (!trustLevel.isTrusted()) {
             throw new Error(`This user cannot find timestamps`)
         }
+        const timestampPrisma = new TimestampPrisma(user);
         const targetTimestamp: string = message.split(" ")[1];
         console.log("targetTimestamp:", targetTimestamp)
         if (targetTimestamp === undefined) {
-            const allTimestamps = await timestampObj.findAll();
+            const allTimestamps = await timestampPrisma.findAll();
             console.log("~ allTimestamps", allTimestamps);
             const timestampsList = allTimestamps
                 .map((timestamp) => {
@@ -213,7 +220,8 @@ export class FindTimestamp implements ICommand {
             this.messageData.response = `Timestamps: ${timestampsList}`;
             return this.messageData;
         }
-        const foundTimestamp = await timestampObj.find(targetTimestamp);
+        const foundTimestamp = await timestampPrisma.find(targetTimestamp);
+        if (!foundTimestamp) throw new ChatError(`Timestamp: ${targetTimestamp} not found. Use "!findts" to list all`);
         const backtrackLength = 90;
         const { name, url, timestamp } = foundTimestamp;
         this.messageData.response = `${name}: ${url}?t=${timestamp - backtrackLength}s`;
@@ -235,16 +243,25 @@ export class DeleteTimestamp implements ICommand {
     }
 
     run = async () => {
-        const { channel, message, chatter } = this.messageData;
-        if (!chatter.username) throw new Error("Creator not specified");
-        const timestampName: string = message.split(" ")[1];
+        const { channel, message } = this.messageData;
         const user = await this.getUser(channel);
-        const timestamp = new TimestampPrisma(user);
-        const deleteTimestamp = await timestamp.remove(timestampName);
+        const timestampName: string = message.split(" ")[1]
         this.chatterNotTrustedError(user)
+        DeleteTimestamp.noTimestampSpecifiedError(message, timestampName)
+        await this.timestampAlreadyExistsError(user, timestampName)
+
+        const timestampPrisma = new TimestampPrisma(user)
+        const deleteTimestamp = await timestampPrisma.remove(timestampName.toLowerCase());
         this.messageData.response = `Timestamp ${deleteTimestamp.name} deleted`;
 
         return this.messageData;
+    }
+
+    private async timestampAlreadyExistsError(user: JoinedUser, timestampName: string) {
+        const foundTimestamp = user.timestamps.find((timestamp) => {
+            return timestamp.name.toLowerCase() === timestampName.toUpperCase()
+        })
+        if (foundTimestamp) throw new ChatError(`Timestamp ${foundTimestamp.name} doesn't exist`)
     }
 
     private chatterNotTrustedError(user: JoinedUser) {
@@ -252,6 +269,13 @@ export class DeleteTimestamp implements ICommand {
         if (!trustLevel.isTrusted()) {
             throw new Error("This user cannot delete timestamps")
         }
+    }
+
+    private static noTimestampSpecifiedError(message: string, targetTimestamp: string) {
+        if (!targetTimestamp) {
+            throw new ChatError("No timestampPrisma specified")
+        }
+        return targetTimestamp
     }
 }
 
@@ -268,8 +292,8 @@ export class ToggleComponent implements ICommand {
     }
 
     async run(): Promise<MessageData> {
-        const { channel, message, chatter } = this.messageData;
         const { channel, message } = this.messageData;
+        const user = await this.getUser(channel);
         const trustLevel = new TrustLevel(this.messageData, user)
         if (!trustLevel.isStreamer()) {
             throw new Error("Only streamer can toggle components")
@@ -277,10 +301,8 @@ export class ToggleComponent implements ICommand {
         const targetComponent = message.split(" ")[1].toUpperCase();
         const isModuleFamily = targetComponent in ModuleFamily;
         if (!isModuleFamily) {
-            this.messageData.response = `${targetComponent} is not a valid component`
-            return this.messageData
+            throw new ChatError(`${targetComponent} is not a valid component`)
         }
-        const user = await this.getUser(channel);
         const component = new ComponentPrisma(user, targetComponent);
         await component.toggle();
         const componentStatus =
@@ -314,14 +336,13 @@ export class NewCommand implements ICommand {
         }
         const commandName = message.split(" ")[1];
         const commandContent = message.split(" ").slice(2).join(" ");
-        const user = await this.getUser(channel);
-        const commandPrisma = new CommandPrisma(user);
-        const existingCommand = await commandPrisma.find(commandName)
-        if (existingCommand !== null) {
-            this.messageData.response = `${existingCommand.name} already exists`;
-            return this.messageData;
+        const existingCommand = user.commands.find((command: Command) => {
+            return command.name.toUpperCase() === commandName.toUpperCase()
+        })
+        if (existingCommand) {
+            throw new ChatError(`${existingCommand.name} already exists`)
         }
-
+        const commandPrisma = new CommandPrisma(user)
         const command = await commandPrisma.add(
             commandName,
             commandContent,
@@ -339,26 +360,24 @@ export class DeleteCommand implements ICommand {
 
     constructor(public messageData: MessageData) {}
 
-
     run = async () => {
-        const { channel, message, chatter } = this.messageData;
-        if (!chatter.username) throw new Error("Creator not specified");
-        await this.isTrusted(channel, chatter);
-        const commandName = message.split(" ")[1];
-        console.log("commandName:", commandName)
+        const { channel, message } = this.messageData;
         const userPrisma = new UserPrisma(channel);
         const user = await userPrisma.get();
-        if (!user) throw new Error("user not found");
-        const command = new CommandPrisma(user);
-        const delCommand = await command.remove(commandName);
         const trustLevel = new TrustLevel(this.messageData, user)
         if (!trustLevel.isStreamer()) {
             throw new Error("Only streamer can delete commands")
         }
+        const commandName = message.split(" ")[1];
+        const commandPrisma = new CommandPrisma(user);
+        const foundCommand = await commandPrisma.find(commandName)
+        if (!foundCommand) {
+            throw new ChatError(`Command ${commandName} not found`)
+        }
+        const delCommand = await commandPrisma.remove(commandName);
         this.messageData.response = `Command ${delCommand.name} deleted`;
 
         return this.messageData;
-
     }
 }
 
@@ -453,7 +472,7 @@ export class UserLeave implements ICommand {
     constructor(public messageData: MessageData) {}
 
     run = async () => {
-        const { channel, message, chatter } = this.messageData;
+        const { channel, chatter } = this.messageData;
         if (!chatter.username) {
             throw new Error("User not found");
         }
