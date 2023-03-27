@@ -1,9 +1,10 @@
 import { ChatEvent } from "./tmi/ChatEvent";
 import { ClientSingleton } from "./tmi/ClientSingleton";
+import { TmiClient } from "../interfaces/tmi"
 
 export class TmiChatBot {
   private chatEvent = new ChatEvent();
-  private client = ClientSingleton.getInstance().get();
+  private client: TmiClient = ClientSingleton.getInstance().get();
 
   constructor() {
       this.client.on("message", this.chatEvent.onMessage)
