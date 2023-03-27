@@ -45,13 +45,10 @@ export class ChatEvent {
         }
     }
 
-    private static async customCommandAction(message: string, joinedUser: JoinedUser): Promise<string> {
-        const isCustomCommand: Command | undefined = joinedUser.commands.find((command: Command) => {
-            return command.name === message
-        })
-        if (!isCustomCommand) return ""
-
-        return isCustomCommand.content
+    private static async customCommandAction(messageData: MessageData, joinedUser: JoinedUser): Promise<string> {
+        const customCommand = new CustomCommand(messageData, joinedUser)
+        const returnData = await customCommand.run()
+        return returnData.response || ""
     }
 
     private static async standardCommandAction(messageData: MessageData, joinedUser: JoinedUser): Promise<string> {
