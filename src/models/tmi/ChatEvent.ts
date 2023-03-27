@@ -8,9 +8,9 @@ import { UserPrisma } from "../database/UserPrisma"
 import { ClientSingleton } from "./ClientSingleton"
 import { JoinedUser } from "../../interfaces/prisma"
 import { Command, Component, Setting } from "@prisma/client"
-import { ComponentPrisma } from "../database/ComponentPrisma"
 import { LinkParser } from "../fetch/SocialMedia"
 import { ChatError } from "../error/ChatError"
+import { CustomCommand } from "../commands/CustomCommand"
 
 
 export class ChatEvent {
@@ -24,13 +24,14 @@ export class ChatEvent {
 
         try {
             const commandsList = [
-                await ChatEvent.customCommandAction(message, joinedUser),
-                await ChatEvent.standardCommandAction(messageData, joinedUser),
-                await ChatEvent.socialCommandAction(messageData)
+                ChatEvent.customCommandAction,
+                ChatEvent.standardCommandAction,
+                ChatEvent.socialCommandAction
             ]
             for (let commandsListElement of commandsList) {
-                if (commandsListElement) {
-                    client.say(channel, commandsListElement)
+                const commandResponse = await commandsListElement(messageData, joinedUser)
+                if (commandResponse) {
+                    client.say(channel, commandResponse)
                     return
                 }
             }
@@ -89,10 +90,10 @@ export class ChatEvent {
         })
     }
 
-    private static async socialCommandAction(messageData: MessageData): Promise<string> {
+    private static async socialCommandAction(messageData: MessageData, joinedUser: JoinedUser): Promise<string> {
         const { message } = messageData;
         const linkParser = new LinkParser(message)
-        return await linkParser.matchRegex()
+        return await linkParser.getLinkMessage()
     }
 
     async onJoin(ircChannel: string, username: string, self: boolean) {
