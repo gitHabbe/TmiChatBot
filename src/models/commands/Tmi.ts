@@ -16,6 +16,7 @@ import { pokemonAPI } from "../../config/pokemonConfig"
 import { randomInt } from "../../utility/math"
 import { ClientSingleton } from "../tmi/ClientSingleton"
 import { JsonChannels } from "../JsonArrayFile"
+import { TrustLevel } from "../tmi/TrustLevel"
 
 export class AddTrust implements ICommand {
     moduleFamily: ModuleFamily = ModuleFamily.PROTECTED
@@ -55,6 +56,11 @@ export class AddTrust implements ICommand {
         if (isTrusted) {
             this.messageData.response = `${isTrusted.name} is already trusted`
             return this.messageData
+
+    private cannotCreateTrustError(user: JoinedUser) {
+        const trustLevel = new TrustLevel(this.messageData, user)
+        if (!trustLevel.isTrusted()) {
+            throw new Error("This user cannot create trust")
         }
         const addTrust = await this.addTrust(user, chatter, newTrust);
         this.messageData.response = `${addTrust.name} added to trust-list`;
@@ -118,34 +124,10 @@ export class UnTrust implements ICommand {
     }
 }
 
-export const isTrustedUser = async (
-    streamer: string,
-    madeBy: ChatUserstate
-): Promise<boolean> => {
-    const userModel = new UserPrisma(streamer);
-    const joinedUser: JoinedUser = await userModel.get();
-    const trustList = joinedUser.trusts.find((trustee: Trust) => {
-        return trustee.name.toUpperCase() === madeBy.username?.toUpperCase();
-    })
-    if (streamer.toUpperCase() === madeBy.username?.toUpperCase()) {
-        return true
-    }
-    if (!trustList) {
-        return false;
-    }
-    return true;
-};
-
 export class Timestamp implements ICommand {
     moduleFamily: ModuleFamily = ModuleFamily.TIMESTAMP
 
     constructor(public messageData: MessageData) {}
-
-    private isTrusted = async (channel: string, chatter: ChatUserstate) => {
-        const isTrusted = await isTrustedUser(channel, chatter);
-        if (!isTrusted)
-            throw new Error(`${chatter.username} not allowed to create timestamps`);
-    }
 
     private getUser = async (channel: string) => {
         const userPrisma = new UserPrisma(channel);
@@ -172,6 +154,7 @@ export class Timestamp implements ICommand {
         }
         if (!chatter.username) throw new Error("Creator not specified");
         await this.isTrusted(channel, chatter);
+        const user = await this.chatterNotTrustedError(channel)
         const timestampName: string = message.split(" ")[1];
         const user = await this.getUser(channel);
         const videos: IVideo[] = await this.fetchStreamerVideos();
@@ -185,6 +168,16 @@ export class Timestamp implements ICommand {
 
         return this.messageData;
     }
+
+    private async chatterNotTrustedError(channel: string) {
+        const user = await this.getUser(channel)
+        const trustLevel = new TrustLevel(this.messageData, user)
+        if (!trustLevel.isTrusted()) {
+            throw new Error("This user cannot create timestamps")
+        }
+        return user
+    }
+
 }
 
 export class FindTimestamp implements ICommand {
@@ -202,8 +195,11 @@ export class FindTimestamp implements ICommand {
     run = async () => {
         const { channel, message, chatter } = this.messageData;
         const user = await this.getUser(channel);
-        console.log("~ user", user);
         const timestampObj = new TimestampPrisma(user);
+        const trustLevel = new TrustLevel(this.messageData, user)
+        if (!trustLevel.isTrusted()) {
+            throw new Error(`This user cannot find timestamps`)
+        }
         const targetTimestamp: string = message.split(" ")[1];
         console.log("targetTimestamp:", targetTimestamp)
         if (targetTimestamp === undefined) {
@@ -231,12 +227,6 @@ export class DeleteTimestamp implements ICommand {
 
     constructor(public messageData: MessageData) {}
 
-    private isTrusted = async (channel: string, chatter: ChatUserstate) => {
-        const isTrusted = await isTrustedUser(channel, chatter);
-        if (!isTrusted)
-            throw new Error(`${chatter.username} not allowed to delete timestamps`);
-    }
-
     private getUser = async (channel: string) => {
         const userPrisma = new UserPrisma(channel);
         const user = await userPrisma.get();
@@ -247,14 +237,21 @@ export class DeleteTimestamp implements ICommand {
     run = async () => {
         const { channel, message, chatter } = this.messageData;
         if (!chatter.username) throw new Error("Creator not specified");
-        await this.isTrusted(channel, chatter);
         const timestampName: string = message.split(" ")[1];
         const user = await this.getUser(channel);
         const timestamp = new TimestampPrisma(user);
         const deleteTimestamp = await timestamp.remove(timestampName);
+        this.chatterNotTrustedError(user)
         this.messageData.response = `Timestamp ${deleteTimestamp.name} deleted`;
 
         return this.messageData;
+    }
+
+    private chatterNotTrustedError(user: JoinedUser) {
+        const trustLevel = new TrustLevel(this.messageData, user)
+        if (!trustLevel.isTrusted()) {
+            throw new Error("This user cannot delete timestamps")
+        }
     }
 }
 
@@ -272,10 +269,10 @@ export class ToggleComponent implements ICommand {
 
     async run(): Promise<MessageData> {
         const { channel, message, chatter } = this.messageData;
-        const isTrusted = await isTrustedUser(channel, chatter);
-        if (!isTrusted) {
-            this.messageData.response = `${chatter.username} is not allowed to toggle this command`
-            return this.messageData;
+        const { channel, message } = this.messageData;
+        const trustLevel = new TrustLevel(this.messageData, user)
+        if (!trustLevel.isStreamer()) {
+            throw new Error("Only streamer can toggle components")
         }
         const targetComponent = message.split(" ")[1].toUpperCase();
         const isModuleFamily = targetComponent in ModuleFamily;
@@ -346,10 +343,6 @@ export class NewCommand implements ICommand {
 
     constructor(public messageData: MessageData) {}
 
-    private isTrusted = async (channel: string, chatter: ChatUserstate) => {
-        return await isTrustedUser(channel, chatter);
-    }
-
     private getUser = async (channel: string) => {
         const userPrisma = new UserPrisma(channel);
         const user = await userPrisma.get();
@@ -360,10 +353,10 @@ export class NewCommand implements ICommand {
     run = async () => {
         const { channel, message, chatter } = this.messageData;
         if (!chatter.username) throw new Error("Creator not specified");
-        const isTrusted = await this.isTrusted(channel, chatter)
-        if (!isTrusted) {
-            this.messageData.response = `${chatter.username} cannot create commands. You need !trust`;
-            return this.messageData;
+        const user = await this.getUser(channel);
+        const trustLevel = new TrustLevel(this.messageData, user)
+        if (!trustLevel.isTrusted()) {
+            throw new Error("This user cannot create command")
         }
         const commandName = message.split(" ")[1];
         const commandContent = message.split(" ").slice(2).join(" ");
@@ -392,10 +385,6 @@ export class DeleteCommand implements ICommand {
 
     constructor(public messageData: MessageData) {}
 
-    private isTrusted = async (channel: string, chatter: ChatUserstate) => {
-        const isTrusted = await isTrustedUser(channel, chatter);
-        if (!isTrusted) throw new Error(`${chatter} not allowed to remove command`);
-    }
 
     run = async () => {
         const { channel, message, chatter } = this.messageData;
@@ -408,6 +397,10 @@ export class DeleteCommand implements ICommand {
         if (!user) throw new Error("user not found");
         const command = new CommandPrisma(user);
         const delCommand = await command.remove(commandName);
+        const trustLevel = new TrustLevel(this.messageData, user)
+        if (!trustLevel.isStreamer()) {
+            throw new Error("Only streamer can delete commands")
+        }
         this.messageData.response = `Command ${delCommand.name} deleted`;
 
         return this.messageData;
