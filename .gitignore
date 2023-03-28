@@ -6,6 +6,7 @@ private/
 .idea/
 changelog.config.js
 test/coverage
+test/ChatEventDebug.ts
 
 src/prisma/migrations
 
