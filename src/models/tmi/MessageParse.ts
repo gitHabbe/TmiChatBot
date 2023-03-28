@@ -34,8 +34,10 @@ export class MessageParser {
         const { message, channel } = messageData
         const targetCategory = MessageParser.getSentenceFromIndex(message, index)
         if (!targetCategory) {
-            const fetcher = twitchFetch || new TwitchFetch()
-            return fetcher.getTitle(channel)
+            const twitchFetcher = twitchFetch || new TwitchFetch()
+            const { title } = await twitchFetcher.singleChannel(channel)
+            return title
+            // return twitchFetcher.getTitle(channel)
         }
         return targetCategory
     }

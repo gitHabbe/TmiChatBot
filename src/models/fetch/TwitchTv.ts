@@ -12,11 +12,6 @@ import { ApiError } from "../error/ChatError"
 export class TwitchFetch {
     private api: AxiosInstance = twitchAPI;
 
-    async getTitle(channel: string): Promise<string> {
-        const { title } = await this.singleChannel(channel);
-        return title;
-    }
-
     async singleChannel(channel: string): Promise<ITwitchChannel> {
         const twitchChannels = await this.channelList(channel);
         return this.filteredChannel(twitchChannels, channel);
