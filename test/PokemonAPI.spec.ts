@@ -12,7 +12,7 @@ describe("PokemonAPI module", () => {
         // const pokemonMove = await mockedPokemonAPI.fetchMove("ember")
         const pokemonMove1 = new PokemonMoveImpl(messagePokemonDataMock, mockedPokemonAPI)
         const res = await pokemonMove1.run()
-        const exp = "Ember: PWR: 40, Type: Fire, ACC: 100, PP: 25, Proc: Burn(10%)"
+        const exp = "Ember [Fire] | PWR:40 PP:25 ACC:100 | Proc: Burn(10%)"
         expect(res.response).toBe(exp)
         spy.mockRestore()
     })
