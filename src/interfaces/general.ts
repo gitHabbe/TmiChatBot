@@ -17,10 +17,6 @@ interface Name {
     name: string;
 }
 
-export interface Category extends Id, Name {
-    links: Link[]
-}
-
 export interface Link {
     rel: string;
     uri: string;
@@ -43,4 +39,8 @@ export interface SpeedrunResponse<T> {
 
 export interface FullSpeedrunGame extends SpeedrunGame {
     categories: Category[]
+}
+
+export interface Category extends Id, Name {
+    links: Link[]
 }

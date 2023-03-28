@@ -3,7 +3,7 @@ import { ITwitchChannel } from "../src/interfaces/twitch"
 import { JoinedUser } from "../src/interfaces/prisma"
 import { MessageData } from "../src/models/tmi/MessageData"
 import { ChatUserstate, Client } from "tmi.js"
-import { SpeedrunGame } from "../src/interfaces/general"
+import { FullSpeedrunGame, SpeedrunGame } from "../src/interfaces/general"
 import { PokemonMove } from "../src/interfaces/pokemon"
 import { Command } from "@prisma/client"
 import { TmiClient } from "../src/interfaces/tmi"
@@ -151,7 +151,7 @@ export const speedrunGameMock: SpeedrunGame = {
     twitch: "Diddy Kong Racing",
     platforms: []
 }
-export const prismaSpeedrunGameMock: SpeedrunGame = {
+export const prismaSpeedrunGameMock: FullSpeedrunGame = {
     abbreviation: "dkr",
     id: "9dow9e1p",
     links: [
@@ -162,6 +162,18 @@ export const prismaSpeedrunGameMock: SpeedrunGame = {
     ],
     international: "Diddy Kong Racing",
     twitch: "Diddy Kong Racing",
+    categories: [
+        {
+            id: "q25qqv2o",
+            name: "100%",
+            links: [
+                {
+                    rel: "category",
+                    uri: "https://www.speedrun.com/api/v1/categories/q25qqv2o"
+                }
+            ]
+        }
+    ],
     platforms: []
 }
 
