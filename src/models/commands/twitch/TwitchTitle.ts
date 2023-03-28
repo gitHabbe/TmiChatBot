@@ -1,7 +1,5 @@
 import { ICommand } from "../../../interfaces/Command";
 import { TwitchFetch } from "../../fetch/TwitchTv";
-import { ITwitchChannel } from "../../../interfaces/twitch";
-import { FilterTwitchChannel } from "./FilterTwitchChannel";
 import { MessageData } from "../../tmi/MessageData";
 import { ModuleFamily } from "../../../interfaces/tmi";
 
