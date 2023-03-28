@@ -7,7 +7,7 @@ import { UserPrisma } from "../src/models/database/UserPrisma"
 describe("Test CustomCommand", () => {
 
   it("Init CustomCommand", async () => {
-    const messageData = new MessageData("habbe", {}, "This is a test message");
+    const messageData = new MessageData("habbe", {}, "!test");
     const userPrisma = new UserPrisma("habbe")
     const joinedUser = await userPrisma.get()
     const customCommand = new CustomCommand(messageData, joinedUser);
