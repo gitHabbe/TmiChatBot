@@ -1,8 +1,6 @@
 import { ICommand } from "../../../interfaces/Command";
 import { TwitchFetch } from "../../fetch/TwitchTv";
 import { dateToLetters, ILetterFormattedDate, millisecondsToDistance } from "../../../utility/dateFormat";
-import { ITwitchChannel } from "../../../interfaces/twitch";
-import { FilterTwitchChannel } from "./FilterTwitchChannel";
 import { MessageData } from "../../tmi/MessageData";
 import { ModuleFamily } from "../../../interfaces/tmi";
 
