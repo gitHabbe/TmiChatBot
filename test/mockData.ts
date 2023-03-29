@@ -4,7 +4,7 @@ import { JoinedUser } from "../src/interfaces/prisma"
 import { MessageData } from "../src/models/tmi/MessageData"
 import { ChatUserstate, Client } from "tmi.js"
 import { FullSpeedrunGame, SpeedrunGame } from "../src/interfaces/general"
-import { PokemonMove } from "../src/interfaces/pokemon"
+import { PokemonItem, PokemonMove } from "../src/interfaces/pokemon"
 import { Command } from "@prisma/client"
 import { TmiClient } from "../src/interfaces/tmi"
 
@@ -203,6 +203,25 @@ export const pokemonMoveMock: PokemonMove = {
     priority: 0,
     type: { name: "fire" },
     accuracy: 100
+}
+
+export const pokemonItemMock: PokemonItem = {
+    id: 4,
+    cost: 200,
+    effect_entries: {
+        effect: "Used in battle :   Attempts to catch a wild Pokémon, using a catch rate of 1×. If used in a trainer battle, nothing happens and the ball is lost.",
+        short_effect: "Tries to catch a wild Pokémon.",
+    },
+    fling_power: null,
+    names: [
+        {
+            language: {
+                name: "en",
+                url: "https://pokeapi.co/api/v2/language/9/"
+            },
+            name: "Poké Ball"
+        }
+   ]
 }
 
 export interface TmiClientTest extends Omit<TmiClient, "say" | "part" | "join" | "connect" | "on"> {
