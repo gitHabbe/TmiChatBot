@@ -26,6 +26,7 @@ import { UserLeave } from "./tmi/UserLeave"
 import { SetPrefix } from "./tmi/SetPrefix"
 import { Pokemon } from "./pokemon/Pokemon"
 import { PokemonMoveImpl } from "./pokemon/PokemonMoveImpl"
+import { PokemonItemImpl } from "./pokemon/PokemonItemImpl"
 
 export class StandardCommandMap {
     private commandMap = new Map<string, ICommand>()
@@ -66,6 +67,7 @@ export class StandardCommandMap {
         this.commandMap.set(CommandName.TTPB, new TimeTrialPersonalBest(this.messageData))
         this.commandMap.set(ComponentsSupport.POKEMON, new Pokemon(this.messageData))
         this.commandMap.set(ComponentsSupport.POKEMONMOVE, new PokemonMoveImpl(this.messageData))
+        this.commandMap.set(ComponentsSupport.POKEMONITEM, new PokemonItemImpl(this.messageData))
         this.commandMap.set(ComponentsSupport.SLOTS, new Slots(this.messageData))
     }
 }

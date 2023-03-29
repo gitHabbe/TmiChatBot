@@ -47,6 +47,7 @@ export enum ComponentsSupport {
   POKEMON = "POKEMON",
   PKMN = "PKMN",
   POKEMONMOVE = "POKEMONMOVE",
+  POKEMONITEM = "POKEMONITEM",
 }
 
 export type OnMessage = (
