@@ -8,9 +8,7 @@ import { PersonalBest } from "./speedrun/PersonalBest"
 import { IndividualPersonalBest } from "./speedrun/IndividualPersonalBest"
 import { MessageData } from "../tmi/MessageData"
 import { Followage } from "./twitch/Followage"
-import {
-    Slots
-} from "./Tmi"
+import { Slots } from "./Tmi"
 import { SetSpeedrunner } from "./speedrun/SetSpeedrunner"
 import { TimeTrialWorldRecord } from "./speedrun/TimeTrialWorldRecord"
 import { TimeTrialPersonalBest } from "./speedrun/TimeTrialPersonalBest"
