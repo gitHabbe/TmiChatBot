@@ -1,6 +1,6 @@
 import { AxiosInstance } from "axios"
 import { pokemonAPI } from "../../config/pokemonConfig"
-import { IPokemon, PokemonMove } from "../../interfaces/pokemon"
+import { IPokemon, PokemonItem, PokemonMove } from "../../interfaces/pokemon"
 import { ChatError } from "../error/ChatError"
 
 export class PokemonAPI {
@@ -21,6 +21,15 @@ export class PokemonAPI {
             return pokemonResponse.data
         } catch (error) {
             throw new ChatError(`Pokemon ${targetPokemon} not found.`)
+        }
+    }
+
+    async fetchItem(item: string) {
+        try {
+            const itemResponse = await this.api.get<PokemonItem>(`/item/${item}`)
+            return itemResponse.data
+        } catch (error) {
+            throw new ChatError(`Item ${item} not found.`)
         }
     }
 }
