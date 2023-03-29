@@ -1,6 +1,6 @@
 import { messagePokemonDataMock, pokemonMoveMock } from "./mockData"
 import { PokemonAPI } from "../src/models/fetch/PokemonAPI"
-import { PokemonMoveImpl } from "../src/models/commands/Tmi"
+import { PokemonMoveImpl } from "../src/models/commands/pokemon/PokemonMoveImpl"
 
 describe("PokemonAPI module", () => {
 

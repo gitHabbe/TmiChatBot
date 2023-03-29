@@ -9,24 +9,25 @@ import { IndividualPersonalBest } from "./speedrun/IndividualPersonalBest"
 import { MessageData } from "../tmi/MessageData"
 import { Followage } from "./twitch/Followage"
 import {
-    AddTrust,
-    DeleteCommand,
-    DeleteTimestamp,
-    FindTimestamp,
-    NewCommand,
-    Pokemon, PokemonMoveImpl,
-    SetPrefix,
-    Slots,
-    Timestamp,
-    ToggleComponent,
-    UnTrust,
-    UserJoin,
-    UserLeave
+    Slots
 } from "./Tmi"
 import { SetSpeedrunner } from "./speedrun/SetSpeedrunner"
 import { TimeTrialWorldRecord } from "./speedrun/TimeTrialWorldRecord"
 import { TimeTrialPersonalBest } from "./speedrun/TimeTrialPersonalBest"
 import { JoinedUser } from "../../interfaces/prisma"
+import { AddTrust } from "./tmi/AddTrust"
+import { UnTrust } from "./tmi/UnTrust"
+import { Timestamp } from "./tmi/Timestamp"
+import { FindTimestamp } from "./tmi/FindTimestamp"
+import { DeleteTimestamp } from "./tmi/DeleteTimestamp"
+import { ToggleComponent } from "./tmi/ToggleComponent"
+import { NewCommand } from "./tmi/NewCommand"
+import { DeleteCommand } from "./tmi/DeleteCommand"
+import { UserJoin } from "./tmi/UserJoin"
+import { UserLeave } from "./tmi/UserLeave"
+import { SetPrefix } from "./tmi/SetPrefix"
+import { Pokemon } from "./pokemon/Pokemon"
+import { PokemonMoveImpl } from "./pokemon/PokemonMoveImpl"
 
 export class StandardCommandMap {
     private commandMap = new Map<string, ICommand>()
