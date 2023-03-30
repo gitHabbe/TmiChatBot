@@ -63,3 +63,4 @@ export class JsonChannels {
     fs.writeFileSync(this.channels.jsonFile, JSON.stringify(this.channels.getData));
   }
 }
+
