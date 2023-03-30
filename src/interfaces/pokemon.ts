@@ -59,10 +59,12 @@ export interface PokemonMove {
 export interface PokemonItem {
     id: number;
     cost: number;
-    effect_entries: {
-        effect: string
-        short_effect: string
-    }
+    effect_entries: [
+        {
+            effect: string
+            short_effect: string
+        }
+    ],
     fling_power: number | null;
     names: [
         {

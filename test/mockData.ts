@@ -109,6 +109,7 @@ export const onlineTwitchChannelMock: ITwitchChannel = {
 
 export const messageDataMock = new MessageData("#habbe", {}, "This is a test message");
 export const messagePokemonDataMock = new MessageData("#habbe", {}, "!pokemonmove slash");
+export const messagePokemonMachineDataMock = new MessageData("#habbe", {}, "!pokemontm TM46");
 
 export const joinedUserMock: JoinedUser = {
     id: 1,
@@ -208,10 +209,12 @@ export const pokemonMoveMock: PokemonMove = {
 export const pokemonItemMock: PokemonItem = {
     id: 4,
     cost: 200,
-    effect_entries: {
-        effect: "Used in battle :   Attempts to catch a wild Pokémon, using a catch rate of 1×. If used in a trainer battle, nothing happens and the ball is lost.",
-        short_effect: "Tries to catch a wild Pokémon.",
-    },
+    effect_entries: [
+        {
+            effect: "Used in battle :   Attempts to catch a wild Pokémon, using a catch rate of 1×. If used in a trainer battle, nothing happens and the ball is lost.",
+            short_effect: "Tries to catch a wild Pokémon.",
+        }
+    ],
     fling_power: null,
     names: [
         {
