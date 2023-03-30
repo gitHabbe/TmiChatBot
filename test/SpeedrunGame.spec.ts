@@ -1,6 +1,6 @@
 import { SpeedrunApi } from "../src/models/fetch/SpeedrunCom"
-import { SpeedrunGame } from "../src/interfaces/general"
-import { speedrunGameMock } from "./mockData"
+import { FullSpeedrunGame, SpeedrunGame } from "../src/interfaces/general"
+import { prismaSpeedrunGameMock } from "./__mocks__/prismaMock"
 
 describe("SpeedrunGame module", () => {
 
@@ -8,7 +8,7 @@ describe("SpeedrunGame module", () => {
         const speedrunGame = new SpeedrunApi("dkr")
         const spy = jest
             .spyOn(speedrunGame, "fetch")
-            .mockImplementation(async (): Promise<SpeedrunGame[]> => [ speedrunGameMock ])
+            .mockImplementation(async (): Promise<FullSpeedrunGame[]> => [ prismaSpeedrunGameMock ])
         const gameResponse: SpeedrunGame[] = await speedrunGame.fetch()
         console.log(gameResponse)
         const res = gameResponse[0].international

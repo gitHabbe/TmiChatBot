@@ -1,8 +1,8 @@
 import { CustomCommand } from "../src/models/commands/CustomCommand";
 import { Command } from "@prisma/client";
-import { commandMockData } from "./mockData";
 import { MessageData } from "../src/models/tmi/MessageData";
 import { UserPrisma } from "../src/models/database/UserPrisma"
+import { commandMockData } from "./__mocks__/prismaMock"
 
 describe("Test CustomCommand", () => {
 

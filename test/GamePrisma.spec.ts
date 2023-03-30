@@ -1,6 +1,6 @@
 import { GamePrisma } from "../src/models/database/GamePrisma"
 import { FullSpeedrunGame } from "../src/interfaces/general"
-import { prismaSpeedrunGameMock } from "./mockData"
+import { prismaSpeedrunGameMock } from "./__mocks__/prismaMock"
 
 describe("GamePrisma module", () => {
 
