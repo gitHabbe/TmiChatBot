@@ -10,7 +10,6 @@ describe("SpeedrunGame module", () => {
             .spyOn(speedrunGame, "fetch")
             .mockReturnValue(Promise.resolve([ prismaSpeedrunGameMock ]))
         const gameResponse: SpeedrunGame[] = await speedrunGame.fetch()
-        console.log(gameResponse)
         const res = gameResponse[0].international
         const exp = "Diddy Kong Racing"
         expect(res).toBe(exp)
