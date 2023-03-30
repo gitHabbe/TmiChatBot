@@ -70,6 +70,7 @@ export class StandardCommandMap {
         this.commandMap.set(ComponentsSupport.POKEMONMOVE, new PokemonMoveImpl(this.messageData))
         this.commandMap.set(ComponentsSupport.POKEMONITEM, new PokemonItemImpl(this.messageData))
         this.commandMap.set(ComponentsSupport.POKEMONHM, new PokemonHM(this.messageData))
+        this.commandMap.set(ComponentsSupport.POKEMONTM, new PokemonHM(this.messageData))
         this.commandMap.set(ComponentsSupport.SLOTS, new Slots(this.messageData))
     }
 }
