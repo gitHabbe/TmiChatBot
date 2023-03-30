@@ -3,7 +3,6 @@ import { TwitchFetch } from "../../fetch/TwitchTv";
 import { ChatUserstate } from "tmi.js";
 import { IFollowage, ITwitchChannel } from "../../../interfaces/twitch";
 import { datesDaysDifference } from "../../../utility/dateFormat";
-import { FilterTwitchChannel } from "./FilterTwitchChannel";
 import { MessageData } from "../../tmi/MessageData";
 import { ModuleFamily } from "../../../interfaces/tmi";
 
