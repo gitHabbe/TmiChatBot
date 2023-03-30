@@ -44,6 +44,25 @@ describe("PokemonAPI module", () => {
             .mockReturnValue(pokemonMachineMock)
         const pokemonMachine = new PokemonHM(messageDataMock, mockedPokemonAPI)
         const messageDataPromise = await pokemonMachine.run()
+        const res = messageDataPromise.response
+        const exp = "HM01: Teaches the move Cut."
+        expect(res).toBe(exp)
+        spy.mockRestore()
+    })
+
+    it("Pokemon T Machine", async () => {
+        const mockedPokemonAPI = new PokemonAPI()
+        const pokemonMachineMock: Record<string, string> = {
+            "TM45": "Teaches the move Explosion/Avalanche/Bulk Up."
+        }
+        const spy = jest
+            .spyOn(mockedPokemonAPI, "fetchMachine")
+            .mockReturnValue(pokemonMachineMock)
+        const pokemonHM = new PokemonHM(messageDataMock, mockedPokemonAPI)
+        const messageData = await pokemonHM.run()
+        const res = messageData.response
+        const exp = "TM45: Teaches the move Explosion/Avalanche/Bulk Up."
+        expect(res).toBe(exp)
         spy.mockRestore()
     })
 
