@@ -1,6 +1,6 @@
 import { AxiosConfig, AxiosFetch } from "./YouTubeAPI.spec";
 import { ITwitterTweetResponse } from "../src/interfaces/socialMedia";
-import { tweetMockData } from "./mockData";
+import { tweetMockData } from "./__mocks__/socialMediaMock"
 
 class TwitterApi<T> implements AxiosFetch<T> {
     readonly baseURL = "https://api.twitter.com/2"

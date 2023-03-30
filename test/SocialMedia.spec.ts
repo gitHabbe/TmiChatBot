@@ -1,7 +1,7 @@
 import { TwitterLink, YoutubeLink } from "../src/models/fetch/SocialMedia";
 import { twitterRegex } from "../src/config/twitterConfig";
 import { youtubeRegex } from "../src/config/youtubeConfig";
-import { tweetMockData, youtubeVideoMockData } from "./mockData";
+import { tweetMockData, youtubeVideosMock } from "./__mocks__/socialMediaMock"
 
 describe("Social media module", () => {
 
@@ -32,7 +32,7 @@ describe("Social media module", () => {
   function mockYoutubeVideo(youtubeLink: YoutubeLink) {
     return jest
         .spyOn(youtubeLink, "fetchVideos")
-        .mockImplementation(async () => youtubeVideoMockData);
+        .mockImplementation(async () => youtubeVideosMock);
   }
 
   function mockTweet(twitterLink: TwitterLink) {

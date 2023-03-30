@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { IYoutubePagination } from "../src/interfaces/socialMedia";
-import { youtubeVideoMockData } from "./mockData";
+import { youtubeVideosMock } from "./__mocks__/socialMediaMock"
 
 interface APIConfig {
   config: AxiosRequestConfig;
@@ -43,7 +43,7 @@ describe("Test YouTubeApi", () => {
     youTubeApi.setVideoId("1")
     const spy = jest
       .spyOn(youTubeApi, "fetch")
-      .mockImplementation(async () => youtubeVideoMockData)
+      .mockImplementation(async () => youtubeVideosMock)
     const video = await youTubeApi.fetch()
     const response = video.items[0].snippet.title
     const expected = "John Walker | Broken"
