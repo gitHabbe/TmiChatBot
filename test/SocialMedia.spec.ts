@@ -24,7 +24,7 @@ describe("Social media module", () => {
     const youtubeLink = new YoutubeLink(regexResult);
     const spy = mockYoutubeVideo(youtubeLink);
     const response: string = await youtubeLink.getMessage();
-    const expected = "John Walker | Broken [03:19 - 99% - 335.6K]";
+    const expected = "John Walker | Broken [03:19 - 9.9K👍 - 335.6K]";
     expect(response).toBe(expected)
     spy.mockRestore()
   });

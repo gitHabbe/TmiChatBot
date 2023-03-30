@@ -59,4 +59,4 @@ export const fakeClient: TmiClientTest = {
         return new Client({})
     }
 }
-export const messageDataMock = new MessageData("#habbe", {}, "This is a test message")
+export const messageDataMock = new MessageData("habbe", {}, "This is a test message")
