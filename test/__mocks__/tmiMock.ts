@@ -1,5 +1,6 @@
 import { ChatUserstate, Client } from "tmi.js"
 import { TmiClient } from "../../src/interfaces/tmi"
+import { MessageData } from "../../src/models/tmi/MessageData"
 
 export const chatterMock: ChatUserstate = {
     'badges': { 'broadcaster': '1', 'warcraft': 'horde' },
@@ -58,3 +59,4 @@ export const fakeClient: TmiClientTest = {
         return new Client({})
     }
 }
+export const messageDataMock = new MessageData("#habbe", {}, "This is a test message")
