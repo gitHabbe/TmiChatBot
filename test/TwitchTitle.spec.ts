@@ -1,6 +1,7 @@
 import { TwitchTitle } from "../src/models/commands/twitch/TwitchTitle"
-import { messageDataMock, offlineTwitchChannelMock } from "./mockData"
+import { messageDataMock} from "./mockData"
 import { TwitchFetch } from "../src/models/fetch/TwitchTv"
+import { offlineTwitchChannelMock } from "./__mocks__/twitchMock"
 
 describe("TwitchTitle module", () => {
 

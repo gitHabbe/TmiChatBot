@@ -1,13 +1,14 @@
 import { ITwitchChannel } from "../src/interfaces/twitch";
 import {
     messageDataMock,
-    offlineTwitchChannelMock,
-    onlineTwitchChannelMock,
+
+
 } from "./mockData"
 import { TwitchFetch } from "../src/models/fetch/TwitchTv";
 import { TwitchTitle } from "../src/models/commands/twitch/TwitchTitle";
 import { TwitchUptime } from "../src/models/commands/twitch/TwitchUptime";
 import { MessageData } from "../src/models/tmi/MessageData";
+import { offlineTwitchChannelMock, onlineTwitchChannelMock } from "./__mocks__/twitchMock"
 
 describe("Standard commands", () => {
 
