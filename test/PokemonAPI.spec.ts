@@ -1,7 +1,7 @@
 import { PokemonAPI } from "../src/models/fetch/PokemonAPI"
 import { PokemonMoveImpl } from "../src/models/commands/pokemon/PokemonMoveImpl"
 import { PokemonItemImpl } from "../src/models/commands/pokemon/PokemonItemImpl"
-import { PokemonHM } from "../src/models/commands/pokemon/PokemonHM"
+import { PokemonMachine } from "../src/models/commands/pokemon/PokemonHM"
 import { pokemonItemMock, pokemonMoveMock } from "./__mocks__/pokemonMock"
 import { messageDataMock } from "./__mocks__/tmiMock"
 
@@ -42,7 +42,7 @@ describe("PokemonAPI module", () => {
         const spy = jest
             .spyOn(mockedPokemonAPI, "fetchMachine")
             .mockReturnValue(pokemonMachineMock)
-        const pokemonMachine = new PokemonHM(messageDataMock, mockedPokemonAPI)
+        const pokemonMachine = new PokemonMachine(messageDataMock, mockedPokemonAPI)
         const messageDataPromise = await pokemonMachine.run()
         const res = messageDataPromise.response
         const exp = "HM01: Teaches the move Cut."
@@ -58,7 +58,7 @@ describe("PokemonAPI module", () => {
         const spy = jest
             .spyOn(mockedPokemonAPI, "fetchMachine")
             .mockReturnValue(pokemonMachineMock)
-        const pokemonHM = new PokemonHM(messageDataMock, mockedPokemonAPI)
+        const pokemonHM = new PokemonMachine(messageDataMock, mockedPokemonAPI)
         const messageData = await pokemonHM.run()
         const res = messageData.response
         const exp = "TM45: Teaches the move Explosion/Avalanche/Bulk Up."

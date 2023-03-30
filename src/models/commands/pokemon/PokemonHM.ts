@@ -4,7 +4,7 @@ import { PokemonAPI } from "../../fetch/PokemonAPI"
 import { MessageData } from "../../tmi/MessageData"
 import { MessageParser } from "../../tmi/MessageParse"
 
-export class PokemonHM implements ICommand {
+export class PokemonMachine implements ICommand {
     moduleFamily: ModuleFamily = ModuleFamily.POKEMON
     private pokeAPI: PokemonAPI
 
