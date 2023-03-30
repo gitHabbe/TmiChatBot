@@ -17,10 +17,9 @@ export class PokemonHM implements ICommand {
         const messageParser = new MessageParser()
         const pokemonItem = messageParser.getPokemonMove(message, 1)
         const strings: Record<string, string> = this.pokeAPI.fetchMachine(pokemonItem)
-        let recordKey = Object.keys(strings)[0]
-        let recordValue = Object.values(strings)[0]
+        const recordKey = Object.keys(strings)[0]
+        const recordValue = Object.values(strings)[0]
         this.messageData.response = recordKey + ": " + recordValue
         return this.messageData
     }
-
 }
