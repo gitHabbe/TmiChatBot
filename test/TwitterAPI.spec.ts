@@ -27,7 +27,7 @@ describe("Test TwitterApi", () => {
         twitterApi.setTweetId("1")
         const spy = jest
           .spyOn(twitterApi, "fetch")
-          .mockImplementation(async () => tweetMockData)
+          .mockReturnValue(Promise.resolve(tweetMockData))
         const twitterResponse = await twitterApi.fetch()
         const response = twitterResponse.data.text
         const expected = "New Lazygit release in stores now! https://t.co/tfgU5rtT2R";

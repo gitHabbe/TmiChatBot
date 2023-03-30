@@ -8,7 +8,7 @@ describe("GamePrisma module", () => {
         const gamePrisma = new GamePrisma("habbe")
         const spy = jest
             .spyOn(gamePrisma, "get")
-            .mockImplementation(async (): Promise<FullSpeedrunGame> => prismaSpeedrunGameMock)
+            .mockReturnValue(Promise.resolve(prismaSpeedrunGameMock))
         const fullSpeedrunGame: FullSpeedrunGame | null = await gamePrisma.get()
         if (!fullSpeedrunGame) {
             expect(fullSpeedrunGame).toBeNull()

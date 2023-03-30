@@ -44,7 +44,7 @@ describe("Standard commands", () => {
     function mockGetChannelsMethod(twitchFetch: TwitchFetch, twitchChannelMockData: ITwitchChannel) {
         return jest
             .spyOn(twitchFetch, "singleChannel")
-            .mockImplementation(async (): Promise<ITwitchChannel> => twitchChannelMockData);
+            .mockReturnValue(Promise.resolve(twitchChannelMockData))
     }
 
 })

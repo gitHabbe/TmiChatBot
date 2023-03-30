@@ -32,12 +32,12 @@ describe("Social media module", () => {
   function mockYoutubeVideo(youtubeLink: YoutubeLink) {
     return jest
         .spyOn(youtubeLink, "fetchVideos")
-        .mockImplementation(async () => youtubeVideosMock);
+        .mockReturnValue(Promise.resolve(youtubeVideosMock))
   }
 
   function mockTweet(twitterLink: TwitterLink) {
     return jest
         .spyOn(twitterLink, "fetchTweet")
-        .mockImplementation(async () => tweetMockData);
+        .mockReturnValue(Promise.resolve(tweetMockData))
   }
 })

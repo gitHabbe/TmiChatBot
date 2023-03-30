@@ -8,7 +8,7 @@ describe("SpeedrunGame module", () => {
         const speedrunGame = new SpeedrunApi("dkr")
         const spy = jest
             .spyOn(speedrunGame, "fetch")
-            .mockImplementation(async (): Promise<FullSpeedrunGame[]> => [ prismaSpeedrunGameMock ])
+            .mockReturnValue(Promise.resolve([ prismaSpeedrunGameMock ]))
         const gameResponse: SpeedrunGame[] = await speedrunGame.fetch()
         console.log(gameResponse)
         const res = gameResponse[0].international

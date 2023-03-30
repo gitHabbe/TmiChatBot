@@ -43,7 +43,7 @@ describe("Test YouTubeApi", () => {
     youTubeApi.setVideoId("1")
     const spy = jest
       .spyOn(youTubeApi, "fetch")
-      .mockImplementation(async () => youtubeVideosMock)
+      .mockReturnValue(Promise.resolve(youtubeVideosMock))
     const video = await youTubeApi.fetch()
     const response = video.items[0].snippet.title
     const expected = "John Walker | Broken"

@@ -13,7 +13,7 @@ describe("Test CustomCommand", () => {
     const customCommand = new CustomCommand(messageData, joinedUser);
     const spy = jest
       .spyOn(customCommand, "isCustomCommand")
-      .mockImplementation((): Command | undefined => commandMockData)
+      .mockReturnValue(commandMockData)
     const response = "This is the content";
     const expected: MessageData = await customCommand.run();
     expect(expected.response).toBe(response)
