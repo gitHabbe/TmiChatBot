@@ -25,12 +25,22 @@ export class PokemonItemImpl implements ICommand {
 
     private static itemDescription(pokemonItemResponse: PokemonItem): string {
         let itemData = ""
-        itemData += pokemonItemResponse.names[0].name
+        let itemData1 = pokemonItemResponse.names.find(names => names.language.name === "en")
+        itemData += itemData1?.name
         if (pokemonItemResponse.cost) {
             itemData += `[${pokemonItemResponse.cost}]`
         }
-        const itemDescription = pokemonItemResponse.effect_entries.effect.split(":")[1]
-        itemData += `: ${itemDescription.trim()}`
+        const includes = pokemonItemResponse.effect_entries[0].effect.includes(":")
+        let longText = ""
+        if (includes) {
+            longText = pokemonItemResponse.effect_entries[0].effect.split(":")[1].trim()
+        }
+        if (pokemonItemResponse.effect_entries[0].short_effect.length > longText.length) {
+            itemData += `: ${pokemonItemResponse.effect_entries[0].short_effect}`
+        } else {
+            itemData += `: ${longText}`
+        }
+        // itemData += `: ${itemDescription.trim()}`
         return itemData
     }
 }
