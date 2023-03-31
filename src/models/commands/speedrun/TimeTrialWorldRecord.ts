@@ -1,9 +1,9 @@
 import { ICommand } from "../../../interfaces/Command";
-import { StringExtract } from "../../StringExtract";
 import { TimeTrialSupport } from "../../../interfaces/speedrun";
 import { TimeTrialWorldRecordDiddyKongRacing } from "../Speedrun";
 import { MessageData } from "../../tmi/MessageData";
 import { ModuleFamily } from "../../../interfaces/tmi";
+import { MessageParser } from "../../tmi/MessageParse"
 
 export class TimeTrialWorldRecord implements ICommand {
     moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN
@@ -11,8 +11,8 @@ export class TimeTrialWorldRecord implements ICommand {
     constructor(public messageData: MessageData) {}
 
     async run(): Promise<MessageData> {
-        const stringExtract = new StringExtract(this.messageData);
-        const gameName: string = await stringExtract.game();
+        const messageParser = new MessageParser()
+        const gameName: string = await messageParser.gameName(this.messageData, 1)
         switch (gameName.toUpperCase()) {
             case TimeTrialSupport.DKR:
                 return new TimeTrialWorldRecordDiddyKongRacing(this.messageData).run();

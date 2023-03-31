@@ -1,5 +1,4 @@
 import { ICommand } from "../../../interfaces/Command";
-import { StringExtract } from "../../StringExtract";
 import { IndividualLevelSupport } from "../../../interfaces/speedrun";
 import { IndividualWorldRecordDiddyKongRacing } from "../Speedrun";
 import { MessageData } from "../../tmi/MessageData";

@@ -1,5 +1,4 @@
 import { ICommand } from "../../../interfaces/Command";
-import { StringExtract } from "../../StringExtract";
 import { TimeTrialSupport } from "../../../interfaces/speedrun";
 import { TimeTrialPersonalBestDiddyKongRacing } from "../Speedrun";
 import { MessageData } from "../../tmi/MessageData";

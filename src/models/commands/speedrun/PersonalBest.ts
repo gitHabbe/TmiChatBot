@@ -1,7 +1,4 @@
 import { ICommand } from "../../../interfaces/Command";
-import { StringExtract } from "../../StringExtract";
-import { GamePrisma } from "../../database/GamePrisma";
-import { FullGame } from "../../../interfaces/prisma";
 import { RunnerPrisma } from "../../database/RunnerPrisma";
 import { Leaderboard } from "../../fetch/Leaderboard";
 import { IRun } from "../../../interfaces/speedrun";
@@ -9,7 +6,6 @@ import { datesDaysDifference, floatToHHMMSS } from "../../../utility/dateFormat"
 import { MessageData } from "../../tmi/MessageData";
 import { ModuleFamily } from "../../../interfaces/tmi";
 import { MessageParser } from "../../tmi/MessageParse"
-import { SpeedrunCategory, SpeedrunApi } from "../../fetch/SpeedrunCom"
 import { SpeedrunGameData } from "./WorldRecord"
 
 export class PersonalBest implements ICommand {
