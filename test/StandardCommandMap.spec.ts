@@ -16,19 +16,17 @@ describe("StandardCommandMap module", () => {
 
     it("StandardCommandMap title", () => {
         const res: ICommand | undefined = getCommand("!title")
-        if (!res) expect(res).toBeUndefined()
         expect(res).toBeInstanceOf(TwitchTitle)
     })
 
     it("StandardCommandMap pokemon", () => {
         const res: ICommand | undefined = getCommand("!pokemon")
-        if (!res) expect(res).toBeUndefined()
         expect(res).toBeInstanceOf(Pokemon)
     })
 
     it("StandardCommandMap undefined", () => {
         const res: ICommand | undefined = getCommand("!undefined")
-        if (!res) expect(res).toBeUndefined()
+        expect(res).toBeUndefined()
     })
 
     function getCommand(mockMessage: string) {
