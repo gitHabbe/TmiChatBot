@@ -6,6 +6,7 @@ import { CommandName, ComponentsSupport } from "../src/interfaces/tmi"
 import { Pokemon } from "../src/models/commands/pokemon/Pokemon"
 import { MessageParser } from "../src/models/tmi/MessageParse"
 import { ICommand } from "../src/interfaces/Command"
+import { TwitchUptime } from "../src/models/commands/twitch/TwitchUptime"
 
 describe("StandardCommandMap module", () => {
     let standardCommandMap: StandardCommandMap
@@ -29,11 +30,22 @@ describe("StandardCommandMap module", () => {
         expect(res).toBeUndefined()
     })
 
-    function getCommand(mockMessage: string) {
+    it("StandardCommandMap undefined 2", () => {
+        const res: ICommand | undefined = getCommand("#undefined")
+        expect(res).toBeUndefined()
+    })
+
+
+    it("StandardCommandMap uptime", () => {
+        const res: ICommand | undefined = getCommand("#uptime", "#")
+        expect(res).toBeInstanceOf(TwitchUptime)
+    })
+    
+    function getCommand(mockMessage: string, targetPrefix: string = "!") {
         messageDataMock.message = mockMessage
         const { message } = messageDataMock
         const messageParser = new MessageParser()
-        const commandName: string = messageParser.getCommandName(message, "!")
+        const commandName: string = messageParser.getCommandName(message, targetPrefix)
         return standardCommandMap.get(commandName)
     }
 
