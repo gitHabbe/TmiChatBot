@@ -26,6 +26,11 @@ describe("StandardCommandMap module", () => {
         expect(res).toBeInstanceOf(Pokemon)
     })
 
+    it("StandardCommandMap undefined", () => {
+        const res: ICommand | undefined = getCommand("!undefined")
+        if (!res) expect(res).toBeUndefined()
+    })
+
     function getCommand(mockMessage: string) {
         messageDataMock.message = mockMessage
         const { message } = messageDataMock
