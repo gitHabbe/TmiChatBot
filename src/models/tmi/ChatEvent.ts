@@ -62,8 +62,8 @@ class CustomCommandAction {
 
     async call() {
         const customCommand = new CustomCommand(this.messageData, this.joinedUser)
-        const returnData = await customCommand.run()
-        return returnData.response || ""
+        const customCommandContent = await customCommand.run()
+        return customCommandContent.response || ""
     }
 }
 
