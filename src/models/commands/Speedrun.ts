@@ -187,7 +187,7 @@ export class TimeTrialPersonalBestDiddyKongRacing implements ICommand {
         const placement = `#${run.ranking}`
         const shortcutPrint = shortcut === "shortcut" ? "[Shortcut]" : "";
         const daysAgo = datesDaysDifference(runDate)
-        this.messageData.response = `${run.username}'s ${track} [${placement}][${formalVehicle}][${laps}-lap]${shortcutPrint} PB: ${time} by ${runner} - ${daysAgo} days ago`;
+        this.messageData.response = `${run.username}'s ${track} [${placement}][${formalVehicle}][${laps}-lap]${shortcutPrint} PB: ${time} - ${daysAgo} days ago`;
 
         return this.messageData;
     }
