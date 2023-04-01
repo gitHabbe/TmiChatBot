@@ -39,9 +39,7 @@ export class StandardCommandMap {
     get(commandName: string): ICommand | undefined{
         const commandNameUpperCase = commandName.toUpperCase()
         console.log(`Command used: ${commandNameUpperCase}`)
-        const targetCommand = this.commandMap.get(commandNameUpperCase)
-        // if (!targetCommand) throw new Error()
-        return targetCommand
+        return this.commandMap.get(commandNameUpperCase)
     }
 
     private buildCommandMap(): void {
