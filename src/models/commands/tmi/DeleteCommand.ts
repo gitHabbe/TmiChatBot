@@ -1,15 +1,16 @@
-import { ICommand } from "../../../interfaces/Command"
+import { ICommand, ICommandUser } from "../../../interfaces/Command"
 import { ModuleFamily } from "../../../interfaces/tmi"
 import { MessageData } from "../../tmi/MessageData"
 import { UserPrisma } from "../../database/UserPrisma"
 import { TrustLevel } from "../../tmi/TrustLevel"
 import { CommandPrisma } from "../../database/CommandPrisma"
 import { ChatError } from "../../error/ChatError"
+import { JoinedUser } from "../../../interfaces/prisma"
 
-export class DeleteCommand implements ICommand {
+export class DeleteCommand implements ICommandUser {
     moduleFamily: ModuleFamily = ModuleFamily.PROTECTED
 
-    constructor(public messageData: MessageData) {
+    constructor(public messageData: MessageData, public user: JoinedUser) {
     }
 
     run = async () => {

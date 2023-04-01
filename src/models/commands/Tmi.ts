@@ -1,14 +1,15 @@
-import { ICommand } from "../../interfaces/Command"
+import { ICommand, ICommandUser } from "../../interfaces/Command"
 import { UserPrisma } from "../database/UserPrisma"
 import { ComponentPrisma } from "../database/ComponentPrisma"
 import { MessageData } from "../tmi/MessageData"
 import { ModuleFamily } from "../../interfaces/tmi"
 import { randomInt } from "../../utility/math"
+import { JoinedUser } from "../../interfaces/prisma"
 
-export class Slots implements ICommand {
+export class Slots implements ICommandUser {
     moduleFamily: ModuleFamily = ModuleFamily.SLOTS
 
-    constructor(public messageData: MessageData) {}
+    constructor(public messageData: MessageData, public user: JoinedUser) {}
 
     run = async () => {
         const { channel, message, chatter } = this.messageData;

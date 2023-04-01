@@ -1,13 +1,14 @@
-import { ICommand } from "../../../interfaces/Command";
+import { ICommand, ICommandUser } from "../../../interfaces/Command"
 import { IndividualLevelSupport } from "../../../interfaces/speedrun";
 import { IndividualWorldRecordDiddyKongRacing } from "../Speedrun";
 import { MessageData } from "../../tmi/MessageData";
 import { ModuleFamily } from "../../../interfaces/tmi";
 import { MessageParser } from "../../tmi/MessageParse";
+import { JoinedUser } from "../../../interfaces/prisma"
 
-export class IndividualWorldRecord implements ICommand {
+export class IndividualWorldRecord implements ICommandUser {
     moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN;
-    constructor(public messageData: MessageData) {
+    constructor(public messageData: MessageData, public user: JoinedUser) {
     }
 
     async run(): Promise<MessageData> {

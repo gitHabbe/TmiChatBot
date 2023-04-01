@@ -1,14 +1,15 @@
-import { ICommand } from "../../../interfaces/Command";
+import { ICommand, ICommandUser } from "../../../interfaces/Command"
 import { TwitchFetch } from "../../fetch/TwitchTv";
 import { dateToLetters, ILetterFormattedDate, millisecondsToDistance } from "../../../utility/dateFormat";
 import { MessageData } from "../../tmi/MessageData";
 import { ModuleFamily } from "../../../interfaces/tmi";
+import { JoinedUser } from "../../../interfaces/prisma"
 
-export class TwitchUptime implements ICommand {
+export class TwitchUptime implements ICommandUser {
     public moduleFamily: ModuleFamily = ModuleFamily.UPTIME
     private twitchFetch: TwitchFetch
 
-    constructor(public messageData: MessageData, twitchFetch?: TwitchFetch) {
+    constructor(public messageData: MessageData, public user: JoinedUser, twitchFetch?: TwitchFetch) {
         this.twitchFetch = twitchFetch || new TwitchFetch()
     }
 

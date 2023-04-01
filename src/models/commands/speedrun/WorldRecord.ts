@@ -1,4 +1,4 @@
-import { ICommand } from "../../../interfaces/Command"
+import { ICommand, ICommandUser } from "../../../interfaces/Command"
 import { Leaderboard } from "../../fetch/Leaderboard"
 import { IRun } from "../../../interfaces/speedrun"
 import { formatWorldRecord } from "../../../utility/math"
@@ -9,6 +9,7 @@ import { MessageParser } from "../../tmi/MessageParse"
 import { SpeedrunApi, SpeedrunCategory } from "../../fetch/SpeedrunCom"
 import { Category, FullSpeedrunGame, SpeedrunGame, SpeedrunResponse } from "../../../interfaces/general"
 import { ChatError } from "../../error/ChatError"
+import { JoinedUser } from "../../../interfaces/prisma"
 
 export class SpeedrunGameData {
 
@@ -60,10 +61,10 @@ export class SpeedrunGameData {
     }
 }
 
-export class WorldRecord implements ICommand {
+export class WorldRecord implements ICommandUser {
     public moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN;
 
-    constructor(public messageData: MessageData) {}
+    constructor(public messageData: MessageData, public user: JoinedUser) {}
 
     async run(): Promise<MessageData> {
         const speedrunGameData = new SpeedrunGameData(this.messageData)

@@ -1,4 +1,4 @@
-import { ICommand } from "../../../interfaces/Command";
+import { ICommand, ICommandUser } from "../../../interfaces/Command"
 import { RunnerPrisma } from "../../database/RunnerPrisma";
 import { Leaderboard } from "../../fetch/Leaderboard";
 import { IRun } from "../../../interfaces/speedrun";
@@ -7,12 +7,12 @@ import { MessageData } from "../../tmi/MessageData";
 import { ModuleFamily } from "../../../interfaces/tmi";
 import { MessageParser } from "../../tmi/MessageParse"
 import { SpeedrunGameData } from "./WorldRecord"
+import { JoinedUser } from "../../../interfaces/prisma"
 
-export class PersonalBest implements ICommand {
+export class PersonalBest implements ICommandUser {
     moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN
 
-    constructor(public messageData: MessageData) {
-    }
+    constructor(public messageData: MessageData, public user: JoinedUser) {}
 
     async run(): Promise<MessageData> {
         const messageArray = this.messageData.message.split(" ");

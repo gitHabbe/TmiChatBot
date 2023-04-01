@@ -12,7 +12,7 @@ describe("StandardCommandMap module", () => {
     let standardCommandMap: StandardCommandMap
 
     beforeEach(() => {
-        standardCommandMap = new StandardCommandMap(messageDataMock, joinedUserMock)
+        standardCommandMap = new StandardCommandMap(messageDataMock)
     })
 
     it("StandardCommandMap title", () => {

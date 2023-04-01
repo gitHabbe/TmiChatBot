@@ -1,17 +1,18 @@
-import { ICommand } from "../../../interfaces/Command";
+import { ICommand, ICommandUser } from "../../../interfaces/Command"
 import { TwitchFetch } from "../../fetch/TwitchTv";
 import { ChatUserstate } from "tmi.js";
 import { IFollowage, ITwitchChannel } from "../../../interfaces/twitch";
 import { datesDaysDifference } from "../../../utility/dateFormat";
 import { MessageData } from "../../tmi/MessageData";
 import { ModuleFamily } from "../../../interfaces/tmi";
+import { JoinedUser } from "../../../interfaces/prisma"
 
-export class Followage implements ICommand {
+export class Followage implements ICommandUser {
     moduleFamily: ModuleFamily = ModuleFamily.FOLLOWAGE
 
     private twitchFetch = new TwitchFetch()
 
-    constructor(public messageData: MessageData, twitchFetch?: TwitchFetch) {
+    constructor(public messageData: MessageData, public user: JoinedUser, twitchFetch?: TwitchFetch) {
         this.twitchFetch = twitchFetch || new TwitchFetch()
     }
 

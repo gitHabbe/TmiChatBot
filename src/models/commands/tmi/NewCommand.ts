@@ -1,4 +1,4 @@
-import { ICommand } from "../../../interfaces/Command"
+import { ICommand, ICommandUser } from "../../../interfaces/Command"
 import { ModuleFamily } from "../../../interfaces/tmi"
 import { MessageData } from "../../tmi/MessageData"
 import { UserPrisma } from "../../database/UserPrisma"
@@ -6,11 +6,12 @@ import { TrustLevel } from "../../tmi/TrustLevel"
 import { Command } from "@prisma/client"
 import { ChatError } from "../../error/ChatError"
 import { CommandPrisma } from "../../database/CommandPrisma"
+import { JoinedUser } from "../../../interfaces/prisma"
 
-export class NewCommand implements ICommand {
+export class NewCommand implements ICommandUser {
     moduleFamily: ModuleFamily = ModuleFamily.PROTECTED
 
-    constructor(public messageData: MessageData) {
+    constructor(public messageData: MessageData, public user: JoinedUser) {
     }
 
     private getUser = async (channel: string) => {

@@ -1,4 +1,4 @@
-import { ICommand } from "../../../interfaces/Command"
+import { ICommand, ICommandUser } from "../../../interfaces/Command"
 import { ModuleFamily } from "../../../interfaces/tmi"
 import { MessageData } from "../../tmi/MessageData"
 import { JoinedUser } from "../../../interfaces/prisma"
@@ -9,10 +9,10 @@ import { Trust } from "@prisma/client"
 import { ChatError } from "../../error/ChatError"
 import { TrustLevel } from "../../tmi/TrustLevel"
 
-export class AddTrust implements ICommand {
+export class AddTrust implements ICommandUser {
     moduleFamily: ModuleFamily = ModuleFamily.PROTECTED
 
-    constructor(public messageData: MessageData) {
+    constructor(public messageData: MessageData, public user: JoinedUser) {
     }
 
     private static async addTrust(user: JoinedUser, chatter: ChatUserstate, newTrust: string) {

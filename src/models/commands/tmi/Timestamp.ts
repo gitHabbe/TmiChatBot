@@ -1,4 +1,4 @@
-import { ICommand } from "../../../interfaces/Command"
+import { ICommand, ICommandUser } from "../../../interfaces/Command"
 import { ModuleFamily } from "../../../interfaces/tmi"
 import { MessageData } from "../../tmi/MessageData"
 import { UserPrisma } from "../../database/UserPrisma"
@@ -7,11 +7,12 @@ import { IVideo } from "../../../interfaces/twitch"
 import { TimestampPrisma } from "../../database/TimestampPrisma"
 import { ChatError } from "../../error/ChatError"
 import { TrustLevel } from "../../tmi/TrustLevel"
+import { JoinedUser } from "../../../interfaces/prisma"
 
-export class Timestamp implements ICommand {
+export class Timestamp implements ICommandUser {
     moduleFamily: ModuleFamily = ModuleFamily.TIMESTAMP
 
-    constructor(public messageData: MessageData) {
+    constructor(public messageData: MessageData, public user: JoinedUser) {
     }
 
     private getUser = async (channel: string) => {

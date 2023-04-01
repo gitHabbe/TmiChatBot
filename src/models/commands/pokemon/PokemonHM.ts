@@ -1,14 +1,15 @@
-import { ICommand } from "../../../interfaces/Command"
+import { ICommand, ICommandUser } from "../../../interfaces/Command"
 import { ModuleFamily } from "../../../interfaces/tmi"
 import { PokemonAPI } from "../../fetch/PokemonAPI"
 import { MessageData } from "../../tmi/MessageData"
 import { MessageParser } from "../../tmi/MessageParse"
+import { JoinedUser } from "../../../interfaces/prisma"
 
-export class PokemonMachine implements ICommand {
+export class PokemonMachine implements ICommandUser {
     moduleFamily: ModuleFamily = ModuleFamily.POKEMON
     private pokeAPI: PokemonAPI
 
-    constructor(public messageData: MessageData, pokeAPI?: PokemonAPI) {
+    constructor(public messageData: MessageData, public user: JoinedUser, pokeAPI?: PokemonAPI) {
         this.pokeAPI = pokeAPI || new PokemonAPI()
     }
 

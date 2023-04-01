@@ -1,15 +1,16 @@
-import { ICommand } from "../../../interfaces/Command"
+import { ICommand, ICommandUser } from "../../../interfaces/Command"
 import { ModuleFamily } from "../../../interfaces/tmi"
 import { MessageData } from "../../tmi/MessageData"
 import { UserPrisma } from "../../database/UserPrisma"
 import { TrustLevel } from "../../tmi/TrustLevel"
 import { ChatError } from "../../error/ChatError"
 import { ComponentPrisma } from "../../database/ComponentPrisma"
+import { JoinedUser } from "../../../interfaces/prisma"
 
-export class ToggleComponent implements ICommand {
+export class ToggleComponent implements ICommandUser {
     public moduleFamily: ModuleFamily = ModuleFamily.PROTECTED
 
-    constructor(public messageData: MessageData) {
+    constructor(public messageData: MessageData, public user: JoinedUser) {
     }
 
     private async getUser(channel: string) {

@@ -1,14 +1,14 @@
-import { ICommand } from "../../../interfaces/Command"
+import { ICommand, ICommandUser } from "../../../interfaces/Command"
 import { ModuleFamily } from "../../../interfaces/tmi"
 import { MessageData } from "../../tmi/MessageData"
 import { UserPrisma } from "../../database/UserPrisma"
 import { JoinedUser } from "../../../interfaces/prisma"
 import { TrustPrisma } from "../../database/TrustPrisma"
 
-export class UnTrust implements ICommand {
+export class UnTrust implements ICommandUser {
     moduleFamily: ModuleFamily = ModuleFamily.PROTECTED
 
-    constructor(public messageData: MessageData) {
+    constructor(public messageData: MessageData, public user: JoinedUser) {
     }
 
     private getUser = async (channel: string) => {

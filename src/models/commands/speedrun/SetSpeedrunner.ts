@@ -1,13 +1,14 @@
-import { ICommand } from "../../../interfaces/Command"
+import { ICommand, ICommandUser } from "../../../interfaces/Command"
 import { UserPrisma } from "../../database/UserPrisma"
 import { SettingPrisma } from "../../database/SettingPrisma"
 import { MessageData } from "../../tmi/MessageData"
 import { ModuleFamily } from "../../../interfaces/tmi"
+import { JoinedUser } from "../../../interfaces/prisma"
 
-export class SetSpeedrunner implements ICommand {
+export class SetSpeedrunner implements ICommandUser {
     moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN;
 
-    constructor(public messageData: MessageData) {}
+    constructor(public messageData: MessageData, public user: JoinedUser) {}
 
     private async getUser(channel: string) {
         const userPrisma = new UserPrisma(channel);

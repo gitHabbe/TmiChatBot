@@ -1,4 +1,4 @@
-import { ICommand } from "../../../interfaces/Command"
+import { ICommand, ICommandUser } from "../../../interfaces/Command"
 import { ModuleFamily } from "../../../interfaces/tmi"
 import { MessageData } from "../../tmi/MessageData"
 import { UserPrisma } from "../../database/UserPrisma"
@@ -7,10 +7,10 @@ import { JoinedUser } from "../../../interfaces/prisma"
 import { ChatError } from "../../error/ChatError"
 import { TrustLevel } from "../../tmi/TrustLevel"
 
-export class DeleteTimestamp implements ICommand {
+export class DeleteTimestamp implements ICommandUser {
     moduleFamily: ModuleFamily = ModuleFamily.TIMESTAMP
 
-    constructor(public messageData: MessageData) {
+    constructor(public messageData: MessageData, public user: JoinedUser) {
     }
 
     private getUser = async (channel: string) => {

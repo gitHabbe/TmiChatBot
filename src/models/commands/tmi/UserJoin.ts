@@ -1,14 +1,15 @@
-import { ICommand } from "../../../interfaces/Command"
+import { ICommand, ICommandUser } from "../../../interfaces/Command"
 import { ModuleFamily } from "../../../interfaces/tmi"
 import { MessageData } from "../../tmi/MessageData"
 import { JsonChannels } from "../../JsonArrayFile"
 import { UserPrisma } from "../../database/UserPrisma"
 import { ClientSingleton } from "../../tmi/ClientSingleton"
+import { JoinedUser } from "../../../interfaces/prisma"
 
-export class UserJoin implements ICommand {
+export class UserJoin implements ICommandUser {
     moduleFamily: ModuleFamily = ModuleFamily.PROTECTED
 
-    constructor(public messageData: MessageData) {
+    constructor(public messageData: MessageData, public user: JoinedUser) {
     }
 
     async run() {

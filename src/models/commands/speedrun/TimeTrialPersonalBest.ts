@@ -1,14 +1,15 @@
-import { ICommand } from "../../../interfaces/Command";
+import { ICommand, ICommandUser } from "../../../interfaces/Command"
 import { TimeTrialSupport } from "../../../interfaces/speedrun";
 import { TimeTrialPersonalBestDiddyKongRacing } from "../Speedrun";
 import { MessageData } from "../../tmi/MessageData";
 import { ModuleFamily } from "../../../interfaces/tmi"
 import { MessageParser } from "../../tmi/MessageParse"
+import { JoinedUser } from "../../../interfaces/prisma"
 
-export class TimeTrialPersonalBest implements ICommand {
+export class TimeTrialPersonalBest implements ICommandUser {
     moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN;
 
-    constructor(public messageData: MessageData) {
+    constructor(public messageData: MessageData, public user: JoinedUser) {
     }
 
     async run(): Promise<MessageData> {

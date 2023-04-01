@@ -1,7 +1,7 @@
 import { ChatUserstate } from "tmi.js"
 import { ModuleFamily } from "../../interfaces/tmi"
 import { StandardCommandMap } from "../commands/StandardCommandMap"
-import { ICommand } from "../../interfaces/Command"
+import { ICommand, ICommandUser } from "../../interfaces/Command"
 import { MessageParser } from "./MessageParse"
 import { MessageData } from "./MessageData"
 import { UserPrisma } from "../database/UserPrisma"
@@ -57,28 +57,29 @@ export class ChatEvent {
             return setting.type === "prefix"
         })
         const prefix: string = userPrefix?.value || "!"
-        const standardCommandMap = new StandardCommandMap(messageData, joinedUser)
+        const standardCommandMap = new StandardCommandMap(messageData)
         const messageParser: MessageParser = new MessageParser()
         const commandName: string = messageParser.getCommandName(messageData.message, prefix)
-        const command: ICommand | undefined = standardCommandMap.get(commandName)
-        if (!command) {
+        const StandardCommand = standardCommandMap.get(commandName)
+        if (!StandardCommand) {
             return ""
         }
 
-        const componentProtected = command.moduleFamily === ModuleFamily.PROTECTED
+        const standardCommand: ICommandUser = new StandardCommand(messageData, joinedUser)
+        const componentProtected = standardCommand.moduleFamily === ModuleFamily.PROTECTED
         if (componentProtected) {
-            const commandData = await command.run()
+            const commandData = await standardCommand.run()
             return commandData.response
         }
 
         const chatter: string | undefined = messageData.chatter.username?.toUpperCase()
         const streamer: string = messageData.channel.toUpperCase()
-        const familyEnabled = ChatEvent.isFamilyEnabled(joinedUser, command.moduleFamily)
+        const familyEnabled = ChatEvent.isFamilyEnabled(joinedUser, standardCommand.moduleFamily)
         if (!familyEnabled && streamer === chatter) {
-            return `Command: ${commandName} is not enabled. Use "!toggle ${command.moduleFamily}"`
+            return `Command: ${commandName} is not enabled. Use "!toggle ${standardCommand.moduleFamily}"`
         }
 
-        const commandData = await command.run()
+        const commandData = await standardCommand.run()
         return commandData.response
     }
 
