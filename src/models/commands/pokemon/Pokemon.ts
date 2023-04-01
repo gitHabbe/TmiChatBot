@@ -37,10 +37,8 @@ export class Pokemon implements ICommandUser {
     }
 
     run = async () => {
-        const { channel, message } = this.messageData
+        const { message } = this.messageData
         const targetPokemon = message.split(" ")[1]
-        const userPrisma = new UserPrisma(channel)
-        const user = await this.getUser(userPrisma)
         const pokemon = await this.pokeAPI.fetchPokemon(targetPokemon)
         this.messageData.response = this.formatPokemonStats(pokemon)
 
