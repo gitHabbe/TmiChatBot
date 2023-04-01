@@ -1,4 +1,4 @@
-import { ICommand, ICommandUser } from "../../../interfaces/Command"
+import { ICommandUser } from "../../../interfaces/Command"
 import { IndividualLevelSupport } from "../../../interfaces/speedrun";
 import { IndividualPersonalBestDiddyKongRacing } from "./IndividualPersonalBestDiddyKongRacing";
 import { MessageData } from "../../tmi/MessageData";

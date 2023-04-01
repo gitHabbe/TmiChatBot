@@ -1,5 +1,5 @@
 import { Trust } from "@prisma/client";
-import { JoinedUser, Model, ModelName } from "../../interfaces/prisma";
+import { JoinedUser, ModelName } from "../../interfaces/prisma";
 import { DatabaseSingleton } from "./Prisma";
 import { Userstate } from "tmi.js";
 

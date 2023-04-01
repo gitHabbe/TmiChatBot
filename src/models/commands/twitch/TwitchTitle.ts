@@ -1,4 +1,4 @@
-import { ICommand, ICommandUser } from "../../../interfaces/Command"
+import { ICommandUser } from "../../../interfaces/Command"
 import { TwitchFetch } from "../../fetch/TwitchTv";
 import { MessageData } from "../../tmi/MessageData";
 import { ModuleFamily } from "../../../interfaces/tmi";

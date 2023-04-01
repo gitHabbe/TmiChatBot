@@ -1,4 +1,4 @@
-import { ICommand, ICommandUser } from "../../../interfaces/Command"
+import { ICommandUser } from "../../../interfaces/Command"
 import { RunnerPrisma } from "../../database/RunnerPrisma";
 import { Leaderboard } from "../../fetch/Leaderboard";
 import { IRun } from "../../../interfaces/speedrun";

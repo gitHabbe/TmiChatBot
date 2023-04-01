@@ -4,8 +4,8 @@ import {
   ICategoryResponse,
   ICategoryType,
   IGameType,
-  SpeedrunComErrorMessage,
-  StatusCode,
+
+
 } from "../../interfaces/speedrun";
 import { IAPI, IAxiosOptions } from "../../interfaces/Axios";
 

@@ -1,5 +1,5 @@
 import { DatabaseSingleton } from "./Prisma";
-import { FullGame, ModelName } from "../../interfaces/prisma";
+import { ModelName } from "../../interfaces/prisma";
 import { ICategoryType, IGameType, Link, } from "../../interfaces/speedrun";
 import { FullSpeedrunGame, SpeedrunGame } from "../../interfaces/general"
 

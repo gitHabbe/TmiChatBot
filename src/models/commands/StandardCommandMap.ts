@@ -1,5 +1,5 @@
 import { CommandName, ComponentsSupport } from "../../interfaces/tmi"
-import { ICommand, ICommandUser } from "../../interfaces/Command"
+import { ICommandUser } from "../../interfaces/Command"
 import { TwitchTitle } from "./twitch/TwitchTitle"
 import { TwitchUptime } from "./twitch/TwitchUptime"
 import { WorldRecord } from "./speedrun/WorldRecord"

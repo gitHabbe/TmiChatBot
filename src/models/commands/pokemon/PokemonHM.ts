@@ -1,4 +1,4 @@
-import { ICommand, ICommandUser } from "../../../interfaces/Command"
+import { ICommandUser } from "../../../interfaces/Command"
 import { ModuleFamily } from "../../../interfaces/tmi"
 import { PokemonAPI } from "../../fetch/PokemonAPI"
 import { MessageData } from "../../tmi/MessageData"

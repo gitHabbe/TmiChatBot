@@ -1,4 +1,4 @@
-import { ICommand, ICommandUser } from "../../interfaces/Command"
+import { ICommandUser } from "../../interfaces/Command"
 import { UserPrisma } from "../database/UserPrisma"
 import { ComponentPrisma } from "../database/ComponentPrisma"
 import { MessageData } from "../tmi/MessageData"

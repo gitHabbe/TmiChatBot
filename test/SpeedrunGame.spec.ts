@@ -1,5 +1,5 @@
 import { SpeedrunApi } from "../src/models/fetch/SpeedrunCom"
-import { FullSpeedrunGame, SpeedrunGame } from "../src/interfaces/general"
+import { SpeedrunGame } from "../src/interfaces/general"
 import { prismaSpeedrunGameMock } from "./__mocks__/prismaMock"
 
 describe("SpeedrunGame module", () => {

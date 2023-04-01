@@ -4,7 +4,7 @@ import { ICategoryType, IRun } from "../../interfaces/speedrun"
 // import { SpeedrunCom } from "./SpeedrunCom";
 import { fuseSearch } from "../../utility/fusejs";
 import { SpeedrunLeaderboard } from "./SpeedrunCom";
-import { Category, FullSpeedrunGame, Link } from "../../interfaces/general"
+import { FullSpeedrunGame, Link } from "../../interfaces/general"
 
 export class Leaderboard {
   constructor(private game: FullSpeedrunGame) {}

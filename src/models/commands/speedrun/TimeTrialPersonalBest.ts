@@ -1,4 +1,4 @@
-import { ICommand, ICommandUser } from "../../../interfaces/Command"
+import { ICommandUser } from "../../../interfaces/Command"
 import { TimeTrialSupport } from "../../../interfaces/speedrun";
 import { TimeTrialPersonalBestDiddyKongRacing } from "../Speedrun";
 import { MessageData } from "../../tmi/MessageData";

@@ -1,4 +1,4 @@
-import { ICommand, ICommandUser } from "../../../interfaces/Command"
+import { ICommandUser } from "../../../interfaces/Command"
 import { TwitchFetch } from "../../fetch/TwitchTv";
 import { dateToLetters, ILetterFormattedDate, millisecondsToDistance } from "../../../utility/dateFormat";
 import { MessageData } from "../../tmi/MessageData";
