@@ -17,7 +17,7 @@ export class PokemonItemImpl implements ICommandUser {
     async run(): Promise<MessageData> {
         const { message } = this.messageData
         const messageParser = new MessageParser()
-        const pokemonItem = messageParser.getPokemonMove(message, 1)
+        const pokemonItem = messageParser.getPokemonMove(message, 1).toLowerCase()
         const pokemonItemResponse = await this.pokeAPI.fetchItem(pokemonItem)
         this.messageData.response = PokemonItemImpl.itemDescription(pokemonItemResponse)
         return this.messageData

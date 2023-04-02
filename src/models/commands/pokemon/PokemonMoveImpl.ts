@@ -17,7 +17,7 @@ export class PokemonMoveImpl implements ICommandUser {
     async run(): Promise<MessageData> {
         const { message } = this.messageData
         const messageParser = new MessageParser()
-        const pokemonMoveName = messageParser.getPokemonMove(message, 1)
+        const pokemonMoveName = messageParser.getPokemonMove(message, 1).toLowerCase()
         const pokemonMove: PokemonMove = await this.pokeAPI.fetchMove(pokemonMoveName)
         const { pp, names, accuracy, name, power, meta, type } = pokemonMove
         const pokemonName = names.find(hit => hit.language.name === 'en')?.name || name
