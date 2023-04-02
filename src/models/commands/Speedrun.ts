@@ -179,9 +179,7 @@ export class TimeTrialPersonalBestDiddyKongRacing implements ICommand {
             throw new Error("Runner not found")
         }
         const track = TimeTrialPersonalBestDiddyKongRacing.trackNameFormatted(item);
-        console.log(track)
         const formalVehicle = item.vehicle.charAt(0).toUpperCase() + item.vehicle.slice(1);
-        const runner = run.username;
         const time = run.time;
         const runDate = run.tstamp;
         const placement = `#${run.ranking}`
