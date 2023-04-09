@@ -9,6 +9,7 @@ import { JoinedUser } from "../../../interfaces/prisma"
 export class PokemonMoveImpl implements ICommandUser {
     public moduleFamily: ModuleFamily = ModuleFamily.POKEMON
     private pokeAPI: PokemonAPI
+    private response: string = ""
 
     constructor(public messageData: MessageData, public user: JoinedUser, pokeAPI?: PokemonAPI) {
         this.pokeAPI = pokeAPI || new PokemonAPI()
@@ -19,33 +20,63 @@ export class PokemonMoveImpl implements ICommandUser {
         const messageParser = new MessageParser()
         const pokemonMoveName = messageParser.getPokemonMove(message, 1).toLowerCase()
         const pokemonMove: PokemonMove = await this.pokeAPI.fetchMove(pokemonMoveName)
-        const { pp, names, accuracy, name, power, meta, type } = pokemonMove
-        const pokemonName = names.find(hit => hit.language.name === 'en')?.name || name
-        let response = ""
-        response += `${this.toTitleCase(pokemonName)}`
-        response += ` [${this.toTitleCase(type.name)}] |`
-        response += ` PWR:${power}`
-        response += ` PP:${pp}`
-        response += ` ACC:${accuracy}`
-        const { crit_rate, ailment_chance, flinch_chance, ailment } = meta
-        if (crit_rate) {
-            response += ` Crit: ${crit_rate}`
-        }
-        if (flinch_chance) {
-            response += ` Flinch: ${flinch_chance}`
-        }
-        if (ailment_chance) {
-            response += ` | Proc: ${this.toTitleCase(ailment.name)}(${ailment_chance}%)`
-        }
 
-        this.messageData.response = response
+        this.messageData.response = this.formatMoveResponse(pokemonMove)
         return this.messageData
     }
 
-    private toTitleCase(str: string) {
-        return str.toLowerCase().split(' ').map(function (word) {
-            return (word.charAt(0).toUpperCase() + word.slice(1))
-        }).join(' ')
+    private formatMoveResponse(pokemonMove: PokemonMove) {
+        const { pp, names, accuracy, name, power, meta, type, effect_entries, flavor_text_entries } = pokemonMove
+        this.response = this.getName(names, name)
+        const damageCategory = pokemonMove.damage_class.name === "special" ? "SP" : "PHY"
+        this.response += ` [${PokemonMoveImpl.toTitleCase(type.name)}][${damageCategory}] |`
+        this.addStat(power, "PWR")
+        this.addStat(pp, "PP")
+        this.addStat(accuracy, "ACC")
+        let ailmentExplained = false
+        if (meta) {
+            const { crit_rate, ailment_chance, flinch_chance, ailment } = meta
+            this.addStat(crit_rate, "Crit")
+            this.addStat(flinch_chance, "Flinch")
+            if (ailment_chance) {
+                this.response += ` | ${PokemonMoveImpl.toTitleCase(ailment.name)}[${ailment_chance}%]`
+            }
+            ailmentExplained = effect_entries[0].short_effect.toLowerCase().includes(ailment.name.toLowerCase()) && power !== null
+        }
+        if (effect_entries[0]) {
+            const isConfuse = meta?.ailment.name.toLowerCase() === "confusion" && effect_entries[0].short_effect.toLowerCase().includes("confuse")
+            const noEffect = effect_entries[0].short_effect.toLowerCase().includes("no additional effect")
+            if (!(ailmentExplained || noEffect || isConfuse)) {
+                this.response += ` | ${effect_entries[0].short_effect}`
+            }
+        } else if (flavor_text_entries.length > 0) {
+            const correctLanguage = flavor_text_entries.find(entry => entry.language.name === "en")
+            if (correctLanguage) {
+                const filteredFlavorText = correctLanguage.flavor_text.replace(/(\r\n|\n|\r)/gm, " ")
+                this.response += ` | ${filteredFlavorText}`
+            }
+        } else {
+            this.response += ` | No additional effect`
+        }
+
+        return this.response
+    }
+
+    private addStat(value: number | undefined, statName: string) {
+        if (value) this.response += ` ${statName}:${value}`
+    }
+
+    private getName(names: [ { language: { name: string }; name: string } ], name: string) {
+        const pokemonMoveName = names.find(hit => hit.language.name === "en")?.name || name
+        return PokemonMoveImpl.toTitleCase(pokemonMoveName)
+    }
+
+    private static toTitleCase(str: string) {
+        return str
+            .toLowerCase()
+            .split(' ')
+            .map((word) => (word.charAt(0).toUpperCase() + word.slice(1)))
+            .join(' ')
     }
 
 }
