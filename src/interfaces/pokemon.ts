@@ -36,16 +36,16 @@ export interface PokemonMove {
             name: string
         }
     ]
-    accuracy: number
+    accuracy?: number
     damage_class: {
         name: string
     }
-    power: number
+    power?: number
     pp: number
     type: {
         name: string
     }
-    meta: {
+    meta?: {
         crit_rate: number
         flinch_chance: number
         ailment: {
@@ -53,6 +53,20 @@ export interface PokemonMove {
         }
         ailment_chance: number
     }
+    effect_entries: [
+        {
+            effect: string,
+            short_effect: string
+        }
+    ],
+    flavor_text_entries: [
+        {
+            flavor_text: string,
+            language: {
+                name: string
+            }
+        }
+    ]
     priority: number
 }
 
