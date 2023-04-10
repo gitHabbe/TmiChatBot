@@ -1,3 +1,5 @@
+import * as cheerio from 'cheerio';
+
 import { ICommandUser } from "../../../interfaces/Command"
 import { ModuleFamily } from "../../../interfaces/tmi"
 import { PokemonAPI } from "../../fetch/PokemonAPI"
@@ -5,6 +7,7 @@ import { MessageData } from "../../tmi/MessageData"
 import { MessageParser } from "../../tmi/MessageParse"
 import { PokemonMove } from "../../../interfaces/pokemon"
 import { JoinedUser } from "../../../interfaces/prisma"
+import { Cheerio, Element } from "cheerio"
 
 export class PokemonMoveImpl implements ICommandUser {
     public moduleFamily: ModuleFamily = ModuleFamily.POKEMON
@@ -21,13 +24,28 @@ export class PokemonMoveImpl implements ICommandUser {
         const pokemonMoveName = messageParser.getPokemonMove(message, 1).toLowerCase()
         const pokemonMove: PokemonMove = await this.pokeAPI.fetchMove(pokemonMoveName)
 
-        this.messageData.response = this.formatMoveResponse(pokemonMove)
+        this.messageData.response = await this.formatMoveResponse(pokemonMove)
         return this.messageData
     }
 
-    private formatMoveResponse(pokemonMove: PokemonMove) {
+    private async getBulbapediaDescription(moveName2: string) {
+        const moveName = moveName2.split(" ").map(word => PokemonMoveImpl.toTitleCase(word)).join("_")
+        const newVar = await this.pokeAPI.fetchBulbapedia(moveName)
+        const html = cheerio.load(newVar)
+        let res;
+        html("th").each((i, el) => {
+            const elemText = html(el).text().toLowerCase()
+            if (elemText === "description\n") {
+                res = html(el).parent().parent().last().find("td").last().text()
+            }
+        })
+        return res
+    }
+
+    private async formatMoveResponse(pokemonMove: PokemonMove) {
         const { pp, names, accuracy, name, power, meta, type, effect_entries, flavor_text_entries } = pokemonMove
-        this.response = this.getName(names, name)
+        let moveName = this.getName(names, name)
+        this.response = moveName
         const damageCategory = pokemonMove.damage_class.name === "special" ? "SP" : "PHY"
         this.response += ` [${PokemonMoveImpl.toTitleCase(type.name)}][${damageCategory}] |`
         this.addStat(power, "PWR")
@@ -43,7 +61,7 @@ export class PokemonMoveImpl implements ICommandUser {
             }
             ailmentExplained = effect_entries[0].short_effect.toLowerCase().includes(ailment.name.toLowerCase()) && power !== null
         }
-        if (effect_entries[0]) {
+        if (effect_entries.length > 0) {
             const isConfuse = meta?.ailment.name.toLowerCase() === "confusion" && effect_entries[0].short_effect.toLowerCase().includes("confuse")
             const noEffect = effect_entries[0].short_effect.toLowerCase().includes("no additional effect")
             if (!(ailmentExplained || noEffect || isConfuse)) {
@@ -56,7 +74,8 @@ export class PokemonMoveImpl implements ICommandUser {
                 this.response += ` | ${filteredFlavorText}`
             }
         } else {
-            this.response += ` | No additional effect`
+            const bulbapediaDescription = await this.getBulbapediaDescription(moveName)
+            this.response += ` | ${bulbapediaDescription}`
         }
 
         return this.response
@@ -71,7 +90,7 @@ export class PokemonMoveImpl implements ICommandUser {
         return PokemonMoveImpl.toTitleCase(pokemonMoveName)
     }
 
-    private static toTitleCase(str: string) {
+    static toTitleCase(str: string) {
         return str
             .toLowerCase()
             .split(' ')
