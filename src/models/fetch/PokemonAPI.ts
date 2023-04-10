@@ -3,6 +3,8 @@ import { pokemonAPI } from "../../config/pokemonConfig"
 import { IPokemon, PokemonItem, PokemonMove } from "../../interfaces/pokemon"
 import { ChatError } from "../error/ChatError"
 import { JsonFile } from "../JsonArrayFile"
+import { bulbapediaAPI } from "../../config/bulbapedia"
+import { PokemonMoveImpl } from "../commands/pokemon/PokemonMoveImpl"
 
 
 class JsonMachines {
@@ -56,5 +58,14 @@ export class PokemonAPI {
             }
         }
         throw new ChatError(`Machine ${machine} not found.`)
+    }
+
+    async fetchBulbapedia(moveName: string) {
+        try {
+            const axiosResponse = await bulbapediaAPI.get(`wiki/${moveName}_(move)`)
+            return axiosResponse.data
+        } catch (e) {
+            throw new Error(`Bulbapedia ${moveName} not found.`)
+        }
     }
 }
