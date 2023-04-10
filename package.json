@@ -46,6 +46,7 @@
   "dependencies": {
     "@prisma/client": "^2.27.0",
     "axios": "^0.21.1",
+    "cheerio": "^1.0.0-rc.12",
     "fuse.js": "^6.4.6",
     "tmi.js": "^1.8.3"
   },
