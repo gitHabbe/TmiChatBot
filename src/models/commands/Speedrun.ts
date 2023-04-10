@@ -1,16 +1,73 @@
-import { Runner } from ".prisma/client";
-import { ITimeTrialJson, ITrack } from "../../interfaces/specificGames";
-import { ILeaderboardResponse, } from "../../interfaces/speedrun";
-import { datesDaysDifference, floatToHHMMSS } from "../../utility/dateFormat";
-import { fuseSearch } from "../../utility/fusejs";
-import { RunnerPrisma } from "../database/RunnerPrisma";
-import { JsonTimeTrials } from "../JsonArrayFile";
-import { ICommand } from "../../interfaces/Command";
-import { ParseMessage } from "../../utility/ParseMessage";
-import { MessageData } from "../tmi/MessageData";
-import { ModuleFamily } from "../../interfaces/tmi";
-import { DiddyKongRacingLeaderboard } from "../fetch/SpeedrunCom";
-import { DiddyKongRacingTimeTrialLeaderboard } from "../fetch/DKR64";
+import { Runner } from ".prisma/client"
+import { ITimeTrial, ITimeTrialJson, ITimeTrialResponse, ITrack } from "../../interfaces/specificGames"
+import { ILeaderboardResponse, } from "../../interfaces/speedrun"
+import { datesDaysDifference, floatToHHMMSS } from "../../utility/dateFormat"
+import { fuseSearch } from "../../utility/fusejs"
+import { RunnerPrisma } from "../database/RunnerPrisma"
+import { JsonTimeTrials } from "../JsonArrayFile"
+import { ICommand } from "../../interfaces/Command"
+import { ParseMessage } from "../../utility/ParseMessage"
+import { MessageData } from "../tmi/MessageData"
+import { ModuleFamily } from "../../interfaces/tmi"
+import { DiddyKongRacingLeaderboard } from "../fetch/SpeedrunCom"
+import { DiddyKongRacingTimeTrialLeaderboard } from "../fetch/DKR64"
+import { ChatError } from "../error/ChatError"
+
+class TimeTrialFilter {
+    private jsonTimeTrials = new JsonTimeTrials();
+    tracks: ITimeTrialJson[] = this.jsonTimeTrials.data()
+    public laps: string = "3"
+    public isShortcut: boolean = false
+    public vehicle: string = "";
+    public filteredMessage = this.message.split(" ").slice(2)
+
+    constructor(private message: string) {}
+
+    parse() {
+        this.filteredMessage = this.filteredMessage
+            .filter(this.isLapsIncluded())
+            .filter(this.isShortcutIncluded())
+            .filter(this.isVehicleIncluded())
+        if (this.tracks.length === 0) this.tracks = this.jsonTimeTrials.data();
+        if (this.vehicle === "") {
+            this.tracks = this.tracks.filter((track: ITimeTrialJson) => {
+                return track.default
+            })
+        }
+    }
+
+    private isVehicleIncluded() {
+        const vehicles = [ "car", "hover", "plane" ]
+        return (word: string) => {
+            if (vehicles.includes(word.toLowerCase())) {
+                this.vehicle = word
+                this.tracks = this.tracks.filter((track: ITimeTrialJson) => {
+                    return track.vehicle.toLowerCase() === word.toLowerCase()
+                })
+                return false
+            }
+            return true
+        }
+    }
+
+    private isShortcutIncluded() {
+        return (word: string) => {
+            const shortcutKeywords = [ "shortcut", "short", "sc" ]
+            if (shortcutKeywords.includes(word.toLowerCase())) {
+                this.isShortcut = true
+                return false
+            }
+            return true
+        }
+    }
+
+    private isLapsIncluded() {
+        return (word: string) => {
+            if (word === "1") this.laps = "1"
+            return word !== this.laps
+        }
+    }
+}
 
 export class IndividualWorldRecordDiddyKongRacing extends ParseMessage implements ICommand {
     moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN
@@ -40,53 +97,23 @@ export class IndividualWorldRecordDiddyKongRacing extends ParseMessage implement
 export class TimeTrialWorldRecordDiddyKongRacing implements ICommand {
     moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN
 
-    private jsonTimeTrials = new JsonTimeTrials();
-
     constructor(public messageData: MessageData) {}
 
     parseMessage() {
         const { message } = this.messageData;
-        let query = message.split(" ").slice(2);
-        let tracks = this.jsonTimeTrials.data()
-        let laps = "3";
-        let isShortcut = false
-        let vehicle: string;
-        let filteredMessage = message.split(" ").slice(2)
-            .filter((word: string) => {
-                if (parseInt(word) === 1) laps = "1";
-                return parseInt(word) !== 1;
-            })
-            .filter((word: string) => {
-                const shortcutKeywords = [ "shortcut", "short", "sc" ];
-                if (shortcutKeywords.includes(word)) isShortcut = true;
-                return !shortcutKeywords.includes(word);
-            })
-            .filter((word: string) => {
-                const vehicles = [ "CAR", "HOVER", "PLANE" ];
-                if (vehicles.includes(word.toUpperCase())) {
-                    vehicle = word;
-                    tracks = tracks.filter((track: ITimeTrialJson) => {
-                        return track.vehicle.toLowerCase() === vehicle.toLowerCase()
-                    })
-                }
-                return !vehicles.includes(word.toUpperCase());
-            })
-            .filter((word: string) => {
-                return word !== "3";
-            });
-        const trackQuery = filteredMessage.join(" ");
-        console.log("filteredMessage:", filteredMessage)
-        if (tracks.length === 0) tracks = this.jsonTimeTrials.data();
-        // console.log("tracks:", tracks)
-        console.log("trackQuery:", trackQuery)
-
-        return { query: filteredMessage, dkrLevels: tracks, isShortcut, laps };
+        const timeTrialFilter = new TimeTrialFilter(message)
+        timeTrialFilter.parse()
+        return {
+            query: timeTrialFilter.filteredMessage,
+            dkrLevels: timeTrialFilter.tracks,
+            isShortcut: timeTrialFilter.isShortcut,
+            laps: timeTrialFilter.laps
+        }
     };
 
     async run() {
         const { query, dkrLevels, isShortcut, laps } = this.parseMessage();
-        let shortcut = "standard"
-        if (isShortcut) shortcut = "shortcut"
+        const shortcut = isShortcut ? "shortcut" : "standard"
         const [ { item } ] = fuseSearch<ITimeTrialJson>(dkrLevels, query.join(" "));
         const dkrtt = new DiddyKongRacingTimeTrialLeaderboard(item, 3, shortcut);
         const res = await dkrtt.fetchWorldRecord();
@@ -111,81 +138,47 @@ export class TimeTrialWorldRecordDiddyKongRacing implements ICommand {
 
 export class TimeTrialPersonalBestDiddyKongRacing implements ICommand {
     moduleFamily: ModuleFamily = ModuleFamily.SPEEDRUN
-    private jsonTimeTrials = new JsonTimeTrials();
 
     constructor(public messageData: MessageData, private targetUser: string) {}
 
     parseMessage() {
         const { message } = this.messageData;
-        let query = message.split(" ").slice(2);
-        let tracks = this.jsonTimeTrials.data()
-        let laps = "3";
-        let isShortcut = false
-        let vehicle: string;
-        let filteredMessage = message.split(" ").slice(2)
-            .filter((word: string) => {
-                if (parseInt(word) === 1) laps = "1";
-                return parseInt(word) !== 1;
-            })
-            .filter((word: string) => {
-                const shortcutKeywords = [ "shortcut", "short", "sc" ];
-                if (shortcutKeywords.includes(word)) isShortcut = true;
-                return !shortcutKeywords.includes(word);
-            })
-            .filter((word: string) => {
-                const vehicles = [ "CAR", "HOVER", "PLANE" ];
-                if (vehicles.includes(word.toUpperCase())) {
-                    vehicle = word;
-                    tracks = tracks.filter((track: ITimeTrialJson) => {
-                        return track.vehicle.toLowerCase() === vehicle.toLowerCase()
-                    })
-                }
-                return !vehicles.includes(word.toUpperCase());
-            })
-            .filter((word: string) => {
-                return word !== "3";
-            });
-        const trackQuery = filteredMessage.join(" ");
-        console.log("filteredMessage:", filteredMessage)
-        if (tracks.length === 0) tracks = this.jsonTimeTrials.data();
-        // console.log("tracks:", tracks)
-        console.log("trackQuery:", trackQuery)
-
-        return { query: filteredMessage, dkrLevels: tracks, isShortcut, laps };
+        const timeTrialFilter = new TimeTrialFilter(message)
+        timeTrialFilter.parse()
+        return {
+            query: timeTrialFilter.filteredMessage,
+            dkrLevels: timeTrialFilter.tracks,
+            isShortcut: timeTrialFilter.isShortcut,
+            laps: timeTrialFilter.laps
+        }
     };
 
     private static trackNameFormatted = (item: ITimeTrialJson) => {
-        const track = item.name
+        return item.name
             .split("-")
             .map((word) => {
                 return word.charAt(0).toUpperCase() + word.slice(1);
             })
             .join(" ");
-        return track;
     }
 
     async run() {
         const { query, dkrLevels, isShortcut, laps } = this.parseMessage();
-        let shortcut = "standard"
-        if (isShortcut) shortcut = "shortcut"
+        const raceType = isShortcut ? "shortcut" : "standard"
         const [ { item } ] = fuseSearch<ITimeTrialJson>(dkrLevels, query.join(" "));
-        const dkrtt = new DiddyKongRacingTimeTrialLeaderboard(item, parseInt(laps), shortcut);
-        const res = await dkrtt.fetchPersonalBest(this.targetUser);
-        // const res = await worldRecordApi.fetch()
-        const run = res.times.find((run) => {
+        const dkrtt = new DiddyKongRacingTimeTrialLeaderboard(item, parseInt(laps), raceType);
+        const res: ITimeTrialResponse = await dkrtt.fetchPersonalBest(this.targetUser);
+        const run: ITimeTrial | undefined = res.times.find((run) => {
             return run.username.toUpperCase() === this.targetUser.toUpperCase()
         })
-        if (run === undefined) {
-            throw new Error("Runner not found")
-        }
+        if (!run) { throw new ChatError("Run not found") }
         const track = TimeTrialPersonalBestDiddyKongRacing.trackNameFormatted(item);
         const formalVehicle = item.vehicle.charAt(0).toUpperCase() + item.vehicle.slice(1);
-        const time = run.time;
-        const runDate = run.tstamp;
-        const placement = `#${run.ranking}`
-        const shortcutPrint = shortcut === "shortcut" ? "[Shortcut]" : "";
-        const daysAgo = datesDaysDifference(runDate)
-        this.messageData.response = `${run.username}'s ${track} [${placement}][${formalVehicle}][${laps}-lap]${shortcutPrint} PB: ${time} - ${daysAgo} days ago`;
+        const { time, ranking, tstamp, username } = run
+        const placement = `#${ranking}`
+        const shortcutPrint = raceType === "shortcut" ? "[Shortcut]" : "";
+        const daysAgo = datesDaysDifference(tstamp)
+        this.messageData.response = `${username}'s ${track} [${placement}][${formalVehicle}][${laps}-lap]${shortcutPrint} PB: ${time} - ${daysAgo} days ago`;
 
         return this.messageData;
     }
