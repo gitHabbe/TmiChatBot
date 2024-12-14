@@ -5,6 +5,7 @@ import { PokemonMachine } from "../src/models/commands/pokemon/PokemonHM"
 import { pokemonItemMock, pokemonMoveMock } from "./__mocks__/pokemonMock"
 import { messageDataMock } from "./__mocks__/tmiMock"
 import { joinedUserMock } from "./__mocks__/prismaMock"
+import { MessageData } from "../src/models/tmi/MessageData"
 
 describe("PokemonAPI module", () => {
 
@@ -14,9 +15,10 @@ describe("PokemonAPI module", () => {
             jest.spyOn(mockedPokemonAPI, "fetchMove")
             .mockReturnValue(Promise.resolve(pokemonMoveMock))
         // const pokemonMove = await mockedPokemonAPI.fetchMove("ember")
-        const pokemonMove1 = new PokemonMoveImpl(messageDataMock, joinedUserMock, mockedPokemonAPI)
+        const messageDataMock2 = new MessageData("habbe", {}, "!pokemonmove ember")
+        const pokemonMove1 = new PokemonMoveImpl(messageDataMock2, joinedUserMock, mockedPokemonAPI)
         const res = await pokemonMove1.run()
-        const exp = "Ember [Fire] | PWR:40 PP:25 ACC:100 | Proc: Burn(10%)"
+        const exp = "Ember [Fire][SP] | PWR:40 PP:25 ACC:100 | Burn[10%]"
         expect(res.response).toBe(exp)
         spy.mockRestore()
     })

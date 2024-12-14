@@ -21,6 +21,20 @@ export const pokemonItemMock: PokemonItem = {
     ]
 }
 export const pokemonMoveMock: PokemonMove = {
+    effect_entries: [
+      {
+          effect: "Inflicts regular damage.  Has a $effect_chance% chance to burn the target.",
+          short_effect: "Has a $effect_chance% chance to burn the target."
+      }
+    ],
+    flavor_text_entries: [
+      {
+          flavor_text: "An attack that may\ninflict a burn.",
+          language: {
+              name: "en"
+          }
+      }
+    ],
     id: 52,
     name: "ember",
     names: [

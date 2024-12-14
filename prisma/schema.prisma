@@ -16,17 +16,17 @@ model Game {
   international String
   twitch        String
 
-  platforms  GamePlatform[]
-  links      GameLink[]
-  categories Category[]
+  platforms   GamePlatform[]
+  links       GameLink[]
+  categories  Category[]
 }
 
 model GamePlatform {
-  id         Int    @id @default(autoincrement())
-  platformId String
+  id          Int    @id @default(autoincrement())
+  platformId  String
 
-  gameId String
-  game   Game   @relation(fields: [gameId], references: [id])
+  gameId  String
+  game    Game @relation(fields: [gameId], references: [id])
 }
 
 model GameLink {
@@ -34,17 +34,17 @@ model GameLink {
   rel String
   uri String
 
-  gameId String
-  game   Game   @relation(fields: [gameId], references: [id])
+  gameId  String
+  game    Game @relation(fields: [gameId], references: [id])
 }
 
 model Category {
-  id    String         @id
+  id    String @id
   name  String
   links CategoryLink[]
 
-  gameId String
-  game   Game   @relation(fields: [gameId], references: [id])
+  gameId  String
+  game    Game @relation(fields: [gameId], references: [id])
 }
 
 model CategoryLink {
@@ -52,26 +52,26 @@ model CategoryLink {
   rel String
   uri String
 
-  categoryId String
-  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
 }
 
 model Runner {
-  id   String @id
-  name String @unique
+  id    String @id
+  name  String @unique
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  name      String   @unique
+  id        Int          @id @default(autoincrement())
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  name      String       @unique
 
-  commands   Command[]
-  settings   Setting[]
-  timestamps Timestamp[]
-  components Component[]
-  trusts     Trust[]
+  commands    Command[]
+  settings    Setting[]
+  timestamps  Timestamp[]
+  components  Component[]
+  trusts      Trust[]
 }
 
 model Command {
@@ -82,8 +82,8 @@ model Command {
   content   String
   madeBy    String
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  user    User @relation(fields: [userId], references: [id])
+  userId  Int
 }
 
 model Timestamp {
@@ -105,8 +105,8 @@ model Component {
   name      String
   enabled   Boolean
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  user    User @relation(fields: [userId], references: [id])
+  userId  Int
 }
 
 model Trust {
@@ -115,8 +115,8 @@ model Trust {
   name      String
   madeBy    String
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  user    User @relation(fields: [userId], references: [id])
+  userId  Int
 }
 
 model Setting {
@@ -125,6 +125,6 @@ model Setting {
   type      String
   value     String
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  user    User @relation(fields: [userId], references: [id])
+  userId  Int
 }

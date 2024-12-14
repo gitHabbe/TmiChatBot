@@ -49,7 +49,8 @@ export class TwitterLink implements Link {
     try {
       const { data } = await twitterAPI.get<ITwitterTweetResponse>(query)
       return data;
-    } catch {
+    } catch (error) {
+      console.error("error", error)
       throw new Error("Error getting tweet info")
     }
   };

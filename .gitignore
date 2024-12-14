@@ -13,3 +13,5 @@ src/prisma/migrations
 .env
 .env.test
 .env.production
+bun.lockb
+.cz.toml

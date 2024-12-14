@@ -1,4 +1,8 @@
 import { TmiChatBot } from "./models/TmiChatBot";
 
-const tmiChatBot = new TmiChatBot();
-tmiChatBot.connect()
+try {
+  const tmiChatBot = new TmiChatBot()
+  tmiChatBot.connect()
+} catch (error) {
+  console.log("Error connecting bot...")
+}
